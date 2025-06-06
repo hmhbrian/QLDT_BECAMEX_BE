@@ -1,0 +1,121 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|d:\\workspaces\\projects\\ttdn\\backend\\qldt_becamex\\qldt_becamex\\src\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\src\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|d:\\workspaces\\projects\\ttdn\\backend\\qldt_becamex\\qldt_becamex\\src\\services\\implementations\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\src\\services\\implementations\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|d:\\workspaces\\projects\\ttdn\\backend\\qldt_becamex\\qldt_becamex\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|d:\\workspaces\\projects\\ttdn\\backend\\qldt_becamex\\qldt_becamex\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|d:\\workspaces\\projects\\ttdn\\backend\\qldt_becamex\\qldt_becamex\\src\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\src\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|d:\\workspaces\\projects\\ttdn\\backend\\qldt_becamex\\qldt_becamex\\src\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\src\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserDto.cs",
+              "DocumentMoniker": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Dtos\\UserDto.cs",
+              "RelativeDocumentMoniker": "QLDT_Becamex\\Src\\Dtos\\UserDto.cs",
+              "ToolTip": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Dtos\\UserDto.cs",
+              "RelativeToolTip": "QLDT_Becamex\\Src\\Dtos\\UserDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-06T01:42:59.301Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Models\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "QLDT_Becamex\\Src\\Models\\ApplicationUser.cs",
+              "ToolTip": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Models\\ApplicationUser.cs",
+              "RelativeToolTip": "QLDT_Becamex\\Src\\Models\\ApplicationUser.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwAkAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-06T01:42:13.447Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Program.cs",
+              "RelativeDocumentMoniker": "QLDT_Becamex\\Program.cs",
+              "ToolTip": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Program.cs",
+              "RelativeToolTip": "QLDT_Becamex\\Program.cs",
+              "ViewState": "AgIAADkAAAAAAAAAAAAqwE4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T09:11:17.664Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\appsettings.json",
+              "RelativeDocumentMoniker": "QLDT_Becamex\\appsettings.json",
+              "ToolTip": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\appsettings.json",
+              "RelativeToolTip": "QLDT_Becamex\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-06-05T09:10:15.42Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "JwtService.cs",
+              "DocumentMoniker": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Services\\Implementations\\JwtService.cs",
+              "RelativeDocumentMoniker": "QLDT_Becamex\\Src\\Services\\Implementations\\JwtService.cs",
+              "ToolTip": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Services\\Implementations\\JwtService.cs",
+              "RelativeToolTip": "QLDT_Becamex\\Src\\Services\\Implementations\\JwtService.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABAAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T09:05:55.923Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
+              "RelativeDocumentMoniker": "QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
+              "ToolTip": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
+              "RelativeToolTip": "QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-05T09:02:39.457Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

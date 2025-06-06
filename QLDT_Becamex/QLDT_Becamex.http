@@ -1,0 +1,6 @@
+@QLDT_Becamex_HostAddress = http://localhost:5228
+
+GET {{QLDT_Becamex_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

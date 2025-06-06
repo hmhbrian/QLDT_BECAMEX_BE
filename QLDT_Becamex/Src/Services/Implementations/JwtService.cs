@@ -9,26 +9,28 @@ namespace QLDT_Becamex.Src.Services.Implementations
 {
     public class JwtService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+
         private readonly IConfiguration _configuration;
 
-        public JwtService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public JwtService(IConfiguration configuration)
         {
-            _userManager = userManager;
+
             _configuration = configuration;
         }
 
-        public async Task<string> GenerateJwtToken(ApplicationUser user)
+        public string GenerateJwtToken(string id, string email, string role)
         {
             var claims = new List<Claim>
         {
-          new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+          new Claim(JwtRegisteredClaimNames.Sub, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new Claim(ClaimTypes.NameIdentifier, id)
         };
 
-            var roles = await _userManager.GetRolesAsync(user);
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            if (!string.IsNullOrEmpty(role))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

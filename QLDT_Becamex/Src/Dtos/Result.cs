@@ -23,8 +23,8 @@ namespace QLDT_Becamex.Src.Dtos
             {
                 IsSuccess = true,
                 Message = message,
-                StatusCode = statusCode,
-                Code = code
+                Code = code,
+                StatusCode = statusCode
             };
         }
 
@@ -61,10 +61,10 @@ namespace QLDT_Becamex.Src.Dtos
             return new Result<T>
             {
                 IsSuccess = true,
-                Data = data,
                 Message = message,
+                Code = code,
                 StatusCode = statusCode,
-                Code = code
+                Data = data,
             };
         }
 

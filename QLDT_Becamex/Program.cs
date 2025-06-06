@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Config;
+using QLDT_Becamex.Src.Mappings;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Repostitories.Implementations;
 using QLDT_Becamex.Src.Repostitories.Interfaces;
@@ -75,7 +76,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 //
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<JwtService>();
-
+//AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 
 builder.Services.AddControllers();

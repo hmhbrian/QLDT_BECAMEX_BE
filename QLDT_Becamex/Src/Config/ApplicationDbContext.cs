@@ -12,6 +12,9 @@ namespace QLDT_Becamex.Src.Config
             : base(options)
         {
         }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Position> Positions { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

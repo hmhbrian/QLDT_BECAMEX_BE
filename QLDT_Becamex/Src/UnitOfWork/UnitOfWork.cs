@@ -8,10 +8,12 @@ namespace QLDT_Becamex.Src.UnitOfWork
     {
         private readonly ApplicationDbContext _dbContext;
         public IUserRepository UserRepository { get; }
+        public IDepartmentRepository DepartmentRepository { get; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
             UserRepository = new UserRepository(dbContext);
+            DepartmentRepository = new DepartmentRepository(dbContext);
         }
         public async Task<int> CompleteAsync()
         {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Config;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Config;
 namespace QLDT_Becamex.Src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610083817_AddFluentAPIToDatabseDBContext")]
+    partial class AddFluentAPIToDatabseDBContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,9 +166,6 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -187,12 +187,10 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FullName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IdCard")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -201,7 +199,7 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ManagerId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifedAt")
                         .HasColumnType("datetime2");
@@ -233,15 +231,13 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UrlAvatar")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -250,8 +246,6 @@ namespace QLDT_Becamex.Src.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
-
-                    b.HasIndex("ManagerId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -272,13 +266,10 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DepartmentName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ParentId")
                         .HasColumnType("nvarchar(450)");
@@ -296,13 +287,10 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PositionName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PositionId");
 
@@ -364,18 +352,11 @@ namespace QLDT_Becamex.Src.Migrations
                 {
                     b.HasOne("QLDT_Becamex.Src.Models.Department", "Department")
                         .WithMany("Users")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("DepartmentId");
 
                     b.HasOne("QLDT_Becamex.Src.Models.Position", "Position")
                         .WithMany("Users")
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("PositionId");
 
                     b.Navigation("Department");
 
@@ -386,8 +367,7 @@ namespace QLDT_Becamex.Src.Migrations
                 {
                     b.HasOne("QLDT_Becamex.Src.Models.Department", "Parent")
                         .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ParentId");
 
                     b.Navigation("Parent");
                 });

@@ -1,0 +1,30 @@
+﻿# Bỏ qua các thư mục build tạm thời
+bin/
+obj/
+out/
+
+# Bỏ qua các file config máy cục bộ
+*.user
+*.vspscc
+*.vssscc
+
+# Visual Studio
+.vscode/
+.vs/
+
+# Git
+.git/
+.gitignore
+
+# Dockerfile backup hoặc log
+Dockerfile.*
+*.log
+
+# macOS & Linux
+.DS_Store
+*.swp
+*.swo
+
+# Windows
+Thumbs.db
+desktop.ini

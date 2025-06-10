@@ -1,12 +1,10 @@
 ﻿using QLDT_Becamex.Src.Models;
+using QLDT_Becamex.Src.Repostitories.GenericRepository;
 
 namespace QLDT_Becamex.Src.Repostitories.Interfaces
 {
-    public interface IDepartmentRepository
+    public interface IDepartmentRepository : IGenericRepository<Department>
     {
-        Task<Department?> GetByIdAsync(string id);
-        Task<bool> AnyAsync(Func<Department, bool> predicate);
-        Task<List<Department>> GetAllAsync();
-        Task AddAsync(Department entity);
+
     }
 }

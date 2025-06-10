@@ -1,7 +1,7 @@
 ﻿// Src/Dtos/LoginDto.cs
 using System.ComponentModel.DataAnnotations;
 
-namespace QLDT_Becamex.Src.Dtos
+namespace QLDT_Becamex.Src.Dtos.Users
 {
     public class LoginDto
     {

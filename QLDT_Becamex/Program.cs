@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using QLDT_Becamex.Src.Config;
 using QLDT_Becamex.Src.Mappings;
 using QLDT_Becamex.Src.Models;
+using QLDT_Becamex.Src.Repostitories.GenericRepository;
 using QLDT_Becamex.Src.Repostitories.Implementations;
 using QLDT_Becamex.Src.Repostitories.Interfaces;
 using QLDT_Becamex.Src.Services.Implementations;
@@ -72,10 +73,11 @@ builder.Services.AddAuthorization();
 // 3. Đăng ký AuthRepository của bạn
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-//
+//Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-//
+
+//Service
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<JwtService>();

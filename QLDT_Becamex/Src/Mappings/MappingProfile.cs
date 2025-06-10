@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using QLDT_Becamex.Src.Dtos;
+using QLDT_Becamex.Src.Dtos.Users;
 using QLDT_Becamex.Src.Models;
 
 namespace QLDT_Becamex.Src.Mappings

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Dtos;
+using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
@@ -18,12 +20,12 @@ namespace QLDT_Becamex.Src.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<Result<DepartmentDto>> CreateDepartmentAsync(CreateDepartmentDto dto)
+        public async Task<Result<DepartmentDto>> CreateDepartmentAsync(DepartmentRq request)
         {
             try
             {
                 // Kiểm tra tên phòng ban đã tồn tại chưa
-                var nameExists = await _unitOfWork.DepartmentRepository.AnyAsync(d => d.DepartmentName == dto.Departmentname);
+                var nameExists = await _unitOfWork.DepartmentRepository.AnyAsync(d => d.DepartmentName == request.DepartmentName);
                 if (nameExists)
                 {
                     return Result<DepartmentDto>.Failure(
@@ -34,16 +36,62 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     );
                 }
 
-                var department = _mapper.Map<Department>(dto);
+                // Kiểm tra và xử lý ParentId
+                string? parentId = request.ParentId?.ToLower() == "null" ? null: request.ParentId;
+                // Mặc định level = 1 nếu không có parent
+                int calculatedLevel = 1;
+                if (parentId != null)
+                {
+                    var parent = await _unitOfWork.DepartmentRepository.GetByIdAsync(parentId);
+                    if(parent != null)
+                        calculatedLevel = parent.level + 1;
+                }
+
+
+                // Kiểm tra ManagerId duy nhất
+                string? managerId = request.ManagerId?.ToLower() == "null" ? null : request.ManagerId;
+                if (!string.IsNullOrEmpty(managerId))
+                {
+                    var existingMag = await _unitOfWork.DepartmentRepository
+                        .AnyAsync(d => d.ManagerId == managerId);
+                    if (existingMag)
+                    {
+                        return Result<DepartmentDto>.Failure(
+                            message: "Tạo phòng ban thất bại",
+                            error: "Manager đã được gán cho một phòng ban khác",
+                            code: "MANAGER_ALREADY_ASSIGNED",
+                            statusCode: StatusCodes.Status400BadRequest
+                        );
+                    }
+                }
+
+                // Ánh xạ dữ liệu
+                var department = _mapper.Map<Department>(request);
+                department.DepartmentId = Guid.NewGuid().ToString();
+                department.ParentId = parentId;
+                department.ManagerId = managerId;
+                department.level = calculatedLevel; // Gán level được tính toán
+                department.CreatedAt = DateTime.Now;
+                department.UpdatedAt = DateTime.Now;
+
                 await _unitOfWork.DepartmentRepository.AddAsync(department);
                 await _unitOfWork.CompleteAsync();
 
                 var resultDto = _mapper.Map<DepartmentDto>(department);
+                resultDto.DepartmentId = department.DepartmentId;
+
                 if (!string.IsNullOrEmpty(department.ParentId))
                 {
                     var parent = await _unitOfWork.DepartmentRepository
                         .GetByIdAsync(department.ParentId);
                     resultDto.ParentName = parent?.DepartmentName;
+                }
+
+                if (!string.IsNullOrEmpty(department.ManagerId))
+                {
+                    var manager = await _unitOfWork.UserRepository
+                        .GetByIdAsync(department.ManagerId);
+                    resultDto.ManagerName = manager?.FullName;
                 }
 
                 return Result<DepartmentDto>.Success(
@@ -62,37 +110,76 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
+
+        public List<string> GetPath(string? departmentId, List<Department> departments)
+        {
+            var path = new List<string>();
+            var currentId = departmentId;
+
+            while (!string.IsNullOrEmpty(currentId))
+            {
+                var currentDept = departments.FirstOrDefault(d => d.DepartmentId == currentId);
+                if (currentDept == null) break;
+
+                path.Insert(0, currentDept.DepartmentCode ?? "Unknown"); // Sử dụng DepartmentName cho Path
+                currentId = currentDept.ParentId; // Tiếp tục với ParentId tiếp theo
+            }
+
+            return path;
+        }
+
         public async Task<Result<List<DepartmentDto>>> GetAllDepartmentsAsync()
         {
             try
             {
                 var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
-                var departmentDtos = new List<DepartmentDto>();
-                foreach (var dept in departments)
+
+
+                var departmentDtos = await Task.WhenAll(departments.Select(async dept =>
                 {
+                    if (string.IsNullOrEmpty(dept.DepartmentId))
+                    {
+                        throw new InvalidOperationException($"DepartmentId is null for department: {dept.DepartmentName}");
+                    }
+
                     var dto = _mapper.Map<DepartmentDto>(dept);
+                    dto.DepartmentId = dept.DepartmentId;
+                    dto.ParentId = dept.ParentId;
+                    dto.ManagerId = dept.ManagerId;
+
                     if (!string.IsNullOrEmpty(dept.ParentId))
                     {
-                        var parent = await _unitOfWork.DepartmentRepository
-                            .GetByIdAsync(dept.ParentId);
+                        var parent = await _unitOfWork.DepartmentRepository.GetByIdAsync(dept.ParentId);
                         dto.ParentName = parent?.DepartmentName;
                     }
-                    departmentDtos.Add(dto);
-                }
+
+                    if (!string.IsNullOrEmpty(dept.ManagerId))
+                    {
+                        var manager = await _unitOfWork.UserRepository.GetByIdAsync(dept.ManagerId);
+                        dto.ManagerName = manager?.UserName;
+                    }
+
+                    dto.Level = dept.level;
+                    dto.Path = GetPath(dept.DepartmentId, departments.ToList()); // Gọi đồng bộ
+                    dto.CreatedAt = dept.CreatedAt ?? DateTime.Now;
+                    dto.UpdatedAt = dept.UpdatedAt ?? DateTime.Now;
+                    return dto;
+                }).ToList());
 
                 return Result<List<DepartmentDto>>.Success(
                     message: "Lấy danh sách phòng ban thành công",
                     code: "DEPARTMENTS_RETRIEVED",
-                    statusCode: 200,
-                    data: departmentDtos
+                    statusCode: StatusCodes.Status200OK,
+                    data: departmentDtos.ToList()
                 );
             }
             catch (Exception ex)
             {
                 return Result<List<DepartmentDto>>.Failure(
-                    error: ex.Message,
+                    message: ex.Message,
+                    error: "Vui lòng thử lại sau",
                     code: "SYSTEM_ERROR",
-                    statusCode: 500
+                    statusCode: StatusCodes.Status500InternalServerError
                 );
             }
         }

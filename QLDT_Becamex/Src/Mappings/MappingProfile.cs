@@ -2,7 +2,7 @@
 
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Dtos;
+using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Dtos.Positions;
 using QLDT_Becamex.Src.Dtos.Roles;
 using QLDT_Becamex.Src.Dtos.Users;
@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Mappings
             //CreateMap<UserDTO, User>().ForMember(dest => dest.Id, opt => opt.Ignore());
 
             //Department
-            CreateMap<CreateDepartmentDto, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == "NULL" ? null : src.ParentId));
+            CreateMap<DepartmentRq, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == "NULL" ? null : src.ParentId));
             CreateMap<Department, DepartmentDto>();
 
             //Position

@@ -13,6 +13,8 @@ namespace QLDT_Becamex.Src.Models // Đảm bảo namespace này khớp với n�
         public DateTime? StartWork { get; set; }
         public DateTime? EndWork { get; set; }
         public string? Status { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
         public string? ManagerId { get; set; } // Khóa ngoại tới ApplicationUser khác (không cần [ForeignKey] nữa)
 
         public string? DepartmentId { get; set; }
@@ -20,6 +22,7 @@ namespace QLDT_Becamex.Src.Models // Đảm bảo namespace này khớp với n�
 
         public string? PositionId { get; set; }
         public Position? Position { get; set; } // Navigation property
+
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifedAt { get; set; }

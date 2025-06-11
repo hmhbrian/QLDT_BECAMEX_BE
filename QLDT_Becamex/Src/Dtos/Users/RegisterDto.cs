@@ -14,14 +14,17 @@ namespace QLDT_Becamex.Src.Dtos.Users
         [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
         public string IdCard { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Role is require")]
-        [StringLength(20, ErrorMessage = "Role cannot exceed 50 characters.")]
-        public string Role { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Code is require")]
+        [MinLength(10, ErrorMessage = "Code must be at least 10 characters.")]
+        [StringLength(50, ErrorMessage = "Code cannot exceed 50 characters.")]
+        public string Code { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "NumberPhone is require")]
-        [MinLength(10, ErrorMessage = "Phone number must be at least 10 characters.")]
-        [StringLength(50, ErrorMessage = "Phone number cannot exceed 50 characters.")]
+        [Required(ErrorMessage = "PositionId is require")]
+        [StringLength(100, ErrorMessage = "PositionId cannot exceed 50 characters.")]
+        public string PositionId { get; set; } = string.Empty;
         public string NumberPhone { get; set; } = string.Empty;
+        public DateTime? StartWork { get; set; }
+        public DateTime? EndWork { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
@@ -30,9 +33,6 @@ namespace QLDT_Becamex.Src.Dtos.Users
              ErrorMessage = "Email must be from @becamex.com domain.")]
         [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
         public string Email { get; set; } = string.Empty;
-
-        public DateTime? StartWork { get; set; }
-        public DateTime? EndWork { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
@@ -45,6 +45,5 @@ namespace QLDT_Becamex.Src.Dtos.Users
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
-        // Tùy chọn: dùng cho chức năng "Remember me" nếu bạn muốn duy trì phiên đăng nhập lâu hơn
     }
 }

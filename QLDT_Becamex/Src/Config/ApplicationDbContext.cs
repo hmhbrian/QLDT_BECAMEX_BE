@@ -108,17 +108,15 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.PositionId);
-                // Tương tự DepartmentId, nếu muốn GUID tự động tạo:
-                // entity.Property(p => p.PositionId).ValueGeneratedOnAdd();
 
-                // Cấu hình thuộc tính PositionName
+                entity.HasOne(p => p.Role)
+                      .WithMany()
+                      .HasForeignKey(p => p.RoleId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
                 entity.Property(p => p.PositionName)
                       .IsRequired()               // Bắt buộc phải có giá trị
-                      .HasMaxLength(255);         // Giới hạn độ dài
-
-                // Cấu hình thuộc tính Description nếu có
-                entity.Property(p => p.Description)
-                      .HasMaxLength(1000); // Giới hạn độ dài cho Description
+                      .HasMaxLength(255);         // Giới hạn độ 
             });
         }
     }

@@ -24,6 +24,10 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
             return await _dbContext.Set<T>().FindAsync(id);
         }
 
+        public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().Where(predicate).FirstOrDefaultAsync();
+        }
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
 

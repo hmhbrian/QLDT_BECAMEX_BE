@@ -87,7 +87,6 @@ namespace QLDT_Becamex.Src.Dtos
             return Failure(new List<string> { error }, message, code, statusCode);
         }
     }
-
 }
 
 

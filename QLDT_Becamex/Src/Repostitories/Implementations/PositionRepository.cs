@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using QLDT_Becamex.Src.Config;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Repostitories.GenericRepository;
@@ -6,12 +6,13 @@ using QLDT_Becamex.Src.Repostitories.Interfaces;
 
 namespace QLDT_Becamex.Src.Repostitories.Implementations
 {
-    public class DepartmentRepository : GenericRepository<Department>, IDepartmentRepository
+    public class PositionRepository : GenericRepository<Position>, IPositionRepostiory
     {
 
-        public DepartmentRepository(ApplicationDbContext dbContext) : base(dbContext)
+        public PositionRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
 
         }
+
     }
 }

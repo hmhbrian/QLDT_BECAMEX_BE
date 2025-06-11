@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Config;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Config;
 namespace QLDT_Becamex.Src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610170722_RemoveFiledIsDescriptionToPosition")]
+    partial class RemoveFiledIsDescriptionToPosition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -303,12 +306,7 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("PositionId");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("Positions");
                 });
@@ -394,16 +392,6 @@ namespace QLDT_Becamex.Src.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Models.Position", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>

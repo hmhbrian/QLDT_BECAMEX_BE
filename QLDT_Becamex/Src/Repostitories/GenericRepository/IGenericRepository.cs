@@ -10,6 +10,8 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
         // Lấy thực thể theo ID
         public Task<T?> GetByIdAsync(string id); // Sử dụng string cho ID nếu các model của bạn dùng string ID
 
+        public Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+
         // Tìm kiếm các thực thể dựa trên một điều kiện
         public Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
 

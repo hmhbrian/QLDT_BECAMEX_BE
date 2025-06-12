@@ -9,22 +9,22 @@ namespace QLDT_Becamex.Src.Dtos.Users
         [StringLength(50, ErrorMessage = "FullName cannot exceed 50 characters.")]
         public string FullName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "IdCard is require")]
-        [MinLength(10, ErrorMessage = "IdCard must be at least 10 characters.")]
+
         [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
-        public string IdCard { get; set; } = string.Empty;
+        public string? IdCard { get; set; } = null;
 
-        [Required(ErrorMessage = "Code is require")]
-        [MinLength(10, ErrorMessage = "Code must be at least 10 characters.")]
-        [StringLength(50, ErrorMessage = "Code cannot exceed 50 characters.")]
-        public string Code { get; set; } = string.Empty;
+        [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
+        public string? Code { get; set; } = null;
 
-        [Required(ErrorMessage = "PositionId is require")]
-        [StringLength(100, ErrorMessage = "PositionId cannot exceed 50 characters.")]
-        public string PositionId { get; set; } = string.Empty;
-        public string NumberPhone { get; set; } = string.Empty;
-        public DateTime? StartWork { get; set; }
-        public DateTime? EndWork { get; set; }
+        [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
+        public string? PositionId { get; set; } = null;
+
+        [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
+        public string? RoleId { get; set; } = null;
+
+        [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
+        public string? NumberPhone { get; set; } = null;
+        public DateTime? StartWork { get; set; } = DateTime.Now;
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]

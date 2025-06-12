@@ -15,7 +15,8 @@ namespace QLDT_Becamex.Src.Models // Đảm bảo namespace này khớp với n�
         public string? Status { get; set; }
 
         public bool IsDeleted { get; set; } = false;
-        public string? ManagerId { get; set; } // Khóa ngoại tới ApplicationUser khác (không cần [ForeignKey] nữa)
+
+        //public string? ManagerId { get; set; } // Khóa ngoại tới ApplicationUser khác (không cần [ForeignKey] nữa)
 
         public string? DepartmentId { get; set; }
         public Department? Department { get; set; } // Navigation property

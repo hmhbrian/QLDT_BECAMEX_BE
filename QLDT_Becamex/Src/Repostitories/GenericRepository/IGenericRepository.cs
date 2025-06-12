@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using QLDT_Becamex.Src.Dtos.Params;
+using QLDT_Becamex.Src.Dtos.Results;
+using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Repostitories.GenericRepository
 {
@@ -30,6 +32,18 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
         // Xóa nhiều thực thể
         public void RemoveRange(IEnumerable<T> entities);
 
+        //Custom thêm
         public Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+
+        public Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
+
+        //Get all linh hoạt 
+
+        public Task<IEnumerable<T>> GetFlexibleAsync(Expression<Func<T, bool>>? predicate = null,
+             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+             int? page = null,
+             int? pageSize = null,
+             bool asNoTracking = false,
+             params Expression<Func<T, object>>[] includes);
     }
 }

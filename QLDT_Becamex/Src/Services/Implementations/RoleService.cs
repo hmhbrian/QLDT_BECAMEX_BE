@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using QLDT_Becamex.Src.Dtos.Roles;
-using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Services.Interfaces;
+using QLDT_Becamex.Src.Dtos.Results;
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {

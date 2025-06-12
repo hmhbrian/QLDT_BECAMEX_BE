@@ -1,9 +1,9 @@
 ﻿using QLDT_Becamex.Src.Dtos.Positions;
-using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using AutoMapper;
 using QLDT_Becamex.Src.UnitOfWork;
+using QLDT_Becamex.Src.Dtos.Results;
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {
@@ -57,7 +57,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 // Ghi log lỗi chi tiết tại đây (ví dụ: logger.LogError(ex, "Error creating position.");)
                 // Console.WriteLine($"Error creating position: {ex.Message}"); // Dùng để debug nhanh
                 return Result.Failure(
-                    message: "Tạo vị trí thất bại",
+                    message: ex.Message,
                     error: "Đã xảy ra lỗi hệ thống khi tạo vị trí. Vui lòng thử lại sau.",
                     code: "SYSTEM_ERROR",
                     statusCode: 500
@@ -121,7 +121,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 // Ghi log lỗi chi tiết tại đây
                 // Console.WriteLine($"Error getting all positions: {ex.Message}");
                 return Result<IEnumerable<PositionDto>>.Failure(
-                    message: "Lấy danh sách vị trí thất bại",
+                    message: ex.Message,
                     error: "Đã xảy ra lỗi hệ thống khi lấy danh sách vị trí. Vui lòng thử lại sau.",
                     code: "SYSTEM_ERROR",
                     statusCode: 500
@@ -185,7 +185,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 // Ghi log lỗi chi tiết tại đây
                 // Console.WriteLine($"Error updating position: {ex.Message}");
                 return Result<PositionDto>.Failure(
-                    message: "Cập nhật vị trí thất bại",
+                    message: ex.Message,
                     error: "Đã xảy ra lỗi hệ thống khi cập nhật vị trí. Vui lòng thử lại sau.",
                     code: "SYSTEM_ERROR",
                     statusCode: 500
@@ -224,7 +224,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 // Ghi log lỗi chi tiết tại đây
                 // Console.WriteLine($"Error deleting position: {ex.Message}");
                 return Result.Failure(
-                    message: "Xóa vị trí thất bại",
+                    message: ex.Message,
                     error: "Đã xảy ra lỗi hệ thống khi xóa vị trí. Vui lòng thử lại sau.",
                     code: "SYSTEM_ERROR",
                     statusCode: 500

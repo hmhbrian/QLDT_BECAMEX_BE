@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using QLDT_Becamex.Src.Dtos;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using QLDT_Becamex.Src.Dtos.Results;
 using QLDT_Becamex.Src.Dtos.Users;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Services.Interfaces;
@@ -14,16 +15,18 @@ namespace QLDT_Becamex.Controllers
         private readonly JwtService _jwtService;
 
 
+
         public AccountController(IUserService userService, JwtService jwtService)
         {
             _userService = userService;
             _jwtService = jwtService;
 
-     
+
         }
 
 
         [HttpPost("register")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             if (!ModelState.IsValid)

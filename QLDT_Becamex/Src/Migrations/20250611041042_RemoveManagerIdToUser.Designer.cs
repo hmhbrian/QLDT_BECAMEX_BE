@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Config;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Config;
 namespace QLDT_Becamex.Src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250611041042_RemoveManagerIdToUser")]
+    partial class RemoveManagerIdToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,6 +166,9 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
 
@@ -248,6 +254,8 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("DepartmentId");
 
@@ -356,6 +364,11 @@ namespace QLDT_Becamex.Src.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.ApplicationUser", b =>
                 {
+                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("QLDT_Becamex.Src.Models.Department", "Department")
                         .WithMany("Users")
                         .HasForeignKey("DepartmentId")

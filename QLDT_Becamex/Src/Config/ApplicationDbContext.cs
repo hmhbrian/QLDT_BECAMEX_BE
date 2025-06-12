@@ -62,13 +62,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .IsRequired(false)              // PositionId có thể là NULL (tức là không bắt buộc User phải có vị trí)
                       .OnDelete(DeleteBehavior.SetNull); // Nếu một Position bị xóa, PositionId của các User liên quan sẽ được đặt thành NULL
 
-                // Cấu hình mối quan hệ tự tham chiếu cho ManagerId (Một người quản lý nhiều người)
-                entity.HasOne<ApplicationUser>()      // Một ApplicationUser có thể có một Manager (cũng là ApplicationUser)
-                      .WithMany()                     // Một Manager có thể quản lý nhiều người (không cần navigation property ngược lại cụ thể ở đây)
-                      .HasForeignKey(u => u.ManagerId)
-                      .IsRequired(false)              // ManagerId có thể là NULL (ví dụ: người đứng đầu công ty không có manager)
-                      .OnDelete(DeleteBehavior.Restrict); // NGĂN CHẶN xóa một User nếu họ đang là Manager của User khác.
-                                                          // Điều này giúp bảo vệ dữ liệu khỏi việc xóa nhầm Manager.
+
             });
         }
 
@@ -108,11 +102,6 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.PositionId);
-
-                entity.HasOne(p => p.Role)
-                      .WithMany()
-                      .HasForeignKey(p => p.RoleId)
-                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.Property(p => p.PositionName)
                       .IsRequired()               // Bắt buộc phải có giá trị

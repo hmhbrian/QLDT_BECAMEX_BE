@@ -6,7 +6,6 @@ using Microsoft.OpenApi.Models;
 using QLDT_Becamex.Src.Config;
 using QLDT_Becamex.Src.Mappings;
 using QLDT_Becamex.Src.Models;
-using QLDT_Becamex.Src.Repostitories.GenericRepository;
 using QLDT_Becamex.Src.Repostitories.Implementations;
 using QLDT_Becamex.Src.Repostitories.Interfaces;
 using QLDT_Becamex.Src.Services.Implementations;
@@ -16,46 +15,47 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- Cấu hình Services ---
+// Các dịch vụ được thêm vào container Dependency Injection.
 
-// 1. Cấu hình kết nối CSDL
+// 1. Cấu hình Database Context và Identity
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Thêm Identity Services
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    // Cấu hình các policy về mật khẩu: TẮT HẾT YÊU CẦU PHỨC TẠP
-    options.Password.RequireDigit = false;            // Không yêu cầu chữ số
-    options.Password.RequireLowercase = false;        // Không yêu cầu chữ thường
-    options.Password.RequireUppercase = false;        // Không yêu cầu chữ hoa
-    options.Password.RequireNonAlphanumeric = false;  // Không yêu cầu ký tự đặc biệt
-    options.Password.RequiredLength = 6;              // Vẫn giữ độ dài tối thiểu là 6
-    options.Password.RequiredUniqueChars = 1;         // Vẫn yêu cầu ít nhất 1 ký tự độc đáo (mặc định)
+    // Cấu hình các policy về mật khẩu
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
 
-    // Cấu hình lockout (khóa tài khoản): TẮT TÍNH NĂNG KHÓA TÀI KHOẢN
-    options.Lockout.AllowedForNewUsers = false;       // Không cho phép tài khoản mới bị khóa
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(0); // Thời gian khóa là 0 phút (vô hiệu hóa)
-    options.Lockout.MaxFailedAccessAttempts = int.MaxValue; // Số lần đăng nhập sai tối đa rất lớn (vô hiệu hóa thực tế)
+    // Cấu hình lockout (khóa tài khoản)
+    options.Lockout.AllowedForNewUsers = false;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(0);
+    options.Lockout.MaxFailedAccessAttempts = int.MaxValue;
 
-    // Cấu hình User: GIỮ LẠI YÊU CẦU EMAIL DUY NHẤT
-    options.User.RequireUniqueEmail = true;           // Vẫn yêu cầu email là duy nhất
+    // Cấu hình User
+    options.User.RequireUniqueEmail = true;
 
-    // Cấu hình Signin: TẮT YÊU CẦU XÁC NHẬN EMAIL/TÀI KHOẢN KHI ĐĂNG NHẬP
-    options.SignIn.RequireConfirmedEmail = false;     // Không yêu cầu xác nhận email để đăng nhập
-    options.SignIn.RequireConfirmedAccount = false;   // Không yêu cầu xác nhận tài khoản (bao gồm email/phone)
-    options.SignIn.RequireConfirmedPhoneNumber = false; // Không yêu cầu xác nhận số điện thoại
-
+    // Cấu hình Signin
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
 })
-.AddEntityFrameworkStores<ApplicationDbContext>() // Sử dụng Entity Framework Core để lưu trữ Identity
-.AddDefaultTokenProviders(); // Cần thiết cho việc tạo token (reset mật khẩu, xác nhận email)
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
-
-//JWT
+// 2. Cấu hình Authentication (JWT) và Authorization
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Để trả về 401 Unauthorized thay vì redirect
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+.AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -69,51 +69,87 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
-// 3. Đăng ký AuthRepository của bạn
+builder.Services.AddAuthorization(); // Đăng ký dịch vụ ủy quyền
 
+// 3. Đăng ký HttpContextAccessor (Cần thiết cho UserService lấy thông tin user hiện tại)
+builder.Services.AddHttpContextAccessor(); // <-- Đã thêm
+
+// 4. Đăng ký Unit of Work, Repositories và Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-//Repository
+
+// Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IPositionRepostiory, PositionRepository>();
 
-
-//Service
+// Services
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
-builder.Services.AddScoped<JwtService>();
-//AutoMapper
+builder.Services.AddScoped<JwtService>(); // Dịch vụ JWT
+
+// 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-
+// 6. Cấu hình Controllers và Swagger/OpenAPI
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer(); // Khám phá các endpoint cho Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "QLDT Becamex API", Version = "v1" });
+    // Tùy chọn: Thêm hỗ trợ JWT cho Swagger UI để có thể thử API được bảo vệ
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Nhập 'Bearer ' và token JWT của bạn vào đây (ví dụ: 'Bearer YOUR_TOKEN')",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
 });
+
 var app = builder.Build();
 
+// --- Cấu hình HTTP Request Pipeline (Middleware) ---
+// Thứ tự của các middleware rất quan trọng.
 
-
-
-
-// Configure the HTTP request pipeline.
+// 1. Cấu hình cho môi trường phát triển (Swagger)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+// 2. Middleware chuyển hướng HTTPS (Tùy chọn, hiện đang bị comment)
+// app.UseHttpsRedirection();
 
-app.UseAuthorization();
+// 3. Middleware định tuyến
+app.UseRouting(); // Cần thiết nếu bạn muốn các middleware Authorization/Authentication hoạt động trước khi chọn endpoint
 
+// 4. Middleware Authentication và Authorization
+app.UseAuthentication(); // Xác thực người dùng (đọc token, cookie, v.v.)
+app.UseAuthorization();  // Ủy quyền (kiểm tra quyền truy cập dựa trên [Authorize] attributes)
+
+// 5. Định tuyến các Controller (Map endpoints)
 app.MapControllers();
 
+// 6. Chạy ứng dụng
 app.Run();

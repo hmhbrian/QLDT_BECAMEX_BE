@@ -1,0 +1,26 @@
+# .gitignore for simple .NET projects
+
+# Build artifacts
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.pdb
+
+# Package files
+packages/
+
+# Local database files (if using LocalDB, SQL Server Express, etc.)
+*.mdf
+*.ldf
+
+# Configuration files - IMPORTANT! Do NOT commit sensitive data.
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.user.json
+
+# Kestrel TLS certificate for HTTPS development
+.dotnet/

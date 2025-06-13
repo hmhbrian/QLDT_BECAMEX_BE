@@ -167,7 +167,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 // Tìm IdentityRole bằng RoleId
-                var role = await _roleManager.FindByIdAsync(position.RoleId);
+                var role = await _roleManager.FindByIdAsync(registerDto.RoleId);
                 if (role == null || string.IsNullOrEmpty(role.Name))
                 {
                     return Result.Failure(
@@ -190,7 +190,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     StartWork = registerDto.StartWork,
                     CreatedAt = DateTime.Now,
                     Code = registerDto.Code,
-                    PositionId = finalPositionId, // Sử dụng finalPositionId đã xác định
+                    PositionId = registerDto.PositionId, // Sử dụng finalPositionId đã xác định
                     // DepartmentId và ManagerId (nếu có trong RegisterDto, cần thêm vào)
                 };
 

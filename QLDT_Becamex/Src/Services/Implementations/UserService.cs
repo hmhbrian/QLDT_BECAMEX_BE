@@ -121,7 +121,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 string targetRoleName;  // Tên của vai trò sẽ gán cho người dùng mới
 
                 // 1. Xác định vai trò sẽ gán cho người dùng mới
-                if (registerDto.RoleId != null)
+                if (!string.IsNullOrEmpty(registerDto.RoleId))
                 {
                     // Nếu RoleId được cung cấp trong DTO, sử dụng nó
                     var submittedRole = await _roleManager.FindByIdAsync(registerDto.RoleId);
@@ -151,7 +151,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         );
                     }
                     targetRoleId = hocVienRole.Id;
-                    targetRoleName = hocVienRole.Name ?? "Null";
+                    targetRoleName = hocVienRole.Name;
                 }
 
                 // 2. Xác thực Email đã tồn tại trước khi tạo user
@@ -166,25 +166,18 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     );
                 }
 
-                // 3. Xử lý PositionId (nếu không có thì không cập nhật)
-                int? finalPositionId = null;
-                if (registerDto.PositionId != null)
+                // Tìm IdentityRole bằng RoleId
+                var role = await _roleManager.FindByIdAsync(position.RoleId);
+                if (role == null || string.IsNullOrEmpty(role.Name))
                 {
-                    var position = await _unitOfWork.PositionRepostiory.GetFirstOrDefaultAsync(
-                        p => p.PositionId == registerDto.PositionId);
-
-                    if (position == null)
-                    {
-                        return Result.Failure(
-                            message: "Đăng ký thất bại",
-                            error: "ID vị trí không hợp lệ hoặc không tồn tại.",
-                            code: "INVALID_POSITION_ID",
-                            statusCode: 400
-                        );
-                    }
-                    finalPositionId = registerDto.PositionId.Value; // Gán nếu PositionId hợp lệ
+                    return Result.Failure(
+                        message: "Đăng ký thất bại",
+                        error: "Vai trò liên kết với vị trí không tồn tại hoặc không hợp lệ.",
+                        code: "INVALID_POSITION_ROLE",
+                        statusCode: 400
+                    );
                 }
-                // Nếu registerDto.PositionId là null/rỗng, finalPositionId sẽ vẫn là null.
+                var roleNameFromPosition = role.Name; // Lấy tên vai trò từ đối tượng IdentityRole
 
                 // 4. Tạo user
                 var user = new ApplicationUser

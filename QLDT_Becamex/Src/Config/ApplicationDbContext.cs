@@ -63,7 +63,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .IsRequired(false)              // PositionId có thể là NULL (tức là không bắt buộc User phải có vị trí)
                       .OnDelete(DeleteBehavior.SetNull); // Nếu một Position bị xóa, PositionId của các User liên quan sẽ được đặt thành NULL
 
-                entity.HasOne(u => u.managerU)        // Một User có MỘT quản lý trực tiếp
+                entity.HasOne(u => u.ManagerU)        // Một User có MỘT quản lý trực tiếp
                       .WithMany(p => p.Children)         // Một quản lý qly NHIỀU User
                       .HasForeignKey(u => u.ManagerUId)   // Khóa ngoại là ManagerUId
                       .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
@@ -84,7 +84,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.Property(d => d.DepartmentName)
                       .IsRequired()               // Bắt buộc phải có giá trị (không NULL)
                       .HasMaxLength(255);         // Giới hạn độ dài tối đa 255 ký tự
-                
+
                 entity.Property(d => d.DepartmentCode)
                       .IsRequired()               // Bắt buộc phải có giá trị (không NULL)
                       .HasMaxLength(255);
@@ -97,14 +97,15 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .IsRequired(false)              // ParentId có thể là NULL (cho các phòng ban gốc)
                       .OnDelete(DeleteBehavior.Restrict); // NGĂN CHẶN xóa một Department nếu nó có các Department con.
                                                           // Điều này đảm bảo cấu trúc cây phòng ban không bị phá vỡ.
-                entity.HasOne(d => d.manager)      // Một Department có 1 quản lý
+                entity.HasOne(d => d.Manager)      // Một Department có 1 quản lý
                       .WithOne()  // 1 qly quản lý 1 department
                       .HasForeignKey<Department>(d => d.ManagerId) // Khóa ngoại là ManagerID
                       .IsRequired(false)              // ParentId có thể là NULL (cho các phòng ban gốc)
                       .OnDelete(DeleteBehavior.Restrict);
+
                 entity.Property(d => d.ManagerId).HasColumnName("ManagerId").IsRequired(false);
 
-                entity.Property(d => d.level);
+                entity.Property(d => d.Level);
 
                 // Cấu hình thuộc tính Description
                 entity.Property(d => d.Description)

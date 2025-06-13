@@ -174,4 +174,3 @@ D:\Workspaces\Projects\TTDN\Backend\QLDT_Becamex\QLDT_Becamex\obj\Debug\net8.0\Q
 D:\Workspaces\Projects\TTDN\Backend\QLDT_Becamex\QLDT_Becamex\obj\Debug\net8.0\ref\QLDT_Becamex.dll
 D:\Workspaces\Projects\TTDN\Backend\QLDT_Becamex\QLDT_Becamex\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\Workspaces\Projects\TTDN\Backend\QLDT_Becamex\QLDT_Becamex\bin\Debug\net8.0\AutoMapper.dll
-D:\Workspaces\Projects\TTDN\Backend\QLDT_Becamex\QLDT_Becamex\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

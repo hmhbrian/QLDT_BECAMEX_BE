@@ -9,11 +9,11 @@ namespace QLDT_Becamex.Src.Models
         public int DepartmentId { get; set; } // Khóa chính
         public string? DepartmentName { get; set; }
         public string? DepartmentCode { get; set; }
-        public int level { get; set; }
+        public int Level { get; set; }
         public int? ParentId { get; set; } // Khóa ngoại tự tham chiếu
         public Department? Parent { get; set; } // Navigation property tới Department cha
         public string? ManagerId { get; set; }
-        public ApplicationUser? manager { get; set; }
+        public ApplicationUser? Manager { get; set; }
         public string? Description { get; set; }
         public string? Status { get; set; }
         public DateTime? CreatedAt { get; set; }

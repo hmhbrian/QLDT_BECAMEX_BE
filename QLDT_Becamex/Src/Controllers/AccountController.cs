@@ -26,7 +26,7 @@ namespace QLDT_Becamex.Controllers
 
 
         [HttpPost("register")]
-        [Authorize(Roles = "ADMIN, HR")]
+        //[Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             if (!ModelState.IsValid)

@@ -9,14 +9,14 @@ namespace QLDT_Becamex.Src.Services.Interfaces
         public Task<Result> CreatePositionAsync(PositionRq dto);
 
         // Read
-        public Task<Result<PositionDto>> GetPositionByIdAsync(string id);
+        public Task<Result<PositionDto>> GetPositionByIdAsync(int id);
 
         public Task<Result<IEnumerable<PositionDto>>> GetAllPositionsAsync();
 
         // Update
-        public Task<Result> UpdatePositionAsync(string id, PositionRq dto);
+        public Task<Result> UpdatePositionAsync(int id, PositionRq dto);
 
         // Delete 
-        public Task<Result> DeletePositionAsync(string id);
+        public Task<Result> DeletePositionAsync(int id);
     }
 }

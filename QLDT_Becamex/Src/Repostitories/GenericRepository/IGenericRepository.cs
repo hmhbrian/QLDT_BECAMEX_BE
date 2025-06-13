@@ -10,7 +10,7 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
         public Task<IEnumerable<T>> GetAllAsync();
 
         // Lấy thực thể theo ID
-        public Task<T?> GetByIdAsync(string id); // Sử dụng string cho ID nếu các model của bạn dùng string ID
+        Task<T?> GetByIdAsync(object id); // Có thể dùng string, int khi tìm kiếm theo ID
 
         public Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
 

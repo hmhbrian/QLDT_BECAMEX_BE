@@ -62,6 +62,11 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .IsRequired(false)              // PositionId có thể là NULL (tức là không bắt buộc User phải có vị trí)
                       .OnDelete(DeleteBehavior.SetNull); // Nếu một Position bị xóa, PositionId của các User liên quan sẽ được đặt thành NULL
 
+                entity.HasOne(u => u.managerU)        // Một User có MỘT quản lý trực tiếp
+                      .WithMany(p => p.Children)         // Một quản lý qly NHIỀU User
+                      .HasForeignKey(u => u.ManagerUId)   // Khóa ngoại là ManagerUId
+                      .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
+                      .OnDelete(DeleteBehavior.NoAction);
 
             });
         }
@@ -72,14 +77,16 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(d => d.DepartmentId);
-                // Vì DepartmentId là string, EF Core sẽ không tự động tạo giá trị Identity.
-                // Nếu bạn muốn nó được tạo tự động dưới dạng GUID, bạn có thể thêm:
-                // entity.Property(d => d.DepartmentId).ValueGeneratedOnAdd();
+                entity.Property(d => d.DepartmentId).ValueGeneratedOnAdd();
 
                 // Cấu hình thuộc tính DepartmentName
                 entity.Property(d => d.DepartmentName)
                       .IsRequired()               // Bắt buộc phải có giá trị (không NULL)
                       .HasMaxLength(255);         // Giới hạn độ dài tối đa 255 ký tự
+                
+                entity.Property(d => d.DepartmentCode)
+                      .IsRequired()               // Bắt buộc phải có giá trị (không NULL)
+                      .HasMaxLength(255);
 
                 // Cấu hình mối quan hệ tự tham chiếu (Parent Department -> Children Departments)
                 entity.HasOne(d => d.Parent)      // Một Department có MỘT Parent Department
@@ -89,10 +96,23 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .IsRequired(false)              // ParentId có thể là NULL (cho các phòng ban gốc)
                       .OnDelete(DeleteBehavior.Restrict); // NGĂN CHẶN xóa một Department nếu nó có các Department con.
                                                           // Điều này đảm bảo cấu trúc cây phòng ban không bị phá vỡ.
+                entity.HasOne(d => d.manager)      // Một Department có 1 quản lý
+                      .WithOne()  // 1 qly quản lý 1 department
+                      .HasForeignKey<Department>(d => d.ManagerId) // Khóa ngoại là ManagerID
+                      .IsRequired(false)              // ParentId có thể là NULL (cho các phòng ban gốc)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(d => d.ManagerId).HasColumnName("ManagerId").IsRequired(false);
+
+                entity.Property(d => d.level);
 
                 // Cấu hình thuộc tính Description
                 entity.Property(d => d.Description)
                       .HasMaxLength(1000); // Giới hạn độ dài cho Description
+
+                entity.Property(d => d.Status)
+                      .HasMaxLength(1000);
+                entity.Property(d => d.CreatedAt);
+                entity.Property(d => d.UpdatedAt);
             });
         }
 
@@ -102,6 +122,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.PositionId);
+                entity.Property(p => p.PositionId).ValueGeneratedOnAdd();
 
                 entity.Property(p => p.PositionName)
                       .IsRequired()               // Bắt buộc phải có giá trị

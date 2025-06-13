@@ -39,7 +39,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 Position position = new Position()
                 {
-                    PositionId = Guid.NewGuid().ToString(),
                     PositionName = rq.PositionName,
                 };
 
@@ -66,7 +65,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
         }
 
         // --- READ ---
-        public async Task<Result<PositionDto>> GetPositionByIdAsync(string id)
+        public async Task<Result<PositionDto>> GetPositionByIdAsync(int id)
         {
             try
             {
@@ -130,7 +129,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
         }
 
         // --- UPDATE ---
-        public async Task<Result> UpdatePositionAsync(string id, PositionRq rq)
+        public async Task<Result> UpdatePositionAsync(int id, PositionRq rq)
         {
             try
             {
@@ -193,7 +192,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-        public async Task<Result> DeletePositionAsync(string id)
+        public async Task<Result> DeletePositionAsync(int id)
         {
             try
             {

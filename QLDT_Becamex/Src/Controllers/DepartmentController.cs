@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using QLDT_Becamex.Src.Dtos;
+using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Services.Interfaces;
 
 namespace QLDT_Becamex.Src.Controllers
@@ -17,7 +17,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentDto dto)
+        public async Task<IActionResult> CreateDepartment([FromBody] DepartmentRq dto)
         {
             if (!ModelState.IsValid)
             {

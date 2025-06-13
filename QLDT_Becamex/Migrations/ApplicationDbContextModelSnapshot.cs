@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Config;
 
@@ -12,11 +11,9 @@ using QLDT_Becamex.Src.Config;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250613040401_InitialCreate")]
-    partial class InitialCreate
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,6 +294,9 @@ namespace QLDT_Becamex.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
                     b.Property<string>("ManagerId")
                         .HasColumnType("nvarchar(450)")
                         .HasColumnName("ManagerId");
@@ -310,9 +310,6 @@ namespace QLDT_Becamex.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("level")
-                        .HasColumnType("int");
 
                     b.HasKey("DepartmentId");
 
@@ -401,7 +398,7 @@ namespace QLDT_Becamex.Migrations
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "managerU")
+                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "ManagerU")
                         .WithMany("Children")
                         .HasForeignKey("ManagerUId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -413,14 +410,14 @@ namespace QLDT_Becamex.Migrations
 
                     b.Navigation("Department");
 
-                    b.Navigation("Position");
+                    b.Navigation("ManagerU");
 
-                    b.Navigation("managerU");
+                    b.Navigation("Position");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>
                 {
-                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "manager")
+                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "Manager")
                         .WithOne()
                         .HasForeignKey("QLDT_Becamex.Src.Models.Department", "ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -430,9 +427,9 @@ namespace QLDT_Becamex.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Parent");
+                    b.Navigation("Manager");
 
-                    b.Navigation("manager");
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.ApplicationUser", b =>

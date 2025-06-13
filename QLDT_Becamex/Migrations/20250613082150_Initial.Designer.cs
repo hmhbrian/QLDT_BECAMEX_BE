@@ -9,11 +9,11 @@ using QLDT_Becamex.Src.Config;
 
 #nullable disable
 
-namespace QLDT_Becamex.Src.Migrations
+namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250611041358_RemoveFluentApiManagerIdToUser")]
-    partial class RemoveFluentApiManagerIdToUser
+    [Migration("20250613082150_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,8 +176,8 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -206,6 +206,9 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("ManagerUId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime?>("ModifedAt")
                         .HasColumnType("datetime2");
 
@@ -226,8 +229,8 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PositionId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("PositionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -254,6 +257,8 @@ namespace QLDT_Becamex.Src.Migrations
 
                     b.HasIndex("DepartmentId");
 
+                    b.HasIndex("ManagerUId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -269,8 +274,19 @@ namespace QLDT_Becamex.Src.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>
                 {
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DepartmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DepartmentCode")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("DepartmentName")
                         .IsRequired()
@@ -281,10 +297,28 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("ParentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ManagerId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("ManagerId");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("DepartmentId");
+
+                    b.HasIndex("ManagerId")
+                        .IsUnique()
+                        .HasFilter("[ManagerId] IS NOT NULL");
 
                     b.HasIndex("ParentId");
 
@@ -293,8 +327,11 @@ namespace QLDT_Becamex.Src.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Position", b =>
                 {
-                    b.Property<string>("PositionId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("PositionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PositionId"));
 
                     b.Property<string>("PositionName")
                         .IsRequired()
@@ -364,6 +401,11 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "ManagerU")
+                        .WithMany("Children")
+                        .HasForeignKey("ManagerUId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("QLDT_Becamex.Src.Models.Position", "Position")
                         .WithMany("Users")
                         .HasForeignKey("PositionId")
@@ -371,17 +413,31 @@ namespace QLDT_Becamex.Src.Migrations
 
                     b.Navigation("Department");
 
+                    b.Navigation("ManagerU");
+
                     b.Navigation("Position");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>
                 {
+                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "Manager")
+                        .WithOne()
+                        .HasForeignKey("QLDT_Becamex.Src.Models.Department", "ManagerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("QLDT_Becamex.Src.Models.Department", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("Manager");
+
                     b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>

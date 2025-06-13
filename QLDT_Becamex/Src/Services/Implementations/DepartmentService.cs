@@ -39,14 +39,14 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 // Kiểm tra và xử lý ParentId
-                int? parentId = request.ParentId == 0 ? null: request.ParentId;
+                int? parentId = request.ParentId == 0 ? null : request.ParentId;
                 // Mặc định level = 1 nếu không có parent
                 int calculatedLevel = 1;
                 if (parentId != null)
                 {
                     var parent = await _unitOfWork.DepartmentRepository.GetByIdAsync(parentId);
-                    if(parent != null)
-                        calculatedLevel = parent.level + 1;
+                    if (parent != null)
+                        calculatedLevel = parent.Level + 1;
                 }
 
 
@@ -71,7 +71,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var department = _mapper.Map<Department>(request);
                 department.ParentId = parentId;
                 department.ManagerId = managerId;
-                department.level = calculatedLevel; // Gán level được tính toán
+                department.Level = calculatedLevel; // Gán level được tính toán
                 department.CreatedAt = DateTime.Now;
                 department.UpdatedAt = DateTime.Now;
 
@@ -161,7 +161,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         dto.ManagerName = manager?.FullName;
                     }
 
-                    dto.Level = dept.level;
+                    dto.Level = dept.Level;
                     dto.Path = GetPath(dept.DepartmentId, departments.ToList()); // Gọi đồng bộ
                     dto.CreatedAt = dept.CreatedAt ?? DateTime.Now;
                     dto.UpdatedAt = dept.UpdatedAt ?? DateTime.Now;

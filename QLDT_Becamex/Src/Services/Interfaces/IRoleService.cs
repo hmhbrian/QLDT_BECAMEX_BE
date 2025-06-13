@@ -1,4 +1,4 @@
-﻿using QLDT_Becamex.Src.Dtos;
+﻿using QLDT_Becamex.Src.Dtos.Results;
 using QLDT_Becamex.Src.Dtos.Roles;
 
 namespace QLDT_Becamex.Src.Services.Interfaces

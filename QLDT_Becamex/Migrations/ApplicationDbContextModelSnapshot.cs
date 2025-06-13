@@ -8,7 +8,7 @@ using QLDT_Becamex.Src.Config;
 
 #nullable disable
 
-namespace QLDT_Becamex.Src.Migrations
+namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -173,8 +173,8 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -203,7 +203,7 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("ManagerId")
+                    b.Property<string>("ManagerUId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("ModifedAt")
@@ -226,8 +226,8 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PositionId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("PositionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -254,7 +254,7 @@ namespace QLDT_Becamex.Src.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex("ManagerUId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -271,8 +271,11 @@ namespace QLDT_Becamex.Src.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>
                 {
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DepartmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -292,12 +295,11 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("ManagerId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnName("ManagerId");
 
-                    b.Property<string>("ParentId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .HasMaxLength(1000)
@@ -322,20 +324,18 @@ namespace QLDT_Becamex.Src.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Position", b =>
                 {
-                    b.Property<string>("PositionId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("PositionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PositionId"));
 
                     b.Property<string>("PositionName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("PositionId");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("Positions");
                 });
@@ -398,10 +398,10 @@ namespace QLDT_Becamex.Src.Migrations
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "managerU")
+                        .WithMany("Children")
+                        .HasForeignKey("ManagerUId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("QLDT_Becamex.Src.Models.Position", "Position")
                         .WithMany("Users")
@@ -411,6 +411,8 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("Position");
+
+                    b.Navigation("managerU");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>
@@ -430,14 +432,9 @@ namespace QLDT_Becamex.Src.Migrations
                     b.Navigation("manager");
                 });
 
-            modelBuilder.Entity("QLDT_Becamex.Src.Models.Position", b =>
+            modelBuilder.Entity("QLDT_Becamex.Src.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Role");
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>

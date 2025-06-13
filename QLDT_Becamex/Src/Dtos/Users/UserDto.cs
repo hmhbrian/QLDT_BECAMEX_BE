@@ -1,4 +1,7 @@
-﻿namespace QLDT_Becamex.Src.Dtos.Users
+﻿using QLDT_Becamex.Src.Dtos.Positions;
+using QLDT_Becamex.Src.Models;
+
+namespace QLDT_Becamex.Src.Dtos.Users
 {
     public class UserDto
     {
@@ -10,8 +13,10 @@
         public string? Status { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? ManagerName { get; set; }
         public bool IsDeleted { get; set; } = false;
         public string? Role { get; set; }
+        public PositionDto? Position { get; set; }
         public DateTime? StartWork { get; set; }
         public DateTime? EndWork { get; set; }
         public DateTime? CreatedAt { get; set; }

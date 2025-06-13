@@ -2,9 +2,7 @@
 {
     public class PositionDto
     {
-        public string? PositionId { get; set; } // Khóa chính
+        public int PositionId { get; set; } // Khóa chính
         public string? PositionName { get; set; }
-        public string? RoleId { get; set; }
-
     }
 }

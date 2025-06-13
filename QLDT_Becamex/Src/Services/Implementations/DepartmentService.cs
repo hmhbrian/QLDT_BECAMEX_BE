@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Dtos.Departments;
+using QLDT_Becamex.Src.Dtos.Results;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
@@ -37,7 +39,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 // Kiểm tra và xử lý ParentId
-                string? parentId = request.ParentId?.ToLower() == "null" ? null: request.ParentId;
+                int? parentId = request.ParentId == 0 ? null: request.ParentId;
                 // Mặc định level = 1 nếu không có parent
                 int calculatedLevel = 1;
                 if (parentId != null)
@@ -67,7 +69,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 // Ánh xạ dữ liệu
                 var department = _mapper.Map<Department>(request);
-                department.DepartmentId = Guid.NewGuid().ToString();
                 department.ParentId = parentId;
                 department.ManagerId = managerId;
                 department.level = calculatedLevel; // Gán level được tính toán
@@ -80,7 +81,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var resultDto = _mapper.Map<DepartmentDto>(department);
                 resultDto.DepartmentId = department.DepartmentId;
 
-                if (!string.IsNullOrEmpty(department.ParentId))
+                if (department.ParentId != null)
                 {
                     var parent = await _unitOfWork.DepartmentRepository
                         .GetByIdAsync(department.ParentId);
@@ -111,12 +112,12 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-        public List<string> GetPath(string? departmentId, List<Department> departments)
+        public List<string> GetPath(int? departmentId, List<Department> departments)
         {
             var path = new List<string>();
             var currentId = departmentId;
 
-            while (!string.IsNullOrEmpty(currentId))
+            while (currentId != null)
             {
                 var currentDept = departments.FirstOrDefault(d => d.DepartmentId == currentId);
                 if (currentDept == null) break;
@@ -128,16 +129,17 @@ namespace QLDT_Becamex.Src.Services.Implementations
             return path;
         }
 
+
         public async Task<Result<List<DepartmentDto>>> GetAllDepartmentsAsync()
         {
             try
             {
                 var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
-
+                var users = await _unitOfWork.UserRepository.GetAllAsync();
 
                 var departmentDtos = await Task.WhenAll(departments.Select(async dept =>
                 {
-                    if (string.IsNullOrEmpty(dept.DepartmentId))
+                    if (dept.DepartmentId < 0)
                     {
                         throw new InvalidOperationException($"DepartmentId is null for department: {dept.DepartmentName}");
                     }
@@ -147,16 +149,16 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     dto.ParentId = dept.ParentId;
                     dto.ManagerId = dept.ManagerId;
 
-                    if (!string.IsNullOrEmpty(dept.ParentId))
+                    if (dept.ParentId > 0)
                     {
-                        var parent = await _unitOfWork.DepartmentRepository.GetByIdAsync(dept.ParentId);
+                        var parent = departments.FirstOrDefault(d => d.DepartmentId == dept.ParentId);
                         dto.ParentName = parent?.DepartmentName;
                     }
 
                     if (!string.IsNullOrEmpty(dept.ManagerId))
                     {
-                        var manager = await _unitOfWork.UserRepository.GetByIdAsync(dept.ManagerId);
-                        dto.ManagerName = manager?.UserName;
+                        var manager = users.FirstOrDefault(u => u.Id == dept.ManagerId);
+                        dto.ManagerName = manager?.FullName;
                     }
 
                     dto.Level = dept.level;
@@ -183,5 +185,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
+
     }
 }

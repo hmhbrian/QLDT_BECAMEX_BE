@@ -15,17 +15,19 @@ namespace QLDT_Becamex.Src.Models // Đảm bảo namespace này khớp với n�
         public string? Status { get; set; }
 
         public bool IsDeleted { get; set; } = false;
-        public string? ManagerId { get; set; } // Khóa ngoại tới ApplicationUser khác (không cần [ForeignKey] nữa)
 
-        public string? DepartmentId { get; set; }
+        public string? ManagerUId { get; set; } // Khóa ngoại tới ApplicationUser khác (không cần [ForeignKey] nữa)
+        public ApplicationUser? managerU { get; set; }
+        public int? DepartmentId { get; set; }
         public Department? Department { get; set; } // Navigation property
 
-        public string? PositionId { get; set; }
+        public int? PositionId { get; set; }
         public Position? Position { get; set; } // Navigation property
 
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifedAt { get; set; }
+        public ICollection<ApplicationUser>? Children { get; set; }
 
     }
 

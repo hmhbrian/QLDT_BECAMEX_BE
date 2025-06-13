@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Dtos.Positions;
@@ -53,7 +54,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPositionById(string id)
+        public async Task<IActionResult> GetPositionById(int id)
         {
             var result = await _positionService.GetPositionByIdAsync(id);
 
@@ -105,7 +106,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePosition(string id, [FromBody] PositionRq request)
+        public async Task<IActionResult> UpdatePosition(int id, [FromBody] PositionRq request)
         {
             if (!ModelState.IsValid)
             {
@@ -142,7 +143,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePosition(string id)
+        public async Task<IActionResult> DeletePosition(int id)
         {
             var result = await _positionService.DeletePositionAsync(id);
 

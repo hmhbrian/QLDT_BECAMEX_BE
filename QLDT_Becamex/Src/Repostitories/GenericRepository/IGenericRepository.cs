@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using QLDT_Becamex.Src.Dtos.Params;
+using QLDT_Becamex.Src.Dtos.Results;
+using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Repostitories.GenericRepository
 {
@@ -8,7 +10,7 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
         public Task<IEnumerable<T>> GetAllAsync();
 
         // Lấy thực thể theo ID
-        public Task<T?> GetByIdAsync(string id); // Sử dụng string cho ID nếu các model của bạn dùng string ID
+        Task<T?> GetByIdAsync(object id); // Có thể dùng string, int khi tìm kiếm theo ID
 
         public Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
 
@@ -30,6 +32,18 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
         // Xóa nhiều thực thể
         public void RemoveRange(IEnumerable<T> entities);
 
+        //Custom thêm
         public Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+
+        public Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
+
+        //Get all linh hoạt 
+
+        public Task<IEnumerable<T>> GetFlexibleAsync(Expression<Func<T, bool>>? predicate = null,
+             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+             int? page = null,
+             int? pageSize = null,
+             bool asNoTracking = false,
+             params Expression<Func<T, object>>[] includes);
     }
 }

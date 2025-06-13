@@ -62,13 +62,12 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .IsRequired(false)              // PositionId có thể là NULL (tức là không bắt buộc User phải có vị trí)
                       .OnDelete(DeleteBehavior.SetNull); // Nếu một Position bị xóa, PositionId của các User liên quan sẽ được đặt thành NULL
 
-                // Cấu hình mối quan hệ tự tham chiếu cho ManagerId (Một người quản lý nhiều người)
-                entity.HasOne<ApplicationUser>()      // Một ApplicationUser có thể có một Manager (cũng là ApplicationUser)
-                      .WithMany()                     // Một Manager có thể quản lý nhiều người (không cần navigation property ngược lại cụ thể ở đây)
-                      .HasForeignKey(u => u.ManagerId)
-                      .IsRequired(false)              // ManagerId có thể là NULL (ví dụ: người đứng đầu công ty không có manager)
-                      .OnDelete(DeleteBehavior.Restrict); // NGĂN CHẶN xóa một User nếu họ đang là Manager của User khác.
-                                                          // Điều này giúp bảo vệ dữ liệu khỏi việc xóa nhầm Manager.
+                entity.HasOne(u => u.managerU)        // Một User có MỘT quản lý trực tiếp
+                      .WithMany(p => p.Children)         // Một quản lý qly NHIỀU User
+                      .HasForeignKey(u => u.ManagerUId)   // Khóa ngoại là ManagerUId
+                      .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
+                      .OnDelete(DeleteBehavior.NoAction);
+
             });
         }
 
@@ -78,9 +77,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(d => d.DepartmentId);
-                // Vì DepartmentId là string, EF Core sẽ không tự động tạo giá trị Identity.
-                // Nếu bạn muốn nó được tạo tự động dưới dạng GUID, bạn có thể thêm:
-                // entity.Property(d => d.DepartmentId).ValueGeneratedOnAdd();
+                entity.Property(d => d.DepartmentId).ValueGeneratedOnAdd();
 
                 // Cấu hình thuộc tính DepartmentName
                 entity.Property(d => d.DepartmentName)
@@ -104,7 +101,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .HasForeignKey<Department>(d => d.ManagerId) // Khóa ngoại là ManagerID
                       .IsRequired(false)              // ParentId có thể là NULL (cho các phòng ban gốc)
                       .OnDelete(DeleteBehavior.Restrict);
-                entity.Property(d => d.ManagerId).HasColumnName("ManagerId").HasMaxLength(10).IsRequired(false);
+                entity.Property(d => d.ManagerId).HasColumnName("ManagerId").IsRequired(false);
 
                 entity.Property(d => d.level);
 
@@ -125,11 +122,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.PositionId);
-
-                entity.HasOne(p => p.Role)
-                      .WithMany()
-                      .HasForeignKey(p => p.RoleId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(p => p.PositionId).ValueGeneratedOnAdd();
 
                 entity.Property(p => p.PositionName)
                       .IsRequired()               // Bắt buộc phải có giá trị

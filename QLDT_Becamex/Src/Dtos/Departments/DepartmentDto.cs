@@ -2,11 +2,11 @@
 {
     public class DepartmentDto
     {
-        public string? DepartmentId { get; set; }
+        public int DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
         public string? DepartmentCode { get; set; }
         public string? Description { get; set; }
-        public string? ParentId { get; set; }
+        public int? ParentId { get; set; }
         public string? ParentName { get; set; }
         public string? ManagerId { get; set; }
         public string? ManagerName { get; set; }
@@ -15,5 +15,6 @@
         public List<string>? Path { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public List<DepartmentDto>? Children { get; set; }
     }
 }

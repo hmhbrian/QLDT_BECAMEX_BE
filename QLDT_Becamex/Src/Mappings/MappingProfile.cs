@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Mappings
             //CreateMap<UserDTO, User>().ForMember(dest => dest.Id, opt => opt.Ignore());
 
             //Department
-            CreateMap<DepartmentRq, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == "NULL" ? null : src.ParentId));
+            CreateMap<DepartmentRq, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId));
             CreateMap<Department, DepartmentDto>();
 
             //Position

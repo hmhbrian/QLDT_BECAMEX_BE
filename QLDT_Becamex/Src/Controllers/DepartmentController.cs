@@ -64,6 +64,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet]
+        //[Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetAllDepartments()
         {
             try
@@ -132,6 +133,53 @@ namespace QLDT_Becamex.Src.Controllers
                     Code = "SYSTEM_ERROR",
                     message = "Đã xảy ra lỗi hệ thống.",
                     error = ex.Message,
+                });
+            }
+        }
+
+        [HttpPut("{id}")]
+        //[Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentRq dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Dữ liệu không hợp lệ.",
+                    errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage)
+                });
+            }
+
+            try
+            {
+                var result = await _departmentService.UpdateDepartmentAsync(id, dto);
+                if (result.IsSuccess)
+                {
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code,
+                        data = result.Data
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = "Vui lòng thử lại sau"
                 });
             }
         }

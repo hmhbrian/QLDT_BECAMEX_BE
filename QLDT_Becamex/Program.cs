@@ -88,6 +88,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<JwtService>(); // Dịch vụ JWT
+builder.Services.AddScoped<ICourseService, CourseService>(); // Đăng ký CourseService
 
 // 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -147,6 +148,17 @@ app.UseRouting(); // Cần thiết nếu bạn muốn các middleware Authorizat
 // 4. Middleware Authentication và Authorization
 app.UseAuthentication(); // Xác thực người dùng (đọc token, cookie, v.v.)
 app.UseAuthorization();  // Ủy quyền (kiểm tra quyền truy cập dựa trên [Authorize] attributes)
+
+// Middleware xử lý lỗi toàn cục, trả về thông báo đơn giản
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("{\"message\": \"Có lỗi hệ thống, vui lòng liên hệ quản trị viên.\"}");
+    });
+});
 
 // 5. Định tuyến các Controller (Map endpoints)
 app.MapControllers();

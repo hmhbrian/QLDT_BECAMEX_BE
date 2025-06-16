@@ -15,7 +15,10 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
         public DbSet<Department> Departments { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<Course> Courses { get; set; } // Thêm DbSet cho Course
-        // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
+        public DbSet<CourseDepartment> CourseDepartments { get; set; }
+        public DbSet<CourseLevel> CourseLevels { get; set; }
+        public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
+        public DbSet<CourseTrainee> CourseTrainees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +30,8 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             ConfigureApplicationUser(modelBuilder);
             ConfigureDepartment(modelBuilder);
             ConfigurePosition(modelBuilder);
+            ConfigureCourse(modelBuilder);
+            ConfigureCourseDepartment(modelBuilder);
         }
 
         private void ConfigureApplicationUser(ModelBuilder modelBuilder)
@@ -129,6 +134,88 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.Property(p => p.PositionName)
                       .IsRequired()               // Bắt buộc phải có giá trị
                       .HasMaxLength(255);         // Giới hạn độ 
+            });
+        }
+
+        private void ConfigureCourse(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Course>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                
+                entity.Property(e => e.Title).IsRequired();
+                entity.Property(e => e.CourseCode).IsRequired();
+                entity.Property(e => e.Description).IsRequired();
+                entity.Property(e => e.Objectives).IsRequired();
+                entity.Property(e => e.Category).IsRequired();
+                entity.Property(e => e.LearningType).IsRequired();
+                entity.Property(e => e.Status).IsRequired();
+                entity.Property(e => e.Location).IsRequired();
+                entity.Property(e => e.EnrollmentType).IsRequired();
+                entity.Property(e => e.StartDate).IsRequired();
+                entity.Property(e => e.EndDate).IsRequired();
+                entity.Property(e => e.RegistrationDeadline).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.ModifiedAt).IsRequired();
+                entity.Property(e => e.Instructor).IsRequired();
+            });
+
+            modelBuilder.Entity<CourseLevel>(entity =>
+            {
+                entity.HasKey(e => new { e.CourseId, e.Level });
+
+                entity.HasOne(cl => cl.Course)
+                    .WithMany(c => c.CourseLevels)
+                    .HasForeignKey(cl => cl.CourseId);
+            });
+
+            modelBuilder.Entity<CoursePrerequisite>(entity =>
+            {
+                entity.HasKey(e => new { e.CourseId, e.PrerequisiteId });
+
+                entity.HasOne(cp => cp.Course)
+                    .WithMany(c => c.Prerequisites)
+                    .HasForeignKey(cp => cp.CourseId);
+
+                entity.HasOne(cp => cp.PrerequisiteCourse)
+                    .WithMany()
+                    .HasForeignKey(cp => cp.PrerequisiteId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<CourseTrainee>(entity =>
+            {
+                entity.HasKey(e => new { e.CourseId, e.TraineeId });
+
+                entity.HasOne(ct => ct.Course)
+                    .WithMany(c => c.CourseTrainees)
+                    .HasForeignKey(ct => ct.CourseId);
+
+                entity.HasOne(ct => ct.Trainee)
+                    .WithMany()
+                    .HasForeignKey(ct => ct.TraineeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+
+        private void ConfigureCourseDepartment(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CourseDepartment>(entity =>
+            {
+                // Configure composite primary key
+                entity.HasKey(cd => new { cd.CourseId, cd.DepartmentId });
+
+                // Configure relationship with Course
+                entity.HasOne(cd => cd.Course)
+                    .WithMany(c => c.CourseDepartments)
+                    .HasForeignKey(cd => cd.CourseId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Configure relationship with Department
+                entity.HasOne(cd => cd.Department)
+                    .WithMany(d => d.CourseDepartments)
+                    .HasForeignKey(cd => cd.DepartmentId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

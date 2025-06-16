@@ -3,6 +3,7 @@ using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Dtos.Courses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using QLDT_Becamex.Src.Services.Interfaces; // Correct namespace for ICourseService
 
 namespace QLDT_Becamex.Src.Controllers
 {
@@ -10,40 +11,98 @@ namespace QLDT_Becamex.Src.Controllers
     [Route("api/[controller]")]
     public class CoursesController : ControllerBase
     {
-        // Tạm thời dùng mock data, sau này sẽ inject service/repository
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseDto>>> GetCourses()
+        private readonly ICourseService _courseService;
+        public CoursesController(ICourseService courseService)
         {
-            // TODO: Lấy danh sách courses từ database/service
-            return Ok(new List<CourseDto>()); // Trả về danh sách rỗng mẫu
+            _courseService = courseService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCourses()
+        {
+            try
+            {
+                var result = await _courseService.GetAllCoursesAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseDto>> GetCourse(int id)
+        public async Task<IActionResult> GetCourse(int id)
         {
-            // TODO: Lấy chi tiết course theo id
-            return Ok();
+            try
+            {
+                var result = await _courseService.GetCourseByIdAsync(id);
+                if (result == null)
+                    return NotFound(new { message = "Không tìm thấy khoá học." });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<CourseDto>> CreateCourse([FromBody] CourseDto dto)
+        public async Task<IActionResult> CreateCourse([FromBody] CourseDto dto)
         {
-            // TODO: Thêm mới course
-            return Ok(dto);
+            try
+            {
+                var result = await _courseService.CreateCourseAsync(dto);
+                return CreatedAtAction(nameof(GetCourse), new { id = result.Id }, result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCourse(int id, [FromBody] CourseDto dto)
+        public async Task<IActionResult> UpdateCourse(int id, [FromBody] CourseDto dto)
         {
-            // TODO: Cập nhật course
-            return NoContent();
+            try
+            {
+                var success = await _courseService.UpdateCourseAsync(id, dto);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCourse(int id)
+        public async Task<IActionResult> DeleteCourse(int id)
         {
-            // TODO: Xóa course
-            return NoContent();
+            try
+            {
+                var success = await _courseService.DeleteCourseAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
     }
 }

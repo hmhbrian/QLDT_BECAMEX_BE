@@ -76,17 +76,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateDepartmentDto"
+                "$ref": "#/components/schemas/DepartmentRq"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateDepartmentDto"
+                "$ref": "#/components/schemas/DepartmentRq"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateDepartmentDto"
+                "$ref": "#/components/schemas/DepartmentRq"
               }
             }
           }
@@ -160,7 +160,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -180,7 +181,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -219,7 +221,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -449,25 +452,42 @@
   },
   "components": {
     "schemas": {
-      "CreateDepartmentDto": {
+      "DepartmentRq": {
         "required": [
-          "departmentname"
+          "departmentCode",
+          "departmentName",
+          "status"
         ],
         "type": "object",
         "properties": {
-          "departmentname": {
+          "departmentName": {
             "maxLength": 100,
             "minLength": 0,
             "type": "string"
           },
-          "parentId": {
-            "type": "string",
-            "nullable": true
+          "departmentCode": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
           },
           "description": {
             "maxLength": 500,
             "minLength": 0,
             "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string"
+          },
+          "managerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           }
         },
@@ -563,14 +583,15 @@
             "nullable": true
           },
           "positionId": {
-            "maxLength": 50,
-            "minLength": 0,
-            "type": "string",
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
           "roleId": {
-            "maxLength": 50,
-            "minLength": 0,
+            "type": "string",
+            "nullable": true
+          },
+          "managerId": {
             "type": "string",
             "nullable": true
           },

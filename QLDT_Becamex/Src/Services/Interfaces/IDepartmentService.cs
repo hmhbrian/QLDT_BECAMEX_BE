@@ -9,5 +9,7 @@ namespace QLDT_Becamex.Src.Services.Interfaces
         public Task<Result<DepartmentDto>> CreateDepartmentAsync(DepartmentRq dto);
         public Task<Result<List<DepartmentDto>>> GetAllDepartmentsAsync();
         public Task<Result<DepartmentDto>> GetDepartmentByIdAsync(int id);
+
+        public Task<Result<DepartmentDto>> UpdateDepartmentAsync(int id, DepartmentRq request);
     }
 }

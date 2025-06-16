@@ -325,12 +325,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     page: null,
                     pageSize: null,
                     asNoTracking: false,
-                    includes: new Expression<Func<Department, object>>[]
-                    {
-                        d => d.Parent,
-                        d => d.Manager,
-                        d => d.Children
-                    }
+                     includes: q => q
+                    .Include(d => d.Parent)
+                    .Include(d => d.Manager)
+                    .Include(d => d.Children)
                 );
 
                 if (!departments.Any())
@@ -479,7 +477,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
-        
+
         // Kiểm tra vòng lặp
         private bool HasCycle(int currentId, int? newParentId, Dictionary<int, Department> departmentDict)
         {
@@ -510,7 +508,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
             return false;
         }
 
-        
+
         // Cập nhật level của các phòng ban con
         private async Task UpdateChildrenLevels(
             Department parent,

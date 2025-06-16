@@ -14,6 +14,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
         // Định nghĩa các DbSet cho các Model của bạn
         public DbSet<Department> Departments { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<Course> Courses { get; set; } // Thêm DbSet cho Course
         // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

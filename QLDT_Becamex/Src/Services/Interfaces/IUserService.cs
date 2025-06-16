@@ -6,10 +6,13 @@ namespace QLDT_Becamex.Src.Services.Interfaces
 {
     public interface IUserService
     {
-        public Task<Result<UserDto>> LoginAsync(LoginDto loginDto);
-        public Task<Result> RegisterAsync(RegisterDto registerDto);
+        public Task<Result<UserDto>> LoginAsync(UserLogin loginDto);
+        public Task<Result> CreateUserAsync(UserDtoRq rq);
         public Task<Result> SoftDeleteUserAsync(string userId);
-        public (string? UserId, string? Role) GetCurrentUserAuthenticationInfo();
+        public Task<Result<UserDto>> GetUserAsync(string userId);
         public Task<Result<PagedResult<UserDto>>> GetUsersAsync(BaseQueryParam queryParams);
+        public Task<Result<UserDto>> UpdateUserAsync(string userId, UserDtoRq loginDto);
+
+        public (string? UserId, string? Role) GetCurrentUserAuthenticationInfo();
     }
 }

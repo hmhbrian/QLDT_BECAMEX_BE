@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QLDT_Becamex.Src.Dtos.Users
 {
-    public class RegisterDto
+    public class UserDtoRq
     {
         [Required(ErrorMessage = "FullName is require")]
         [StringLength(50, ErrorMessage = "FullName cannot exceed 50 characters.")]
@@ -17,8 +17,8 @@ namespace QLDT_Becamex.Src.Dtos.Users
         public string? Code { get; set; } = null;
         public int? PositionId { get; set; }
         public string? RoleId { get; set; }
-
-        public string? ManagerId { get; set; }
+        public string? ManagerUId { get; set; }
+        public int? DepartmentId { get; set; }
 
         [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
         public string? NumberPhone { get; set; } = null;

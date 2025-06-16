@@ -147,12 +147,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                      page: null,
                      pageSize: null,
                      asNoTracking: true,
-                     includes: new Expression<Func<Department, object>>[]
-                     { 
-                        d => d.Parent,
-                        d => d.Manager,
-                        d => d.Children
-                     }
+                     includes: q => q
+                        .Include(d => d.Parent)
+                        .Include(d => d.Manager)
+                        .Include(d => d.Children)
                  );
 
                 // Tải tất cả người dùng
@@ -242,12 +240,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     page: null,
                     pageSize: null,
                     asNoTracking: true,
-                    includes: new Expression<Func<Department, object>>[]
-                    {
-                        d => d.Parent,
-                        d => d.Manager,
-                        d => d.Children
-                    }
+                    includes: q => q
+                    .Include(d => d.Parent)
+                    .Include(d => d.Manager)
+                    .Include(d => d.Children)
                 );
 
                 if (!department.Any())

@@ -12,8 +12,7 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
         // Lấy thực thể theo ID
         Task<T?> GetByIdAsync(object id); // Có thể dùng string, int khi tìm kiếm theo ID
 
-        public Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
-
+        public Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IQueryable<T>>? includes = null);
         // Tìm kiếm các thực thể dựa trên một điều kiện
         public Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
 
@@ -44,6 +43,6 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
              int? page = null,
              int? pageSize = null,
              bool asNoTracking = false,
-             params Expression<Func<T, object>>[] includes);
+             Func<IQueryable<T>, IQueryable<T>>? includes = null);
     }
 }

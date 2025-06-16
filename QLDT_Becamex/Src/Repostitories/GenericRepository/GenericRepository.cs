@@ -24,9 +24,18 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
             return await _dbContext.Set<T>().FindAsync(new object[] { id });
         }
 
-        public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        public async Task<T?> GetFirstOrDefaultAsync(
+        Expression<Func<T, bool>> predicate,
+        Func<IQueryable<T>, IQueryable<T>>? includes = null)
         {
-            return await _dbContext.Set<T>().Where(predicate).FirstOrDefaultAsync();
+            IQueryable<T> query = _dbContext.Set<T>();
+
+            if (includes != null)
+            {
+                query = includes(query); // Apply includes nếu có
+            }
+
+            return await query.FirstOrDefaultAsync(predicate);
         }
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
@@ -92,47 +101,39 @@ namespace QLDT_Becamex.Src.Repostitories.GenericRepository
         int? page = null,
         int? pageSize = null,
         bool asNoTracking = false,
-        params Expression<Func<T, object>>[] includes)
+        Func<IQueryable<T>, IQueryable<T>>? includes = null)
         {
             IQueryable<T> query = _dbContext.Set<T>();
 
-            // AsNoTracking nếu được bật
             if (asNoTracking)
             {
                 query = query.AsNoTracking();
             }
 
-            // Include các bảng liên quan
-            foreach (var include in includes)
+            if (includes != null)
             {
-                query = query.Include(include);
+                query = includes(query);
             }
 
-            // Lọc theo điều kiện
             if (predicate != null)
             {
                 query = query.Where(predicate);
             }
 
-            // Lưu lại số lượng trước khi phân trang
             int totalCount = await query.CountAsync();
 
-            // Sắp xếp
             if (orderBy != null)
             {
                 query = orderBy(query);
             }
 
-            // Phân trang
             if (page.HasValue && pageSize.HasValue)
             {
                 int skip = (page.Value - 1) * pageSize.Value;
                 query = query.Skip(skip).Take(pageSize.Value);
             }
 
-            var items = await query.ToListAsync();
-            return items;
-
+            return await query.ToListAsync();
         }
 
     }

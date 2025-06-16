@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Services.Interfaces;
@@ -97,5 +98,43 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
         }
+
+        [HttpGet("{id}")]
+        //[Authorize(Roles = "ADMIN, HR")]
+        public async Task<IActionResult> GetDepartmentById(int id)
+        {
+            try
+            {
+                var result = await _departmentService.GetDepartmentByIdAsync(id);
+                if (result.IsSuccess)
+                {
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code,
+                        data = result.Data
+                    });
+                }
+
+                return NotFound(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = ex.Message,
+                });
+            }
+        }
+
     }
 }

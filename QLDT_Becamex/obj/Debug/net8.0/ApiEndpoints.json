@@ -156,7 +156,7 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "QLDT_Becamex.Src.Dtos.CreateDepartmentDto",
+        "Type": "QLDT_Becamex.Src.Dtos.Departments.DepartmentRq",
         "IsRequired": true
       }
     ],
@@ -170,6 +170,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QLDT_Becamex.Src.Controllers.DepartmentController",
+    "Method": "GetDepartmentById",
+    "RelativePath": "Department/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -208,7 +224,7 @@
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.String",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -224,7 +240,7 @@
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.String",
+        "Type": "System.Int32",
         "IsRequired": true
       },
       {
@@ -245,7 +261,7 @@
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.String",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],

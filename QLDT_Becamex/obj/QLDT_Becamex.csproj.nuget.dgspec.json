@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\QLDT_Becamex.csproj": {}
+    "H:\\QLDT_BE\\QLDT_BECAMEX_BE\\QLDT_Becamex\\QLDT_Becamex.csproj": {}
   },
   "projects": {
-    "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\QLDT_Becamex.csproj": {
+    "H:\\QLDT_BE\\QLDT_BECAMEX_BE\\QLDT_Becamex\\QLDT_Becamex.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\QLDT_Becamex.csproj",
+        "projectUniqueName": "H:\\QLDT_BE\\QLDT_BECAMEX_BE\\QLDT_Becamex\\QLDT_Becamex.csproj",
         "projectName": "QLDT_Becamex",
-        "projectPath": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\QLDT_Becamex.csproj",
-        "packagesPath": "C:\\Users\\nghia\\.nuget\\packages\\",
-        "outputPath": "D:\\Workspaces\\Projects\\TTDN\\Backend\\QLDT_Becamex\\QLDT_Becamex\\obj\\",
+        "projectPath": "H:\\QLDT_BE\\QLDT_BECAMEX_BE\\QLDT_Becamex\\QLDT_Becamex.csproj",
+        "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
+        "outputPath": "H:\\QLDT_BE\\QLDT_BECAMEX_BE\\QLDT_Becamex\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\nghia\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -42,9 +42,9 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "all"
+          "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -96,7 +96,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

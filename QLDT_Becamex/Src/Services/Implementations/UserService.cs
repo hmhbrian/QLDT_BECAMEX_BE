@@ -40,13 +40,14 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
 
 
-        public async Task<Result<UserDto>> LoginAsync(LoginDto loginDto)
+        public async Task<Result<UserDto>> LoginAsync(UserLogin loginDto)
         {
 
             // Hãy đảm bảo rằng LoginDto.Email thực sự chứa email, và bạn tìm theo email.
             var user = await _userManager.Users
                                .Include(u => u.Position)
                                .Include(u => u.Department)
+                               .Include(u => u.ManagerU)
                                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
             // Nếu không tìm thấy bằng email, bạn có thể cân nhắc tìm bằng username nếu muốn linh hoạt
 
@@ -113,7 +114,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-        public async Task<Result> RegisterAsync(RegisterDto registerDto)
+        public async Task<Result> CreateUserAsync(UserDtoRq registerDto)
         {
             try
             {
@@ -182,8 +183,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 // 4. Tạo user
                 var user = new ApplicationUser
                 {
-                    UserName = registerDto.Email,
-                    Email = registerDto.Email,
+                    UserName = registerDto.Email.ToLower(),
+                    Email = registerDto.Email.ToLower(),
                     FullName = registerDto.FullName,
                     IdCard = registerDto.IdCard,
                     PhoneNumber = registerDto.NumberPhone,
@@ -332,12 +333,14 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     orderBy: orderByFunc,
                     page: queryParams.Page,
                     pageSize: queryParams.Limit,
+                     includes: q => q
+                        .Include(d => d.Position),
                     asNoTracking: true
 
                 );
 
                 // 4. Calculate pagination metadata
-                int effectiveLimit = queryParams.Limit > 0 ? queryParams.Limit : 1;
+                int effectiveLimit = queryParams.Limit;
                 int totalPages = (int)Math.Ceiling((double)totalItems / effectiveLimit);
                 var paginationInfo = new Pagination // Use Pagination as per your updated DTO
                 {
@@ -376,5 +379,54 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
+
+        public async Task<Result<UserDto>> GetUserAsync(string userId)
+        {
+            try
+            {
+
+                var user = await _unitOfWork.UserRepository.GetFirstOrDefaultAsync(
+                    predicate: u => u.Id == userId,
+                    includes: q => q
+                        .Include(d => d.Position)
+                );
+                if (user == null)
+                {
+                    return Result<UserDto>.Failure(
+                  error: "Get user success!",
+                  code: "SUCCESS",
+                  statusCode: 404
+                );
+                }
+                var roles = await _userManager.GetRolesAsync(user);
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Role = roles.FirstOrDefault();
+
+                return Result<UserDto>.Success(
+
+                   message: "Get user success!",
+                   code: "SUCCESS",
+                   statusCode: 200,
+                   data: userDto
+               );
+
+            }
+            catch (Exception ex)
+            {
+                return Result<UserDto>.Failure(
+                   error: ex.Message,
+                   message: "An error occurred while retrieving the user list.",
+                   code: "SYSTEM_ERROR",
+                   statusCode: 500
+               );
+            }
+        }
+
+        public Task<Result<UserDto>> UpdateUserAsync(string userId, UserDtoRq rq)
+        {
+            throw new NotImplementedException();
+        }
+    
+
     }
 }

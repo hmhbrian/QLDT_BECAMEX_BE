@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\QLDT_Becamex.props" />
+</Project>

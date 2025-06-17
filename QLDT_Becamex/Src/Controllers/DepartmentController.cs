@@ -173,7 +173,7 @@ namespace QLDT_Becamex.Src.Controllers
                     code = result.Code
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
@@ -184,5 +184,41 @@ namespace QLDT_Becamex.Src.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        //[Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> DeleteDepartment(int id)
+        {
+            try
+            {
+                var result = await _departmentService.DeleteDepartmentAsync(id);
+                if (result.IsSuccess)
+                {
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code,
+                        data = result.Data
+                    });
+                }
+
+                return NotFound(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = ex.Message,
+                });
+            }
+        }
     }
 }

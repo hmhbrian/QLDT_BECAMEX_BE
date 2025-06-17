@@ -88,7 +88,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     data: positionDto
                 );
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ghi log lỗi chi tiết tại đây
                 // Console.WriteLine($"Error getting position by ID: {ex.Message}");

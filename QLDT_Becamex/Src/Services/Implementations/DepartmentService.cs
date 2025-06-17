@@ -129,7 +129,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     break;
                 }
 
-                path.Insert(0, currentDept.DepartmentCode ?? "Unknown");
+                path.Insert(0, currentDept.DepartmentName ?? "Unknown");
                 currentId = currentDept.ParentId ?? 0;
             }
 
@@ -533,5 +533,127 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
+        public async Task<Result<bool>> DeleteDepartmentAsync(int id)
+        {
+            try
+            {
+                // Lấy phòng ban theo ID 
+                var departments = await _unitOfWork.DepartmentRepository.GetFlexibleAsync(
+                    predicate: d => d.DepartmentId == id,
+                    orderBy: null,
+                    page: null,
+                    pageSize: null,
+                    asNoTracking: false,
+                    includes: q => q
+                        .Include(d => d.Children)
+                        .Include(d => d.Parent)
+                        .Include(d => d.Manager)
+                );
+                if (!departments.Any())
+                {
+                    return Result<bool>.Failure(
+                        message: "Xóa phòng ban thất bại",
+                        error: "Phòng ban không tồn tại",
+                        code: "DEPARTMENT_NOT_FOUND",
+                        statusCode: StatusCodes.Status404NotFound
+                    );
+                }
+                var department = departments.First();
+
+                // Lấy tất cả phòng ban
+                var allDepartments = await _unitOfWork.DepartmentRepository.GetFlexibleAsync(
+                    predicate: null,
+                    orderBy: null,
+                    page: null,
+                    pageSize: null,
+                    asNoTracking: true
+                );
+
+                var departmentDict = allDepartments.ToDictionary(d => d.DepartmentId, d => d);
+
+                // Cập nhật DepartmentId của các user liên kết thành null
+                var usersInDepartment = await _unitOfWork.UserRepository.GetFlexibleAsync(
+                    predicate: u => u.DepartmentId == id,
+                    asNoTracking: false // Cần theo dõi để cập nhật
+                );
+
+                foreach (var user in usersInDepartment)
+                {
+                    user.DepartmentId = null;
+                    _unitOfWork.UserRepository.Update(user);
+                }
+
+                // Xử lý phòng ban con
+                if (department.Children?.Any() == true)
+                {
+                    int newLevel;
+                    int? newParentId;
+
+                    if (department.Level == 1)
+                    {
+                        // Phòng ban cấp 1: con trở thành cấp 1, ParentId = null
+                        newLevel = 1;
+                        newParentId = null;
+                    }
+                    else
+                    {
+                        // Phòng ban không phải cấp 1: con kế thừa ParentId của phòng ban hiện tại
+                        newLevel = department.ParentId.HasValue ? department.Level : 1;
+                        newParentId = department.ParentId;
+                    }
+
+                    // Cập nhật các phòng ban con
+                    await UpdateChildrenAfterDeleteAsync(department, newParentId, newLevel, departmentDict);
+                }
+
+                // Xóa phòng ban
+                _unitOfWork.DepartmentRepository.Remove(department);
+                await _unitOfWork.CompleteAsync();
+
+                return Result<bool
+                    >.Success(
+                    message: "Xóa phòng ban thành công",
+                    code: "DEPARTMENT_DELETED",
+                    statusCode: StatusCodes.Status200OK,
+                    data: true
+                );
+
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(
+                    message: "Xóa phòng ban thất bại do lỗi hệ thống" + ex.Message,
+                    error: "Vui lòng thử lại sau",
+                    code: "SYSTEM_ERROR",
+                    statusCode: StatusCodes.Status500InternalServerError
+                );
+            }
+
+        }
+
+        //Cập nhật phòng ban con sau khi xóa phòng ban cha
+        private async Task UpdateChildrenAfterDeleteAsync(
+            Department parent,
+            int? newParentId,
+            int newLevel,
+            Dictionary<int, Department> departmentDict)
+        {
+            if (parent.Children == null || !parent.Children.Any())
+            {
+                return;
+            }
+            foreach (var child in parent.Children)
+            {
+                child.ParentId = newParentId;
+                child.Level = newLevel;
+                child.Status = "inactive";
+                child.UpdatedAt = DateTime.Now;
+
+                departmentDict[child.DepartmentId] = child;
+
+                // Đệ quy cập nhật các phòng ban con
+                await UpdateChildrenAfterDeleteAsync(child, newParentId, newLevel+1, departmentDict);
+            }
+        }
     }
 }

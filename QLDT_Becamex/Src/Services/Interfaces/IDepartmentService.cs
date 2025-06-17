@@ -11,5 +11,6 @@ namespace QLDT_Becamex.Src.Services.Interfaces
         public Task<Result<DepartmentDto>> GetDepartmentByIdAsync(int id);
 
         public Task<Result<DepartmentDto>> UpdateDepartmentAsync(int id, DepartmentRq request);
+        public Task<Result<bool>> DeleteDepartmentAsync(int id);
     }
 }

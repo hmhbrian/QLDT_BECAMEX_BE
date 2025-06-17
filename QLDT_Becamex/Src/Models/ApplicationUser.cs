@@ -12,7 +12,8 @@ namespace QLDT_Becamex.Src.Models // Đảm bảo namespace này khớp với n�
         public string? Code { get; set; } // mã nhân viên
         public DateTime? StartWork { get; set; }
         public DateTime? EndWork { get; set; }
-        public string? Status { get; set; }
+        public int? StatusId { get; set; }
+        public Status? Status { get; set; }
 
         public bool IsDeleted { get; set; } = false;
 

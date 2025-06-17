@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace QLDT_Becamex.Src.Controllers
 {
     [ApiController]
-    [Route("[controller]")] // Hoặc [Route("api/[controller]")]
+    [Route("api/[controller]")] // Hoặc [Route("api/[controller]")]
     public class PositionsController : ControllerBase
     {
         private readonly IPositionService _positionService;

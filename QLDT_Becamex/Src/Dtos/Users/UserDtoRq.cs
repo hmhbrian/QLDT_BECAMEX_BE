@@ -20,9 +20,13 @@ namespace QLDT_Becamex.Src.Dtos.Users
         public string? ManagerUId { get; set; }
         public int? DepartmentId { get; set; }
 
+        public int? StatusId { get; set; }
+
+
         [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
         public string? NumberPhone { get; set; } = null;
         public DateTime? StartWork { get; set; } = DateTime.Now;
+        public DateTime? EndWork { get; set; } = DateTime.Now;
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
@@ -33,13 +37,11 @@ namespace QLDT_Becamex.Src.Dtos.Users
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Password is required")]
-        [DataType(DataType.Password)]
         [StringLength(100, ErrorMessage = "The password must be at least 6 and at max 100 characters long.", MinimumLength = 6)]
         public string Password { get; set; } = string.Empty;
 
         // Thêm trường ConfirmPassword
         [Required(ErrorMessage = "Confirm Password is required")]
-        [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = string.Empty;
 

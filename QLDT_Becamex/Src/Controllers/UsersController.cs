@@ -171,8 +171,8 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
 
-
         [HttpGet]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetAllUsers([FromQuery] BaseQueryParam queryParams)
         {
             // 1. Kiểm tra Model State Validation (từ [Range] attributes trong BaseQueryParam)
@@ -205,5 +205,157 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
         }
+
+
+        [HttpPatch("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordRq rq)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(rq);
+            }
+            try
+            {
+                var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
+                Result result = await _userService.ChangePasswordUserAsync(userId, rq);
+
+                if (result.IsSuccess)
+                {
+
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = ex.Message,
+                });
+            }
+        }
+
+
+        [HttpPatch("{userId}/reset-password")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> ResetPasswordByAdmin(string userId, [FromBody] UserResetPasswordRq rq)
+        {
+
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(rq);
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(rq);
+            }
+            try
+            {
+
+                Result result = await _userService.ResetPasswordByAdminAsync(userId, rq);
+
+                if (result.IsSuccess)
+                {
+
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = ex.Message,
+                });
+            }
+        }
+
+
+
+        [HttpDelete("{userId}/soft-delete")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> SoftDeletePasswordByAdmin(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(userId);
+            }
+            try
+            {
+                var (userIdCurrent, _) = _userService.GetCurrentUserAuthenticationInfo();
+                if (userIdCurrent == userId)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Bạn không thể thực hiện hành động này trên chính tài khoản của mình.",
+                        code = "FORBIDDEN_SELF_ACTION",
+                        statusCode = 403
+                    });
+                }
+
+                Result result = await _userService.SoftDeleteUserAsync(userId);
+
+                if (result.IsSuccess)
+                {
+
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = ex.Message,
+                });
+            }
+        }
+
     }
+
 }

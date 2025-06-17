@@ -21,15 +21,16 @@ namespace QLDT_Becamex.Src.Services.Implementations
         public string GenerateJwtToken(string id, string email, string role)
         {
             var claims = new List<Claim>
-        {
-          new Claim(JwtRegisteredClaimNames.Sub, email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, id)
-        };
+            {
+                new Claim(ClaimTypes.NameIdentifier, id),
+                new Claim(JwtRegisteredClaimNames.Sub, email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+
+            };
 
             if (!string.IsNullOrEmpty(role))
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim(ClaimTypes.Role, role.ToUpper()));
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

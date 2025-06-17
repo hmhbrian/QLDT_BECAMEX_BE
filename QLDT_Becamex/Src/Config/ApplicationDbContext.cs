@@ -14,6 +14,8 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
         // Định nghĩa các DbSet cho các Model của bạn
         public DbSet<Department> Departments { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<Status> Status { get; set; }
+
         // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +28,8 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             ConfigureApplicationUser(modelBuilder);
             ConfigureDepartment(modelBuilder);
             ConfigurePosition(modelBuilder);
+            ConfigureStatus(modelBuilder);
+
         }
 
         private void ConfigureApplicationUser(ModelBuilder modelBuilder)
@@ -43,10 +47,10 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .HasMaxLength(500); // Giới hạn độ dài URL avatar
 
                 entity.Property(u => u.IdCard)
-                      .HasMaxLength(20); // Giới hạn độ dài ID Card (ví dụ: CCCD)
+                      .HasMaxLength(100); // Giới hạn độ dài ID Card (ví dụ: CCCD)
 
-                entity.Property(u => u.Status)
-                      .HasMaxLength(50); // Giới hạn độ dài trạng thái
+                entity.Property(u => u.StatusId)
+                      .HasMaxLength(100); // Giới hạn độ dài trạng thái
 
                 // Cấu hình mối quan hệ khóa ngoại với Department
                 entity.HasOne(u => u.Department)      // Một ApplicationUser có MỘT Department
@@ -67,6 +71,13 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .HasForeignKey(u => u.ManagerUId)   // Khóa ngoại là ManagerUId
                       .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
                       .OnDelete(DeleteBehavior.NoAction);
+
+
+                entity.HasOne(u => u.Status)        // Một User có MỘT quản lý trực tiếp
+                      .WithMany()         // Một quản lý qly NHIỀU User
+                      .HasForeignKey(u => u.StatusId)   // Khóa ngoại là ManagerUId
+                      .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
+                      .OnDelete(DeleteBehavior.SetNull);
 
             });
         }
@@ -126,6 +137,20 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.Property(p => p.PositionId).ValueGeneratedOnAdd();
 
                 entity.Property(p => p.PositionName)
+                      .IsRequired()               // Bắt buộc phải có giá trị
+                      .HasMaxLength(255);         // Giới hạn độ 
+            });
+        }
+
+        private void ConfigureStatus(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Status>(entity =>
+            {
+                // Định nghĩa khóa chính
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+
+                entity.Property(p => p.Name)
                       .IsRequired()               // Bắt buộc phải có giá trị
                       .HasMaxLength(255);         // Giới hạn độ 
             });

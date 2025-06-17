@@ -8,6 +8,7 @@ using QLDT_Becamex.Src.Dtos.Users;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace QLDT_Becamex.Src.Services.Implementations
@@ -191,7 +192,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     StartWork = registerDto.StartWork,
                     CreatedAt = DateTime.Now,
                     Code = registerDto.Code,
-                    PositionId = registerDto.PositionId, // Sử dụng finalPositionId đã xác định
+                    PositionId = registerDto.PositionId,
+                    ManagerUId = registerDto.ManagerUId// Sử dụng finalPositionId đã xác định
                     // DepartmentId và ManagerId (nếu có trong RegisterDto, cần thêm vào)
                 };
 
@@ -226,6 +228,197 @@ namespace QLDT_Becamex.Src.Services.Implementations
             {
                 // Ghi log lỗi chi tiết tại đây (ví dụ: ILogger)
                 // Console.WriteLine($"Error registering user: {ex.Message}");
+                return Result.Failure(
+                    error: ex.Message,
+                    code: "SYSTEM_ERROR",
+                    statusCode: 500
+                );
+            }
+        }
+
+        public async Task<Result> UpdateUserAsync(string userId, UserDtoRq updateDto)
+        {
+            try
+            {
+                // 1. Tìm người dùng cần cập nhật
+                var userToUpdate = await _userManager.FindByIdAsync(userId);
+                if (userToUpdate == null)
+                {
+                    return Result.Failure(
+                        message: "Cập nhật người dùng thất bại",
+                        error: $"Không tìm thấy người dùng với ID: {userId}.",
+                        code: "USER_NOT_FOUND",
+                        statusCode: 404
+                    );
+                }
+
+                // 2. Cập nhật các trường thông tin cơ bản
+                userToUpdate.FullName = updateDto.FullName; // Required, nên luôn có giá trị
+                userToUpdate.IdCard = updateDto.IdCard;
+                userToUpdate.Code = updateDto.Code;
+                userToUpdate.PhoneNumber = updateDto.NumberPhone;
+                userToUpdate.StartWork = updateDto.StartWork; // Có thể là null trong DTO
+                userToUpdate.EndWork = updateDto.EndWork;     // Cần thêm vào UserDtoRq nếu muốn cập nhật
+                userToUpdate.StatusId = updateDto.StatusId; // Cần thêm vào UserDtoRq nếu muốn cập nhật Status
+                userToUpdate.IsDeleted = false; // Mặc định là false, cần thêm vào Dto nếu muốn điều khiển
+
+                // Cập nhật các khóa ngoại:
+                // Bạn có thể muốn kiểm tra xem DepartmentId, PositionId, ManagerUId có hợp lệ không
+                // trước khi gán. Tôi sẽ thêm một ví dụ kiểm tra.
+                if (updateDto.DepartmentId.HasValue)
+                {
+                    var departmentExists = await _unitOfWork.DepartmentRepository.AnyAsync(d => d.DepartmentId == updateDto.DepartmentId.Value);
+                    if (!departmentExists)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "ID phòng ban không hợp lệ.",
+                            code: "INVALID_DEPARTMENT_ID",
+                            statusCode: 400
+                        );
+                    }
+                    userToUpdate.DepartmentId = updateDto.DepartmentId;
+                }
+
+
+                if (updateDto.PositionId.HasValue)
+                {
+                    var positionExists = await _unitOfWork.PositionRepostiory.AnyAsync(p => p.PositionId == updateDto.PositionId.Value);
+                    if (!positionExists)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "ID vị trí không hợp lệ.",
+                            code: "INVALID_POSITION_ID",
+                            statusCode: 400
+                        );
+                    }
+                    userToUpdate.PositionId = updateDto.PositionId;
+                }
+
+
+                if (!string.IsNullOrEmpty(updateDto.ManagerUId))
+                {
+                    var managerExists = await _userManager.FindByIdAsync(updateDto.ManagerUId);
+                    if (managerExists == null)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "ID người quản lý không hợp lệ.",
+                            code: "INVALID_MANAGER_ID",
+                            statusCode: 400
+                        );
+                    }
+                    userToUpdate.ManagerUId = updateDto.ManagerUId;
+                }
+
+
+                userToUpdate.ModifedAt = DateTime.Now; // Cập nhật thời gian chỉnh sửa
+
+                // 3. Cập nhật Email và Username (nếu thay đổi)
+                // Lưu ý: UserDtoRq có Email là Required, nên luôn có giá trị
+                if (!string.Equals(userToUpdate.Email, updateDto.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Kiểm tra xem email mới đã tồn tại cho người dùng khác chưa
+                    var existingUserWithNewEmail = await _userManager.FindByEmailAsync(updateDto.Email);
+                    if (existingUserWithNewEmail != null && existingUserWithNewEmail.Id != userToUpdate.Id)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "Email này đã được sử dụng bởi một tài khoản khác.",
+                            code: "EMAIL_ALREADY_EXISTS",
+                            statusCode: 400
+                        );
+                    }
+
+                    var setEmailResult = await _userManager.SetEmailAsync(userToUpdate, updateDto.Email);
+                    if (!setEmailResult.Succeeded)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            errors: setEmailResult.Errors.Select(e => e.Description),
+                            code: "EMAIL_UPDATE_FAILED",
+                            statusCode: 400
+                        );
+                    }
+                    // Đồng bộ UserName với Email (thường là lowercase email)
+                    var setUserNameResult = await _userManager.SetUserNameAsync(userToUpdate, updateDto.Email.ToLower());
+                    if (!setUserNameResult.Succeeded)
+                    {
+                        return Result.Failure(
+                           message: "Cập nhật người dùng thất bại",
+                           errors: setUserNameResult.Errors.Select(e => e.Description),
+                           code: "USERNAME_UPDATE_FAILED",
+                           statusCode: 400
+                       );
+                    }
+                }
+
+                // 4. Cập nhật vai trò (nếu RoleId được cung cấp trong updateDto)
+                if (!string.IsNullOrEmpty(updateDto.RoleId))
+                {
+                    var newRole = await _roleManager.FindByIdAsync(updateDto.RoleId);
+                    if (newRole == null || string.IsNullOrEmpty(newRole.Name))
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "ID vai trò mới được cung cấp không hợp lệ hoặc không tồn tại.",
+                            code: "INVALID_NEW_ROLE_ID",
+                            statusCode: 400
+                        );
+                    }
+
+                    var currentRoles = await _userManager.GetRolesAsync(userToUpdate);
+
+                    // Loại bỏ tất cả các vai trò hiện tại
+                    var removeRolesResult = await _userManager.RemoveFromRolesAsync(userToUpdate, currentRoles);
+                    if (!removeRolesResult.Succeeded)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            errors: removeRolesResult.Errors.Select(e => e.Description),
+                            code: "REMOVE_ROLES_FAILED",
+                            statusCode: 500
+                        );
+                    }
+
+                    // Gán vai trò mới
+                    var addRoleResult = await _userManager.AddToRoleAsync(userToUpdate, newRole.Name);
+                    if (!addRoleResult.Succeeded)
+                    {
+                        // Nếu không thể thêm vai trò mới, bạn có thể cân nhắc gán lại các vai trò cũ ở đây
+                        // hoặc chỉ log lỗi và trả về thất bại.
+                        // Để an toàn, có thể thử add lại vai trò cũ:
+                        // await _userManager.AddToRolesAsync(userToUpdate, currentRoles);
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            errors: addRoleResult.Errors.Select(e => e.Description),
+                            code: "ADD_NEW_ROLE_FAILED",
+                            statusCode: 500
+                        );
+                    }
+                }
+                // else { /* RoleId không được cung cấp, không thay đổi vai trò */ }
+
+                // 5. Lưu các thay đổi vào database
+                // UserManager.UpdateAsync đã tự động gọi SaveChanges của DbContext
+                var updateResult = await _userManager.UpdateAsync(userToUpdate);
+                if (!updateResult.Succeeded)
+                {
+                    return Result.Failure(
+                        message: "Cập nhật người dùng thất bại",
+                        errors: updateResult.Errors.Select(e => e.Description),
+                        code: "USER_UPDATE_FAILED",
+                        statusCode: 500
+                    );
+                }
+
+                return Result.Success(message: "Cập nhật người dùng thành công.", code: "USER_UPDATE_SUCCESS", statusCode: 200);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi chi tiết tại đây (ví dụ: ILogger)
+                // _logger.LogError(ex, "An error occurred while updating the user with ID {UserId}.", userId);
                 return Result.Failure(
                     error: ex.Message,
                     code: "SYSTEM_ERROR",
@@ -299,9 +492,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
         public (string? UserId, string? Role) GetCurrentUserAuthenticationInfo()
         {
             var currentUser = _httpContextAccessor.HttpContext?.User;
-            var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var role = currentUser?.FindFirst(ClaimTypes.Role)?.Value;
+
 
             return (userId, role);
         }
@@ -384,7 +578,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
         {
             try
             {
-
                 var user = await _unitOfWork.UserRepository.GetFirstOrDefaultAsync(
                     predicate: u => u.Id == userId,
                     includes: q => q
@@ -422,11 +615,112 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-        public Task<Result<UserDto>> UpdateUserAsync(string userId, UserDtoRq rq)
+        public async Task<Result> ChangePasswordUserAsync(string userId, UserChangePasswordRq rq)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // 1. Tìm người dùng bằng userId (UserManager sẽ làm việc này hiệu quả hơn UserRepository cho Identity User)
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Result.Failure(
+                        error: "User not found.",
+                        code: "USER_NOT_FOUND", // Đổi code rõ ràng hơn
+                        statusCode: 404
+                    );
+                }
+
+                // 2. Thay đổi mật khẩu bằng UserManager
+                // UserManager.ChangePasswordAsync yêu cầu mật khẩu cũ để xác minh
+                var changePasswordResult = await _userManager.ChangePasswordAsync(user, rq.OldPassword, rq.NewPassword);
+
+                if (changePasswordResult.Succeeded)
+                {
+                    // Mật khẩu đã được thay đổi thành công
+                    // Bạn có thể không cần _unitOfWork.CompleteAsync() nếu UserManager đã xử lý việc lưu
+                    return Result.Success(
+                        message: "Password changed successfully!",
+                        code: "SUCCESS",
+                        statusCode: 200
+                    // Không cần trả về userDto ở đây vì đây là hàm đổi mật khẩu
+                    );
+                }
+                else
+                {
+                    // Mật khẩu không đổi được, lấy các lỗi từ IdentityResult
+                    var errors = changePasswordResult.Errors.Select(e => e.Description);
+                    var errorMessage = string.Join(" ", errors);
+
+                    return Result.Failure(
+                        error: errorMessage,
+                        message: "Failed to change password. Please check your old password or new password requirements.",
+                        code: "CHANGE_PASSWORD_FAILED",
+                        statusCode: 400 // Bad Request vì lỗi từ phía người dùng (mật khẩu cũ sai, không đáp ứng yêu cầu)
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] ChangePasswordUserAsync: {ex}"); // Ghi log lỗi chi tiết
+                return Result.Failure(
+                    error: ex.Message,
+                    message: "An unexpected error occurred while changing the password.",
+                    code: "SYSTEM_ERROR",
+                    statusCode: 500
+                );
+            }
         }
-    
+
+        public async Task<Result> ResetPasswordByAdminAsync(string userId, UserResetPasswordRq rq)
+        {
+            try
+            {
+                // 1. Tìm user theo ID
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Result.Failure(
+                        error: "User not found.",
+                        code: "USER_NOT_FOUND",
+                        statusCode: 404
+                    );
+                }
+
+                // 2. Tạo token reset password (chuẩn của ASP.NET Identity)
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                // 3. Dùng token để reset password (mật khẩu cũ không cần)
+                var resetResult = await _userManager.ResetPasswordAsync(user, resetToken, rq.NewPassword);
+
+                if (resetResult.Succeeded)
+                {
+                    return Result.Success(
+                        message: "Password reset successfully.",
+                        code: "SUCCESS",
+                        statusCode: 200
+                    );
+                }
+
+                // 4. Xử lý lỗi nếu reset thất bại
+                var errorMessages = string.Join(" ", resetResult.Errors.Select(e => e.Description));
+                return Result.Failure(
+                    error: errorMessages,
+                    message: "Failed to reset password.",
+                    code: "RESET_PASSWORD_FAILED",
+                    statusCode: 400
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] ResetPasswordByAdminAsync: {ex}");
+                return Result.Failure(
+                    error: ex.Message,
+                    message: "An unexpected error occurred while resetting the password.",
+                    code: "SYSTEM_ERROR",
+                    statusCode: 500
+                );
+            }
+        }
 
     }
 }

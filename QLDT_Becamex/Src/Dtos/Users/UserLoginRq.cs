@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QLDT_Becamex.Src.Dtos.Users
 {
-    public class UserLogin
+    public class UserLoginRq
     {
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]

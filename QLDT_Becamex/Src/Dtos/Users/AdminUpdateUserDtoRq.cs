@@ -1,13 +1,12 @@
-﻿// Src/Dtos/LoginDto.cs
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace QLDT_Becamex.Src.Dtos.Users
 {
-    public class UserDtoRq
+    public class AdminUpdateUserDtoRq
     {
-        [Required(ErrorMessage = "FullName is require")]
+
         [StringLength(50, ErrorMessage = "FullName cannot exceed 50 characters.")]
-        public string FullName { get; set; } = string.Empty;
+        public string? FullName { get; set; } = null;
 
         [StringLength(50, MinimumLength = 10, ErrorMessage = "IdCard must be between 10 and 50 characters.")]
         public string? IdCard { get; set; } = null;
@@ -33,22 +32,21 @@ namespace QLDT_Becamex.Src.Dtos.Users
         public DateTime? StartWork { get; set; } = DateTime.Now;
         public DateTime? EndWork { get; set; }
 
-        [Required(ErrorMessage = "Email is required")]
+
         [EmailAddress(ErrorMessage = "Invalid email format")]
         // Thêm RegularExpression để kiểm tra domain @becamex.com
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@becamex\.com$",
              ErrorMessage = "Email must be from @becamex.com domain.")]
         [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; } = null;
 
-        [Required(ErrorMessage = "Password is required")]
+
         [StringLength(100, ErrorMessage = "The password must be at least 6 and at max 100 characters long.", MinimumLength = 6)]
-        public string Password { get; set; } = string.Empty;
+        public string? NewPassword { get; set; } = null;
 
         // Thêm trường ConfirmPassword
-        [Required(ErrorMessage = "Confirm Password is required")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; } = string.Empty;
 
+        [Compare("NewPassword", ErrorMessage = "The password and confirmation password do not match.")]
+        public string? ConfirmNewPassword { get; set; } = null;
     }
 }

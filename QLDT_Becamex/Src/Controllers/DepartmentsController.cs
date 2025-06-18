@@ -7,12 +7,12 @@ using QLDT_Becamex.Src.Services.Interfaces;
 namespace QLDT_Becamex.Src.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class DepartmentController : ControllerBase
+    [Route("api/[controller]")]
+    public class DepartmentsController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartmentService departmentService)
+        public DepartmentsController(IDepartmentService departmentService)
         {
             _departmentService = departmentService;
         }

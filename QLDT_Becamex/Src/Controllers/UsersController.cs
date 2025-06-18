@@ -264,7 +264,7 @@ namespace QLDT_Becamex.Src.Controllers
             }
             if (string.IsNullOrEmpty(userId))
             {
-                return BadRequest(rq);
+                return BadRequest(userId);
             }
             try
             {
@@ -279,6 +279,57 @@ namespace QLDT_Becamex.Src.Controllers
                         message = result.Message,
                         statusCode = result.StatusCode,
                         code = result.Code
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = ex.Message,
+                });
+            }
+        }
+
+
+        [HttpPatch("search/{keyword}")]
+        [Authorize(Roles = "ADMIN, HR")]
+        public async Task<IActionResult> SearchUser(string keyword, [FromQuery] BaseQueryParam rq)
+        {
+
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(rq);
+            }
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return BadRequest(keyword);
+            }
+            try
+            {
+
+                Result<PagedResult<UserDto>> result = await _userService.SearchUserAsync(keyword, rq);
+
+                if (result.IsSuccess)
+                {
+
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code,
+                        data = result.Data
                     });
                 }
 

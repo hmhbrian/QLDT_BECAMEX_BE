@@ -303,7 +303,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpPatch("search/{keyword}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> SearchUser(string keyword, [FromQuery] BaseQueryParam rq)
         {
 

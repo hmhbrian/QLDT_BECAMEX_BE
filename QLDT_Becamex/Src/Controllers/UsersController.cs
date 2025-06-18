@@ -67,7 +67,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserLogin dto)
+        public async Task<IActionResult> Login([FromBody] UserLoginRq dto)
         {
             if (!ModelState.IsValid)
             {
@@ -170,9 +170,9 @@ namespace QLDT_Becamex.Src.Controllers
             }
         }
 
-        [HttpPut("profile")]
+        [HttpPut("update")]
         [Authorize]
-        public async Task<IActionResult> UpdateMyProfile([FromForm] UserUpdateSelfDto rq)
+        public async Task<IActionResult> UpdateMyProfile([FromForm] UserUpdateSelfDtoRq rq)
         {
 
             try
@@ -186,6 +186,50 @@ namespace QLDT_Becamex.Src.Controllers
                 }
 
                 Result result = await _userService.UpdateMyProfileAsync(userId, rq);
+
+                if (result.IsSuccess)
+                {
+
+                    return Ok(new
+                    {
+                        message = result.Message,
+                        statusCode = result.StatusCode,
+                        code = result.Code
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+                    statusCode = result.StatusCode,
+                    code = result.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = "SYSTEM_ERROR",
+                    message = "Đã xảy ra lỗi hệ thống.",
+                    error = ex.Message,
+                });
+            }
+        }
+
+        [HttpPut("admin/{userId}/update")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> UpdateUserByAdmin(string userId, [FromBody] AdminUpdateUserDtoRq rq)
+        {
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(userId);
+
+            }
+            try
+            {
+                Result result = await _userService.UpdateUserByAdmin(userId, rq);
 
                 if (result.IsSuccess)
                 {

@@ -44,7 +44,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
 
 
-        public async Task<Result<UserDto>> LoginAsync(UserLogin loginDto)
+        public async Task<Result<UserDto>> LoginAsync(UserLoginRq loginDto)
         {
 
             // Hãy đảm bảo rằng LoginDto.Email thực sự chứa email, và bạn tìm theo email.
@@ -239,199 +239,256 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-        public async Task<Result> UpdateUserByAdmin(string userId, AdminUpdateUserDto rq)
+        public async Task<Result> UpdateUserByAdmin(string userId, AdminUpdateUserDtoRq rq)
         {
-            //try
-            //{
-            //    // 1. Tìm người dùng cần cập nhật
-            //    var userToUpdate = await _userManager.FindByIdAsync(userId);
-            //    if (userToUpdate == null)
-            //    {
-            //        return Result.Failure(
-            //            message: "Cập nhật người dùng thất bại",
-            //            error: $"Không tìm thấy người dùng với ID: {userId}.",
-            //            code: "USER_NOT_FOUND",
-            //            statusCode: 404
-            //        );
-            //    }
+            try
+            {
+                // 1. Tìm người dùng cần cập nhật
+                var userToUpdate = await _userManager.FindByIdAsync(userId);
+                if (userToUpdate == null)
+                {
+                    return Result.Failure(
+                        message: "Cập nhật người dùng thất bại",
+                        error: $"Không tìm thấy người dùng với ID: {userId}.",
+                        code: "USER_NOT_FOUND",
+                        statusCode: 404
+                    );
+                }
 
-            //    // 2. Cập nhật các trường thông tin cơ bản
-            //    userToUpdate.FullName = updateDto.FullName; // Required, nên luôn có giá trị
-            //    userToUpdate.IdCard = updateDto.IdCard;
-            //    userToUpdate.Code = updateDto.Code;
-            //    userToUpdate.PhoneNumber = updateDto.NumberPhone;
-            //    userToUpdate.StartWork = updateDto.StartWork; // Có thể là null trong DTO
-            //    userToUpdate.EndWork = updateDto.EndWork;     // Cần thêm vào UserDtoRq nếu muốn cập nhật
-            //    userToUpdate.StatusId = updateDto.StatusId; // Cần thêm vào UserDtoRq nếu muốn cập nhật Status
-            //    userToUpdate.IsDeleted = false; // Mặc định là false, cần thêm vào Dto nếu muốn điều khiển
+                // 2. Cập nhật các trường thông tin cơ bản
+                // Ánh xạ từ DTO sang entity (nếu bạn có AutoMapper mapping phù hợp)
+                // Hoặc gán thủ công như bạn đang làm.
+                // Cập nhật FullName nếu khác
+                if (!string.IsNullOrWhiteSpace(rq.FullName) && !string.Equals(userToUpdate.FullName, rq.FullName, StringComparison.Ordinal))
+                {
+                    userToUpdate.FullName = rq.FullName;
+                }
 
-            //    // Cập nhật các khóa ngoại:
-            //    // Bạn có thể muốn kiểm tra xem DepartmentId, PositionId, ManagerUId có hợp lệ không
-            //    // trước khi gán. Tôi sẽ thêm một ví dụ kiểm tra.
-            //    if (updateDto.DepartmentId.HasValue)
-            //    {
-            //        var departmentExists = await _unitOfWork.DepartmentRepository.AnyAsync(d => d.DepartmentId == updateDto.DepartmentId.Value);
-            //        if (!departmentExists)
-            //        {
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                error: "ID phòng ban không hợp lệ.",
-            //                code: "INVALID_DEPARTMENT_ID",
-            //                statusCode: 400
-            //            );
-            //        }
-            //        userToUpdate.DepartmentId = updateDto.DepartmentId;
-            //    }
+                // Cập nhật SĐT nếu khác
+                if (!string.IsNullOrWhiteSpace(rq.NumberPhone) && !string.Equals(userToUpdate.PhoneNumber, rq.NumberPhone, StringComparison.Ordinal))
+                {
+                    userToUpdate.PhoneNumber = rq.NumberPhone;
+                }
+
+                // Cập nhật ngày bắt đầu nếu khác
+                if (rq.StartWork.HasValue && userToUpdate.StartWork != rq.StartWork)
+                {
+                    userToUpdate.StartWork = rq.StartWork;
+                }
+
+                // Cập nhật ngày kết thúc nếu khác
+                if (rq.EndWork.HasValue && userToUpdate.EndWork != rq.EndWork)
+                {
+                    userToUpdate.EndWork = rq.EndWork;
+                }
+
+                // Cập nhật trạng thái nếu khác
+                if (rq.StatusId.HasValue && userToUpdate.StatusId != rq.StatusId)
+                {
+                    userToUpdate.StatusId = rq.StatusId;
+                }
+
+                // Cập nhật phòng ban nếu khác
+                if (rq.DepartmentId.HasValue && userToUpdate.DepartmentId != rq.DepartmentId)
+                {
+                    userToUpdate.DepartmentId = rq.DepartmentId;
+                }
+
+                // Cập nhật ManagerUId nếu khác
+                if (!string.IsNullOrEmpty(rq.ManagerUId) && !string.Equals(userToUpdate.ManagerUId, rq.ManagerUId, StringComparison.Ordinal))
+                {
+                    userToUpdate.ManagerUId = rq.ManagerUId;
+                }
+
+                if (rq.PositionId.HasValue && userToUpdate.PositionId != rq.PositionId)
+                {
+                    userToUpdate.PositionId = rq.PositionId;
+                }
+
+                // Nếu có thay đổi, cập nhật thời gian chỉnh sửa
+                userToUpdate.ModifedAt = DateTime.UtcNow;
+
+                // 3. Cập nhật Email và Username (nếu thay đổi)
+                // Kiểm tra xem email mới có khác email hiện tại không
+                if (!string.IsNullOrEmpty(rq.Email) && !string.Equals(userToUpdate.Email, rq.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Kiểm tra xem email mới đã tồn tại cho người dùng khác chưa
+                    var existingUserWithNewEmail = await _userManager.FindByEmailAsync(rq.Email);
+                    if (existingUserWithNewEmail != null && existingUserWithNewEmail.Id != userToUpdate.Id)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "Email này đã được sử dụng bởi một tài khoản khác.",
+                            code: "EMAIL_ALREADY_EXISTS",
+                            statusCode: 400
+                        );
+                    }
+
+                    // Cập nhật Email và UserName thông qua UserManager
+                    var setEmailResult = await _userManager.SetEmailAsync(userToUpdate, rq.Email);
+                    if (!setEmailResult.Succeeded)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            errors: setEmailResult.Errors.Select(e => e.Description),
+                            code: "EMAIL_UPDATE_FAILED",
+                            statusCode: 400
+                        );
+                    }
+                    // UserName thường được đồng bộ với Email (lowercase)
+                    var setUserNameResult = await _userManager.SetUserNameAsync(userToUpdate, rq.Email.ToLowerInvariant());
+                    if (!setUserNameResult.Succeeded)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            errors: setUserNameResult.Errors.Select(e => e.Description),
+                            code: "USERNAME_UPDATE_FAILED",
+                            statusCode: 400
+                        );
+                    }
+                }
+                // else: Email không thay đổi hoặc rỗng, không làm gì.
+
+                // 4. Kiểm tra và cập nhật CMND/CCCD (IdCard)
+                if (!string.IsNullOrWhiteSpace(rq.IdCard) && !string.Equals(userToUpdate.IdCard, rq.IdCard, StringComparison.OrdinalIgnoreCase))
+                {
+                    var duplicateIdCardUser = await _userManager.Users
+                        .Where(u => u.Id != userId && u.IdCard == rq.IdCard)
+                        .FirstOrDefaultAsync();
+
+                    if (duplicateIdCardUser != null)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "CMND/CCCD (IdCard) này đã tồn tại trong hệ thống.",
+                            code: "IDCARD_ALREADY_EXISTS",
+                            statusCode: 400
+                        );
+                    }
+                    userToUpdate.IdCard = rq.IdCard; // Gán giá trị mới
+                }
 
 
-            //    if (updateDto.PositionId.HasValue)
-            //    {
-            //        var positionExists = await _unitOfWork.PositionRepostiory.AnyAsync(p => p.PositionId == updateDto.PositionId.Value);
-            //        if (!positionExists)
-            //        {
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                error: "ID vị trí không hợp lệ.",
-            //                code: "INVALID_POSITION_ID",
-            //                statusCode: 400
-            //            );
-            //        }
-            //        userToUpdate.PositionId = updateDto.PositionId;
-            //    }
+                // 5. Kiểm tra và cập nhật Mã nhân viên (Code)
+                if (!string.IsNullOrWhiteSpace(rq.Code) && !string.Equals(userToUpdate.Code, rq.Code, StringComparison.OrdinalIgnoreCase))
+                {
+                    var duplicateCodeUser = await _userManager.Users
+                        .Where(u => u.Id != userId && u.Code == rq.Code)
+                        .FirstOrDefaultAsync();
+
+                    if (duplicateCodeUser != null)
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "Mã nhân viên (Code) này đã tồn tại trong hệ thống.",
+                            code: "CODE_ALREADY_EXISTS",
+                            statusCode: 400
+                        );
+                    }
+                    userToUpdate.Code = rq.Code; // Gán giá trị mới
+                }
+                // Position
 
 
-            //    if (!string.IsNullOrEmpty(updateDto.ManagerUId))
-            //    {
-            //        var managerExists = await _userManager.FindByIdAsync(updateDto.ManagerUId);
-            //        if (managerExists == null)
-            //        {
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                error: "ID người quản lý không hợp lệ.",
-            //                code: "INVALID_MANAGER_ID",
-            //                statusCode: 400
-            //            );
-            //        }
-            //        userToUpdate.ManagerUId = updateDto.ManagerUId;
-            //    }
+                // 6. Cập nhật vai trò
+                if (!string.IsNullOrEmpty(rq.RoleId))
+                {
+                    var newRole = await _roleManager.FindByIdAsync(rq.RoleId);
+                    if (newRole == null || string.IsNullOrEmpty(newRole.Name))
+                    {
+                        return Result.Failure(
+                            message: "Cập nhật người dùng thất bại",
+                            error: "ID vai trò mới được cung cấp không hợp lệ hoặc không tồn tại.",
+                            code: "INVALID_NEW_ROLE_ID",
+                            statusCode: 400
+                        );
+                    }
+
+                    var currentRoles = await _userManager.GetRolesAsync(userToUpdate);
+
+                    // Chỉ thay đổi vai trò nếu vai trò mới khác với vai trò hiện tại
+                    if (!currentRoles.Contains(newRole.Name))
+                    {
+                        // Xóa tất cả vai trò cũ
+                        var removeRolesResult = await _userManager.RemoveFromRolesAsync(userToUpdate, currentRoles);
+                        if (!removeRolesResult.Succeeded)
+                        {
+                            return Result.Failure(
+                                message: "Cập nhật người dùng thất bại",
+                                errors: removeRolesResult.Errors.Select(e => e.Description),
+                                code: "REMOVE_ROLES_FAILED",
+                                statusCode: 500
+                            );
+                        }
+
+                        // Thêm vai trò mới
+                        var addRoleResult = await _userManager.AddToRoleAsync(userToUpdate, newRole.Name);
+                        if (!addRoleResult.Succeeded)
+                        {
+                            return Result.Failure(
+                                message: "Cập nhật người dùng thất bại",
+                                errors: addRoleResult.Errors.Select(e => e.Description),
+                                code: "ADD_NEW_ROLE_FAILED",
+                                statusCode: 500
+                            );
+                        }
+                    }
+                }
+                // else: RoleId không được cung cấp, không thay đổi vai trò.
 
 
-            //    userToUpdate.ModifedAt = DateTime.Now; // Cập nhật thời gian chỉnh sửa
+                // 7. Thay đổi mật khẩu (chỉ nếu rq.Password được cung cấp và không rỗng)
+                if (!string.IsNullOrWhiteSpace(rq.NewPassword))
+                {
+                    // Tạo token reset password (UserManager sẽ kiểm tra tính hợp lệ của token)
+                    var resetToken = await _userManager.GeneratePasswordResetTokenAsync(userToUpdate);
 
-            //    // 3. Cập nhật Email và Username (nếu thay đổi)
-            //    // Lưu ý: UserDtoRq có Email là Required, nên luôn có giá trị
-            //    if (!string.Equals(userToUpdate.Email, updateDto.Email, StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        // Kiểm tra xem email mới đã tồn tại cho người dùng khác chưa
-            //        var existingUserWithNewEmail = await _userManager.FindByEmailAsync(updateDto.Email);
-            //        if (existingUserWithNewEmail != null && existingUserWithNewEmail.Id != userToUpdate.Id)
-            //        {
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                error: "Email này đã được sử dụng bởi một tài khoản khác.",
-            //                code: "EMAIL_ALREADY_EXISTS",
-            //                statusCode: 400
-            //            );
-            //        }
+                    // Sử dụng token để reset password (không cần mật khẩu cũ)
+                    var resetResult = await _userManager.ResetPasswordAsync(userToUpdate, resetToken, rq.NewPassword);
 
-            //        var setEmailResult = await _userManager.SetEmailAsync(userToUpdate, updateDto.Email);
-            //        if (!setEmailResult.Succeeded)
-            //        {
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                errors: setEmailResult.Errors.Select(e => e.Description),
-            //                code: "EMAIL_UPDATE_FAILED",
-            //                statusCode: 400
-            //            );
-            //        }
-            //        // Đồng bộ UserName với Email (thường là lowercase email)
-            //        var setUserNameResult = await _userManager.SetUserNameAsync(userToUpdate, updateDto.Email.ToLower());
-            //        if (!setUserNameResult.Succeeded)
-            //        {
-            //            return Result.Failure(
-            //               message: "Cập nhật người dùng thất bại",
-            //               errors: setUserNameResult.Errors.Select(e => e.Description),
-            //               code: "USERNAME_UPDATE_FAILED",
-            //               statusCode: 400
-            //           );
-            //        }
-            //    }
+                    if (!resetResult.Succeeded)
+                    {
+                        var errorMessages = string.Join(" ", resetResult.Errors.Select(e => e.Description));
+                        return Result.Failure(
+                            error: errorMessages,
+                            message: "Cập nhật người dùng thất bại: Không thể đặt lại mật khẩu mới.",
+                            code: "RESET_PASSWORD_FAILED",
+                            statusCode: 400 // Mật khẩu mới không đáp ứng yêu cầu
+                        );
+                    }
+                }
 
-            //    // 4. Cập nhật vai trò (nếu RoleId được cung cấp trong updateDto)
-            //    if (!string.IsNullOrEmpty(updateDto.RoleId))
-            //    {
-            //        var newRole = await _roleManager.FindByIdAsync(updateDto.RoleId);
-            //        if (newRole == null || string.IsNullOrEmpty(newRole.Name))
-            //        {
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                error: "ID vai trò mới được cung cấp không hợp lệ hoặc không tồn tại.",
-            //                code: "INVALID_NEW_ROLE_ID",
-            //                statusCode: 400
-            //            );
-            //        }
+                // 8. Lưu các thay đổi cuối cùng vào database
+                // UserManager.UpdateAsync sẽ lưu các thay đổi của các thuộc tính trực tiếp trên userToUpdate
+                // Các thao tác SetEmail/UserName, AddToRole/RemoveFromRoles, ResetPasswordAsync đã tự động lưu.
+                // Tuy nhiên, việc gọi UpdateAsync này cũng đảm bảo những thay đổi đơn giản khác được lưu.
+                var updateResult = await _userManager.UpdateAsync(userToUpdate);
+                if (!updateResult.Succeeded)
+                {
+                    return Result.Failure(
+                        message: "Cập nhật người dùng thất bại",
+                        errors: updateResult.Errors.Select(e => e.Description),
+                        code: "USER_FINAL_UPDATE_FAILED", // Đổi code cho rõ ràng
+                        statusCode: 500
+                    );
+                }
 
-            //        var currentRoles = await _userManager.GetRolesAsync(userToUpdate);
-
-            //        // Loại bỏ tất cả các vai trò hiện tại
-            //        var removeRolesResult = await _userManager.RemoveFromRolesAsync(userToUpdate, currentRoles);
-            //        if (!removeRolesResult.Succeeded)
-            //        {
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                errors: removeRolesResult.Errors.Select(e => e.Description),
-            //                code: "REMOVE_ROLES_FAILED",
-            //                statusCode: 500
-            //            );
-            //        }
-
-            //        // Gán vai trò mới
-            //        var addRoleResult = await _userManager.AddToRoleAsync(userToUpdate, newRole.Name);
-            //        if (!addRoleResult.Succeeded)
-            //        {
-            //            // Nếu không thể thêm vai trò mới, bạn có thể cân nhắc gán lại các vai trò cũ ở đây
-            //            // hoặc chỉ log lỗi và trả về thất bại.
-            //            // Để an toàn, có thể thử add lại vai trò cũ:
-            //            // await _userManager.AddToRolesAsync(userToUpdate, currentRoles);
-            //            return Result.Failure(
-            //                message: "Cập nhật người dùng thất bại",
-            //                errors: addRoleResult.Errors.Select(e => e.Description),
-            //                code: "ADD_NEW_ROLE_FAILED",
-            //                statusCode: 500
-            //            );
-            //        }
-            //    }
-            //    // else { /* RoleId không được cung cấp, không thay đổi vai trò */ }
-
-            //    // 5. Lưu các thay đổi vào database
-            //    // UserManager.UpdateAsync đã tự động gọi SaveChanges của DbContext
-            //    var updateResult = await _userManager.UpdateAsync(userToUpdate);
-            //    if (!updateResult.Succeeded)
-            //    {
-            //        return Result.Failure(
-            //            message: "Cập nhật người dùng thất bại",
-            //            errors: updateResult.Errors.Select(e => e.Description),
-            //            code: "USER_UPDATE_FAILED",
-            //            statusCode: 500
-            //        );
-            //    }
-
-            //    return Result.Success(message: "Cập nhật người dùng thành công.", code: "USER_UPDATE_SUCCESS", statusCode: 200);
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Ghi log lỗi chi tiết tại đây (ví dụ: ILogger)
-            //    // _logger.LogError(ex, "An error occurred while updating the user with ID {UserId}.", userId);
-            //    return Result.Failure(
-            //        error: ex.Message,
-            //        code: "SYSTEM_ERROR",
-            //        statusCode: 500
-            //    );
-            //}
-            throw new NotImplementedException();
+                return Result.Success(message: "Cập nhật người dùng thành công.", code: "USER_UPDATE_SUCCESS", statusCode: 200);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi chi tiết tại đây (ví dụ: ILogger)
+                // _logger.LogError(ex, "An error occurred while updating the user with ID {UserId}.", userId);
+                return Result.Failure(
+                    error: ex.Message,
+                    message: "Đã xảy ra lỗi hệ thống khi cập nhật người dùng. Vui lòng thử lại sau.",
+                    code: "SYSTEM_ERROR",
+                    statusCode: 500
+                );
+            }
         }
 
-        public async Task<Result> UpdateMyProfileAsync(string userId, UserUpdateSelfDto rq)
+        public async Task<Result> UpdateMyProfileAsync(string userId, UserUpdateSelfDtoRq rq)
         {
             try
             {
@@ -478,7 +535,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
-
 
         public async Task<Result> SoftDeleteUserAsync(string userId)
         {
@@ -540,7 +596,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
-
 
         public (string? UserId, string? Role) GetCurrentUserAuthenticationInfo()
         {

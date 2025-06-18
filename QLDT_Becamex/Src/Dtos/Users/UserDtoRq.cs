@@ -10,10 +10,10 @@ namespace QLDT_Becamex.Src.Dtos.Users
         public string FullName { get; set; } = string.Empty;
 
 
-        [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
+        [StringLength(50, MinimumLength = 10, ErrorMessage = "IdCard must be between 10 and 50 characters.")]
         public string? IdCard { get; set; } = null;
 
-        [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
+        [StringLength(50, MinimumLength = 10, ErrorMessage = "Code must be between 10 and 50 characters.")]
         public string? Code { get; set; } = null;
         public int? PositionId { get; set; }
         public string? RoleId { get; set; }

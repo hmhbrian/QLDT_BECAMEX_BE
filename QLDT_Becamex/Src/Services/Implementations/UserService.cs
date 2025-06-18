@@ -169,7 +169,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 // Tìm IdentityRole bằng RoleId
-                var role = await _roleManager.FindByIdAsync(registerDto.RoleId);
+                var role = await _roleManager.FindByIdAsync(targetRoleId);
                 if (role == null || string.IsNullOrEmpty(role.Name))
                 {
                     return Result.Failure(
@@ -716,6 +716,92 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result.Failure(
                     error: ex.Message,
                     message: "An unexpected error occurred while resetting the password.",
+                    code: "SYSTEM_ERROR",
+                    statusCode: 500
+                );
+            }
+        }
+
+
+        public async Task<Result<PagedResult<UserDto>>> SearchUserAsync(string keyword, BaseQueryParam queryParams)
+        {
+            try
+            {
+                IQueryable<ApplicationUser> query = _userManager.Users;
+
+                // 1. Lọc theo tên (hoặc các trường khác nếu muốn)
+                // Chuyển keyword về chữ thường để tìm kiếm không phân biệt hoa thường
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    string lowerKeyword = keyword.ToLowerInvariant().Trim();
+                    query = query.Where(u => u.UserName.ToLower().Contains(lowerKeyword) ||
+                                             u.Email!.ToLower().Contains(lowerKeyword)); // Có thể tìm cả theo Email
+                }
+
+                // 2. Tính tổng số lượng bản ghi (trước khi phân trang và sắp xếp)
+                int totalCount = await query.CountAsync();
+
+                // 3. Sắp xếp
+                // Mặc định sắp xếp theo CreatedAt giảm dần (hoặc UserName tăng dần, tùy ý)
+                // Lưu ý: IdentityUser không có CreatedAt mặc định.
+                // Nếu ApplicationUser của bạn có CreatedAt, hãy dùng nó.
+                // Nếu không, có thể sắp xếp theo UserName hoặc Id.
+                // 3. Sắp xếp (Chỉ CreatedAt)
+                Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> orderBy = q => q.OrderByDescending(u => u.CreatedAt); // Mặc định: CreatedAt DESC
+
+                // Kiểm tra nếu có yêu cầu sắp xếp CreatedAt ASC
+                if (queryParams.SortField?.ToLower() == "createdat")
+                {
+                    orderBy = queryParams.SortType?.ToLower() == "asc"
+                        ? q => q.OrderBy(u => u.CreatedAt)
+                        : q => q.OrderByDescending(u => u.CreatedAt);
+                }
+                // Nếu SortField không phải "createdat", hoặc không có, sẽ dùng mặc định là CreatedAt DESC.
+
+                // Áp dụng sắp xếp
+                query = orderBy(query);
+
+                // 4. Phân trang
+                int skip = (queryParams.Page - 1) * queryParams.Limit;
+                query = query.Skip(skip).Take(queryParams.Limit);
+
+                // 5. Lấy dữ liệu
+                // ToListAsync() sẽ thực thi truy vấn
+                var users = await query.ToListAsync();
+
+                // 6. Ánh xạ từ ApplicationUser sang UserDto
+                IEnumerable<UserDto> userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+
+                // 7. Tạo đối tượng PagedResult
+                var pagination = new Pagination()
+                {
+                    CurrentPage = queryParams.Page,
+                    ItemsPerPage = queryParams.Limit,
+                    TotalItems = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / queryParams.Limit)
+                };
+
+
+
+                var pagedResult = new PagedResult<UserDto>
+                {
+                    Items = userDtos,
+                    Pagination = pagination
+                };
+
+                return Result<PagedResult<UserDto>>.Success(
+                    data: pagedResult,
+                    message: "User list retrieved successfully.",
+                    code: "SUCCESS",
+                    statusCode: 200
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] SearchUserAsync: {ex}"); // Ghi log chi tiết lỗi
+                return Result<PagedResult<UserDto>>.Failure(
+                    error: ex.Message,
+                    message: "An error occurred while searching for users.",
                     code: "SYSTEM_ERROR",
                     statusCode: 500
                 );

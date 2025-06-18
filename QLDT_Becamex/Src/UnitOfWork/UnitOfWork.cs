@@ -11,12 +11,15 @@ namespace QLDT_Becamex.Src.UnitOfWork
         public IDepartmentRepository DepartmentRepository { get; }
         public IPositionRepostiory PositionRepostiory { get; }
 
+        public IUserStatusRepostiory UserStatusRepostiory { get; }
+
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
             UserRepository = new UserRepository(dbContext);
             DepartmentRepository = new DepartmentRepository(dbContext);
             PositionRepostiory = new PositionRepository(dbContext);
+            UserStatusRepostiory = new UserStatusRepostiory(dbContext);
         }
 
         public async Task<int> CompleteAsync()

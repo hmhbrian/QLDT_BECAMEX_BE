@@ -14,7 +14,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
         // Định nghĩa các DbSet cho các Model của bạn
         public DbSet<Department> Departments { get; set; }
         public DbSet<Position> Positions { get; set; }
-        public DbSet<Status> Status { get; set; }
+        public DbSet<UserStatus> UserStatus { get; set; }
 
         // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
 
@@ -72,11 +72,11 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                       .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
                       .OnDelete(DeleteBehavior.NoAction);
 
-
-                entity.HasOne(u => u.Status)        // Một User có MỘT quản lý trực tiếp
-                      .WithMany()         // Một quản lý qly NHIỀU User
-                      .HasForeignKey(u => u.StatusId)   // Khóa ngoại là ManagerUId
-                      .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
+                // User status
+                entity.HasOne(u => u.UserStatus)
+                      .WithMany()
+                      .HasForeignKey(u => u.StatusId)
+                      .IsRequired(false)
                       .OnDelete(DeleteBehavior.SetNull);
 
             });
@@ -144,8 +144,9 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
 
         private void ConfigureStatus(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Status>(entity =>
+            modelBuilder.Entity<UserStatus>(entity =>
             {
+                entity.ToTable("UserStatus"); // 👉 Đặt tên bảng ở đây
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.Id);
                 entity.Property(p => p.Id).ValueGeneratedOnAdd();

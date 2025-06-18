@@ -9,7 +9,6 @@ namespace QLDT_Becamex.Src.Dtos.Users
         [StringLength(50, ErrorMessage = "FullName cannot exceed 50 characters.")]
         public string FullName { get; set; } = string.Empty;
 
-
         [StringLength(50, MinimumLength = 10, ErrorMessage = "IdCard must be between 10 and 50 characters.")]
         public string? IdCard { get; set; } = null;
 
@@ -19,9 +18,7 @@ namespace QLDT_Becamex.Src.Dtos.Users
         public string? RoleId { get; set; }
         public string? ManagerUId { get; set; }
         public int? DepartmentId { get; set; }
-
         public int? StatusId { get; set; }
-
 
         [StringLength(50, ErrorMessage = "IdCard cannot exceed 50 characters.")]
         public string? NumberPhone { get; set; } = null;

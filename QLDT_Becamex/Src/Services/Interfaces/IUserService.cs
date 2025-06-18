@@ -12,7 +12,9 @@ namespace QLDT_Becamex.Src.Services.Interfaces
         public Task<Result<UserDto>> GetUserAsync(string userId);
         public Task<Result<PagedResult<UserDto>>> GetUsersAsync(BaseQueryParam queryParams);
         public Task<Result<PagedResult<UserDto>>> SearchUserAsync(string keyword, BaseQueryParam queryParams);
-        public Task<Result> UpdateUserAsync(string userId, UserDtoRq loginDto);
+        public Task<Result> UpdateMyProfileAsync(string userId, UserUpdateSelfDto rq);
+        public Task<Result> UpdateUserByAdmin(string userId, AdminUpdateUserDto rq);
+
         public Task<Result> ChangePasswordUserAsync(string userId, UserChangePasswordRq rq);
         public Task<Result> ResetPasswordByAdminAsync(string userId, UserResetPasswordRq rq);
 

@@ -608,7 +608,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
             return (userId, role);
         }
 
-
         public async Task<Result<PagedResult<UserDto>>> GetUsersAsync(BaseQueryParam queryParams) // Return type remains Result<PagedResult<UserDto>>
         {
             try
@@ -654,6 +653,16 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 // 5. Map to UserDto and fetch roles
                 var userDtos = _mapper.Map<List<UserDto>>(users);
+
+                foreach (var userDto in userDtos)
+                {
+                    var user = users.FirstOrDefault(u => u.Id == userDto.Id);
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        userDto.Role = roles.FirstOrDefault();
+                    }
+                }
 
                 // 6. Create the PagedResult<UserDto> instance
                 var pagedResultData = new PagedResult<UserDto> // Use 'new' as it's a plain class now
@@ -830,7 +839,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-
         public async Task<Result<PagedResult<UserDto>>> SearchUserAsync(string keyword, BaseQueryParam queryParams)
         {
             try
@@ -879,6 +887,16 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 // 6. Ánh xạ từ ApplicationUser sang UserDto
                 IEnumerable<UserDto> userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+
+                foreach (var userDto in userDtos)
+                {
+                    var user = users.FirstOrDefault(u => u.Id == userDto.Id);
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        userDto.Role = roles.FirstOrDefault();
+                    }
+                }
 
                 // 7. Tạo đối tượng PagedResult
                 var pagination = new Pagination()

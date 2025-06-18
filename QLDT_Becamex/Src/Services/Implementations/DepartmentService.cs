@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using QLDT_Becamex.Src.Common;
 using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Dtos.Results;
@@ -28,13 +29,13 @@ namespace QLDT_Becamex.Src.Services.Implementations
             try
             {
                 // Kiểm tra tên phòng ban đã tồn tại chưa
-                var nameExists = await _unitOfWork.DepartmentRepository.AnyAsync(d => d.DepartmentName == request.DepartmentName);
+                var nameExists = await _unitOfWork.DepartmentRepository.AnyAsync(d => d.DepartmentName == request.DepartmentName || d.DepartmentCode == request.DepartmentCode);
                 if (nameExists)
                 {
                     return Result<DepartmentDto>.Failure(
                         message: "Tạo phòng ban thất bại",
-                        error: "Tên phòng ban đã tồn tại",
-                        code: "DEPARTMENT_NAME_EXISTS",
+                        error: "Tên phòng ban hoặc mã phòng ban đã tồn tại",
+                        code: "DEPARTMENT_NAME_CODE_EXISTS",
                         statusCode: 400
                     );
                 }
@@ -52,20 +53,23 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
 
                 // Kiểm tra ManagerId duy nhất
-                string? managerId = request.ManagerId?.ToLower() == "null" ? null : request.ManagerId;
-                if (!string.IsNullOrEmpty(managerId))
+                string? managerId = request.ManagerId.Trim();
+
+                var managerCheckResult = await ValidateManagerIdAsync(
+                    managerId: request.ManagerId,
+                    isRequired: true, // Bắt buộc ManagerId
+                    currentManagerId: null, // Không có quản lý hiện tại
+                    departmentId: null // Không có DepartmentId khi tạo mới
+                );
+
+                if (!managerCheckResult.IsSuccess)
                 {
-                    var existingMag = await _unitOfWork.DepartmentRepository
-                        .AnyAsync(d => d.ManagerId == managerId);
-                    if (existingMag)
-                    {
-                        return Result<DepartmentDto>.Failure(
-                            message: "Tạo phòng ban thất bại",
-                            error: "Manager đã được gán cho một phòng ban khác",
-                            code: "MANAGER_ALREADY_ASSIGNED",
-                            statusCode: StatusCodes.Status400BadRequest
-                        );
-                    }
+                    return Result<DepartmentDto>.Failure(
+                        message: managerCheckResult.Message,
+                        error: managerCheckResult.Errors.First(),
+                        code: managerCheckResult.Code,
+                        statusCode: managerCheckResult.StatusCode
+                    );
                 }
 
                 // Ánh xạ dữ liệu
@@ -99,18 +103,83 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<DepartmentDto>.Success(
                     message: "Tạo phòng ban thành công",
                     code: "DEPARTMENT_CREATED",
-                    statusCode: 201,
+                    statusCode: 200,
                     data: resultDto
                 );
             }
             catch (Exception ex)
             {
                 return Result<DepartmentDto>.Failure(
-                    error: ex.Message,
+                    error: "Lỗi hệ thống: " + ex.Message,
                     code: "SYSTEM_ERROR",
                     statusCode: 500
                 );
             }
+        }
+
+        private async Task<Result<bool>> ValidateManagerIdAsync( string? managerId, bool isRequired, string? currentManagerId, int? departmentId)
+        {
+            if (string.IsNullOrWhiteSpace(managerId))
+            {
+                if (isRequired)
+                {
+                    return Result<bool>.Failure(
+                        message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
+                        error: "Chưa chọn quản lý",
+                        code: "MANAGER_REQUIRED",
+                        statusCode: StatusCodes.Status400BadRequest
+                    );
+                }
+                return Result<bool>.Success(data: true);
+            }
+
+            managerId = managerId.Trim();
+
+            // Kiểm tra người dùng tồn tại và vai trò
+            var user = await _unitOfWork.UserRepository.GetFirstOrDefaultAsync(
+                u => u.Id == managerId,
+                includes: q => q.Include(u => u.Position)
+            );
+
+            if (user == null)
+            {
+                return Result<bool>.Failure(
+                    message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
+                    error: "Người dùng không tồn tại",
+                    code: "USER_NOT_FOUND",
+                    statusCode: StatusCodes.Status404NotFound
+                );
+            }
+
+            var validManagerRoles = new[] { PositionNames.SeniorManager, PositionNames.MiddleManager };
+            if (!validManagerRoles.Contains(user.Position?.PositionName))
+            {
+                return Result<bool>.Failure(
+                    message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
+                    error: "Người dùng không phải là quản lý cấp cao hoặc cấp trung",
+                    code: "NOT_MANAGER",
+                    statusCode: StatusCodes.Status400BadRequest
+                );
+            }
+
+            // Kiểm tra ManagerId duy nhất
+            if (managerId != currentManagerId)
+            {
+                var managerExists = await _unitOfWork.DepartmentRepository.AnyAsync(
+                    d => d.ManagerId == managerId && (!departmentId.HasValue || d.DepartmentId != departmentId.Value)
+                );
+                if (managerExists)
+                {
+                    return Result<bool>.Failure(
+                        message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
+                        error: "Quản lý đã được gán cho một phòng ban khác",
+                        code: "MANAGER_ALREADY_ASSIGNED",
+                        statusCode: StatusCodes.Status400BadRequest
+                    );
+                }
+            }
+
+            return Result<bool>.Success(data: true);
         }
 
         public List<string> GetPath(int departmentId, Dictionary<int, Department> departmentDict, Dictionary<int, List<string>> pathCache)
@@ -189,16 +258,16 @@ namespace QLDT_Becamex.Src.Services.Implementations
             try
             {
                 var allDepartments = await _unitOfWork.DepartmentRepository.GetFlexibleAsync(
-                     predicate: null,
-                     orderBy: null,
-                     page: null,
-                     pageSize: null,
-                     asNoTracking: true,
-                     includes: q => q
+                    predicate: null,
+                    orderBy: null,
+                    page: null,
+                    pageSize: null,
+                    asNoTracking: true,
+                    includes: q => q
                         .Include(d => d.Parent)
                         .Include(d => d.Manager)
                         .Include(d => d.Children)
-                 );
+                );
 
                 // Tải tất cả người dùng
                 var allUsers = await _unitOfWork.UserRepository.GetFlexibleAsync(
@@ -342,16 +411,25 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 var department = departments.First();
+                if(request.DepartmentName == null || request.DepartmentCode == null)
+                {
+                    return Result<DepartmentDto>.Failure(
+                        message: "Cập nhật phòng ban thất bại",
+                        error: "Tên hoặc mã phòng ban không được để trống",
+                        code: "DEPARTMENT_NAME_OR_CODE_REQUIRED",
+                        statusCode: StatusCodes.Status400BadRequest
+                    );
+                }
 
                 // Kiểm tra tên phòng ban đã tồn tại chưa (ngoại trừ chính nó)
                 var nameExists = await _unitOfWork.DepartmentRepository
-                    .AnyAsync(d => d.DepartmentName == request.DepartmentName && d.DepartmentId != id);
+                    .AnyAsync(d => d.DepartmentName == request.DepartmentName || d.DepartmentCode == request.DepartmentCode && d.DepartmentId != id);
                 if (nameExists)
                 {
                     return Result<DepartmentDto>.Failure(
                         message: "Cập nhật phòng ban thất bại",
-                        error: "Tên phòng ban đã tồn tại",
-                        code: "DEPARTMENT_NAME_EXISTS",
+                        error: "Tên phòng ban hoặc mã phòng ban đã tồn tại",
+                        code: "DEPARTMENT_NAME_CODE_EXISTS",
                         statusCode: StatusCodes.Status400BadRequest
                     );
                 }
@@ -408,21 +486,23 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 int levelDifference = newLevel - department.Level;
 
                 // Kiểm tra ManagerId duy nhất (ngoại trừ chính nó)
-                string? managerId = request.ManagerId?.ToLower() == "null" ? null : request.ManagerId;
-                if (!string.IsNullOrEmpty(managerId) && managerId != department.ManagerId)
+                string? managerId = request.ManagerId;
+
+                var managerCheckResult = await ValidateManagerIdAsync(
+                    managerId: managerId,
+                    isRequired: false, // ManagerId không bắt buộc khi cập nhật
+                    currentManagerId: department.ManagerId,
+                    departmentId: id
+                );
+
+                if (!managerCheckResult.IsSuccess)
                 {
-                    var managerExists = await _unitOfWork.DepartmentRepository.AnyAsync(
-                d => d.ManagerId == managerId && d.DepartmentId != id
-            );
-                    if (managerExists)
-                    {
-                        return Result<DepartmentDto>.Failure(
-                            message: "Cập nhật phòng ban thất bại",
-                            error: "Manager đã được gán cho một phòng ban khác",
-                            code: "MANAGER_ALREADY_ASSIGNED",
-                            statusCode: StatusCodes.Status400BadRequest
-                        );
-                    }
+                    return Result<DepartmentDto>.Failure(
+                        message: managerCheckResult.Message,
+                        error: managerCheckResult.Errors.First(),
+                        code: managerCheckResult.Code,
+                        statusCode: managerCheckResult.StatusCode
+                    );
                 }
 
                 // Cập nhật thông tin

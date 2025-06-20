@@ -10,8 +10,11 @@ namespace QLDT_Becamex.Src.UnitOfWork
         public IUserRepository UserRepository { get; }
         public IDepartmentRepository DepartmentRepository { get; }
         public IPositionRepostiory PositionRepostiory { get; }
-
         public IUserStatusRepostiory UserStatusRepostiory { get; }
+
+        public ICourseDepartmentRepository CourseDepartmentRepository { get; }
+        public ICoursePostitionRepository CoursePostitionRepository { get; }
+        public ICourseStatusRepository CourseStatusRepository { get; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -20,6 +23,9 @@ namespace QLDT_Becamex.Src.UnitOfWork
             DepartmentRepository = new DepartmentRepository(dbContext);
             PositionRepostiory = new PositionRepository(dbContext);
             UserStatusRepostiory = new UserStatusRepostiory(dbContext);
+            CourseDepartmentRepository = new CourseDepartmentRepository(dbContext);
+            CoursePostitionRepository = new CoursePostitionRepository(dbContext);
+            CourseStatusRepository = new CourseStatusRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

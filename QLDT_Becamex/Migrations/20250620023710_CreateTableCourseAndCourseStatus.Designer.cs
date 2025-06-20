@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Config;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Config;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250620023710_CreateTableCourseAndCourseStatus")]
+    partial class CreateTableCourseAndCourseStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -206,7 +209,7 @@ namespace QLDT_Becamex.Migrations
                     b.Property<string>("ManagerUId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("ModifiedAt")
+                    b.Property<DateTime?>("ModifedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NormalizedEmail")
@@ -331,54 +334,6 @@ namespace QLDT_Becamex.Migrations
                     b.HasIndex("StatusId");
 
                     b.ToTable("Course", (string)null);
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Models.CourseDepartment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.ToTable("CourseDepartment", (string)null);
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Models.CoursePosition", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("PositionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("PositionId");
-
-                    b.ToTable("CoursePosition", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.CourseSatus", b =>
@@ -580,44 +535,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("QLDT_Becamex.Src.Models.CourseDepartment", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Models.Course", "Course")
-                        .WithMany("CourseDepartments")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("QLDT_Becamex.Src.Models.Department", "Department")
-                        .WithMany("CourseDepartments")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Department");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Models.CoursePosition", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Models.Course", "Course")
-                        .WithMany("CoursePositions")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("QLDT_Becamex.Src.Models.Position", "Position")
-                        .WithMany("CoursePositions")
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Position");
-                });
-
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Department", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Models.ApplicationUser", "Manager")
@@ -640,13 +557,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Children");
                 });
 
-            modelBuilder.Entity("QLDT_Becamex.Src.Models.Course", b =>
-                {
-                    b.Navigation("CourseDepartments");
-
-                    b.Navigation("CoursePositions");
-                });
-
             modelBuilder.Entity("QLDT_Becamex.Src.Models.CourseSatus", b =>
                 {
                     b.Navigation("Courses");
@@ -656,15 +566,11 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.Navigation("Children");
 
-                    b.Navigation("CourseDepartments");
-
                     b.Navigation("Users");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Models.Position", b =>
                 {
-                    b.Navigation("CoursePositions");
-
                     b.Navigation("Users");
                 });
 #pragma warning restore 612, 618

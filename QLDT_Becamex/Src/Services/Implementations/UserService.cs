@@ -311,7 +311,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 // Nếu có thay đổi, cập nhật thời gian chỉnh sửa
-                userToUpdate.ModifedAt = DateTime.UtcNow;
+                userToUpdate.ModifiedAt = DateTime.UtcNow;
 
                 // 3. Cập nhật Email và Username (nếu thay đổi)
                 // Kiểm tra xem email mới có khác email hiện tại không
@@ -570,7 +570,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 // 3. Thực hiện xóa mềm: Cập nhật IsDeleted thành true và đặt DeletedAt
                 user.IsDeleted = true;
-                user.ModifedAt = DateTime.UtcNow; // Cập nhật cả UpdatedAt
+                user.ModifiedAt = DateTime.UtcNow; // Cập nhật cả UpdatedAt
 
                 // 4. Cập nhật người dùng trong UserManager
                 // Lưu ý: UserManager.UpdateAsync sẽ lưu các thay đổi này vào DB

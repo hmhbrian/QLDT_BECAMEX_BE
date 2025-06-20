@@ -74,6 +74,18 @@ builder.Services.AddAuthorization(); // Đăng ký dịch vụ ủy quyền
 // 3. Đăng ký HttpContextAccessor (Cần thiết cho UserService lấy thông tin user hiện tại)
 builder.Services.AddHttpContextAccessor(); // <-- Đã thêm
 
+// Add Cors dành cho môi trường dev khác domain
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Chỉ cho phép frontend này
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Nếu có sử dụng cookie, session
+    });
+});
+
 // 4. Đăng ký Unit of Work, Repositories và Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -87,7 +99,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
-builder.Services.AddScoped<JwtService>(); // Dịch vụ JWT
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddSingleton<CloudinaryService>();
 // 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -136,6 +148,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("AllowSpecificOrigin"); // 🔥 Bật CORS ở middleware
 }
 
 // 2. Middleware chuyển hướng HTTPS (Tùy chọn, hiện đang bị comment)
@@ -144,6 +157,12 @@ if (app.Environment.IsDevelopment())
 // 3. Middleware định tuyến
 app.UseRouting(); // Cần thiết nếu bạn muốn các middleware Authorization/Authentication hoạt động trước khi chọn endpoint
 
+app.UseCors(option =>
+{
+    option.AllowAnyHeader();
+    option.AllowAnyMethod();
+    option.AllowAnyOrigin();
+});
 // 4. Middleware Authentication và Authorization
 app.UseAuthentication(); // Xác thực người dùng (đọc token, cookie, v.v.)
 app.UseAuthorization();  // Ủy quyền (kiểm tra quyền truy cập dựa trên [Authorize] attributes)

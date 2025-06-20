@@ -122,69 +122,58 @@ namespace QLDT_Becamex.Src.Services.Implementations
         {
             try
             {
-                string targetRoleId;    // ID của vai trò sẽ gán cho người dùng mới
-                string targetRoleName;  // Tên của vai trò sẽ gán cho người dùng mới
+                string targetRoleId;
+                string targetRoleName;
 
                 // 1. Xác định vai trò sẽ gán cho người dùng mới
+                IdentityRole? selectedRole = null;
+
                 if (!string.IsNullOrEmpty(registerDto.RoleId))
                 {
-                    // Nếu RoleId được cung cấp trong DTO, sử dụng nó
-                    var submittedRole = await _roleManager.FindByIdAsync(registerDto.RoleId);
-                    if (submittedRole == null || string.IsNullOrEmpty(submittedRole.Name))
+                    // Kiểm tra RoleId có tồn tại trong DB không
+                    selectedRole = await _roleManager.FindByIdAsync(registerDto.RoleId);
+                    if (selectedRole == null)
                     {
                         return Result.Failure(
                             message: "Đăng ký thất bại",
-                            error: "ID vai trò được cung cấp không hợp lệ hoặc không tồn tại.",
-                            code: "INVALID_ROLE_ID_SUBMITTED",
+                            error: $"Không tìm thấy vai trò với ID: {registerDto.RoleId}.",
+                            code: "ROLE_NOT_FOUND",
                             statusCode: 400
                         );
                     }
-                    targetRoleId = submittedRole.Id;
-                    targetRoleName = submittedRole.Name;
                 }
                 else
                 {
-                    // Nếu RoleId không được cung cấp, mặc định là "HOCVIEN"
-                    var hocVienRole = await _roleManager.FindByNameAsync("HOCVIEN");
-                    if (hocVienRole == null)
+                    // Nếu không cung cấp RoleId, mặc định là "HOCVIEN"
+                    selectedRole = await _roleManager.FindByNameAsync("HOCVIEN");
+                    if (selectedRole == null)
                     {
                         return Result.Failure(
                             message: "Đăng ký thất bại",
-                            error: "Vai trò 'HOCVIEN' không tồn tại trong hệ thống. Vui lòng cấu hình vai trò này.",
-                            code: "HOCVIEN_ROLE_NOT_FOUND",
-                            statusCode: 500 // Lỗi cấu hình hệ thống
+                            error: "Vai trò mặc định 'HOCVIEN' không tồn tại.",
+                            code: "DEFAULT_ROLE_MISSING",
+                            statusCode: 500
                         );
                     }
-                    targetRoleId = hocVienRole.Id;
-                    targetRoleName = hocVienRole.Name;
                 }
 
-                // 2. Xác thực Email đã tồn tại trước khi tạo user
-                var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.Email);
-                if (existingUserByEmail != null)
+                // Gán thông tin vai trò
+                targetRoleId = selectedRole.Id;
+                targetRoleName = selectedRole.Name!;
+
+                // 2. Kiểm tra email đã tồn tại chưa
+                var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+                if (existingUser != null)
                 {
                     return Result.Failure(
                         message: "Đăng ký thất bại",
-                        error: "Email này đã được sử dụng bởi một tài khoản khác.",
-                        code: "EMAIL_ALREADY_EXISTS",
+                        error: "Email này đã được sử dụng.",
+                        code: "EMAIL_DUPLICATE",
                         statusCode: 400
                     );
                 }
 
-                // Tìm IdentityRole bằng RoleId
-                var role = await _roleManager.FindByIdAsync(targetRoleId);
-                if (role == null || string.IsNullOrEmpty(role.Name))
-                {
-                    return Result.Failure(
-                        message: "Đăng ký thất bại",
-                        error: "Vai trò liên kết với vị trí không tồn tại hoặc không hợp lệ.",
-                        code: "INVALID_POSITION_ROLE",
-                        statusCode: 400
-                    );
-                }
-                var roleNameFromPosition = role.Name; // Lấy tên vai trò từ đối tượng IdentityRole
-
-                // 4. Tạo user
+                // 3. Tạo người dùng mới
                 var user = new ApplicationUser
                 {
                     UserName = registerDto.Email.ToLower(),
@@ -196,32 +185,33 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     CreatedAt = DateTime.Now,
                     Code = registerDto.Code,
                     PositionId = registerDto.PositionId,
-                    ManagerUId = registerDto.ManagerUId// Sử dụng finalPositionId đã xác định
-                    // DepartmentId và ManagerId (nếu có trong RegisterDto, cần thêm vào)
+                    ManagerUId = registerDto.ManagerUId,
+                    DepartmentId = registerDto.DepartmentId,
+                    StatusId = registerDto.StatusId,
+                    EndWork = registerDto.EndWork,
                 };
 
-                var createUserResult = await _userManager.CreateAsync(user, registerDto.Password);
-                if (!createUserResult.Succeeded)
+                var createResult = await _userManager.CreateAsync(user, registerDto.Password);
+                if (!createResult.Succeeded)
                 {
                     return Result.Failure(
                         message: "Đăng ký thất bại",
-                        errors: createUserResult.Errors.Select(e => e.Description),
+                        errors: createResult.Errors.Select(e => e.Description),
                         code: "USER_CREATION_FAILED",
                         statusCode: 400
                     );
                 }
 
-                // 5. Gán role cho user
+                // 4. Gán vai trò cho user
                 var addRoleResult = await _userManager.AddToRoleAsync(user, targetRoleName);
                 if (!addRoleResult.Succeeded)
                 {
-                    // Nếu gán role thất bại -> XÓA USER đã tạo trước đó để tránh user không có role
-                    await _userManager.DeleteAsync(user);
+                    await _userManager.DeleteAsync(user); // Rollback
                     return Result.Failure(
                         message: "Đăng ký thất bại",
-                        error: "Không thể gán vai trò cho người dùng, vui lòng thử lại.",
-                        code: "ROLE_ASSIGNMENT_FAILED",
-                        statusCode: 400
+                        error: "Không thể gán vai trò cho người dùng.",
+                        code: "ROLE_ASSIGN_FAILED",
+                        statusCode: 500
                     );
                 }
 
@@ -229,8 +219,6 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
             catch (Exception ex)
             {
-                // Ghi log lỗi chi tiết tại đây (ví dụ: ILogger)
-                // Console.WriteLine($"Error registering user: {ex.Message}");
                 return Result.Failure(
                     error: ex.Message,
                     code: "SYSTEM_ERROR",

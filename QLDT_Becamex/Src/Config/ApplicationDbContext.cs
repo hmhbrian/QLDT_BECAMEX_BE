@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
         public DbSet<CourseSatus> CourseStatus { get; set; }
         public DbSet<CourseDepartment> CourseDepartment { get; set; }
         public DbSet<CoursePosition> CoursePosition { get; set; }
-
+        public DbSet<UserCourse> UserCourse { get; set; }
 
 
 
@@ -40,7 +40,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             ConfigureCourseSatus(modelBuilder);
             ConfigureCourseDepartment(modelBuilder);
             ConfigureCoursePosition(modelBuilder);
-
+            ConfigureUserCourse(modelBuilder);
 
         }
 
@@ -190,14 +190,23 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.Property(p => p.Description)
                       .HasMaxLength(1000);
 
+                entity.Property(p => p.ThumbUrl)
+                    .HasMaxLength(200);
+
                 entity.Property(p => p.Objecttives)
                       .HasMaxLength(255);
 
                 entity.Property(p => p.Format)
                       .HasMaxLength(255);
 
-                entity.Property(p => p.Duration)
+                entity.Property(p => p.Sesstions)
                       .HasMaxLength(100);
+                entity.Property(p => p.HoursPerSesstions)
+                    .HasMaxLength(100);
+                entity.Property(p => p.Optional)
+                   .HasMaxLength(100);
+                entity.Property(p => p.MaxParticipant)
+               .HasMaxLength(100);
 
                 entity.Property(p => p.Location)
                       .HasMaxLength(255);
@@ -213,6 +222,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
 
                 entity.Property(p => p.RegistrationSlosingDate)
                       .HasColumnType("datetime");
+
 
                 entity.Property(p => p.StatusId);
 
@@ -238,7 +248,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.HasKey(s => s.Id);
 
                 entity.Property(s => s.Id)
-                      .IsRequired();
+                      .IsRequired().ValueGeneratedOnAdd();
 
                 entity.Property(s => s.Name)
                       .IsRequired()
@@ -259,6 +269,9 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
 
                 entity.HasKey(e => e.Id);
 
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
                 entity.HasOne(cd => cd.Course)
                       .WithMany(c => c.CourseDepartments)
                       .HasForeignKey(cd => cd.CourseId)
@@ -278,6 +291,9 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
 
                 entity.HasKey(e => e.Id);
 
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
                 entity.HasOne(cp => cp.Course)
                       .WithMany(c => c.CoursePositions)
                       .HasForeignKey(cp => cp.CourseId)
@@ -290,6 +306,33 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             });
         }
 
+        private void ConfigureUserCourse(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserCourse>(entity =>
+            {
+                entity.ToTable("UserCourse");
 
+                entity.HasKey(e => e.Id);
+
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
+                entity.Property(s => s.AssignedAt);
+                entity.Property(s => s.IsMandatory);
+                entity.Property(s => s.Status);
+
+
+
+                entity.HasOne(cp => cp.Course)
+                      .WithMany(c => c.UserCourses)
+                      .HasForeignKey(cp => cp.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cp => cp.User)
+                      .WithMany(p => p.UserCourse)
+                      .HasForeignKey(cp => cp.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
     }
 }

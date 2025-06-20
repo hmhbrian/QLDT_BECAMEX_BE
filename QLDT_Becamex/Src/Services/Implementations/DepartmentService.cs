@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Common;
-using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Dtos.Results;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
-using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {
@@ -117,7 +113,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-        private async Task<Result<bool>> ValidateManagerIdAsync( string? managerId, bool isRequired, string? currentManagerId, int? departmentId)
+        private async Task<Result<bool>> ValidateManagerIdAsync(string? managerId, bool isRequired, string? currentManagerId, int? departmentId)
         {
             if (string.IsNullOrWhiteSpace(managerId))
             {
@@ -151,8 +147,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
 
-            var validManagerRoles = new[] { PositionNames.SeniorManager, PositionNames.MiddleManager };
-            if (!validManagerRoles.Contains(user.Position?.PositionName))
+            var validManagerRoles = new[] { PositionNames.SeniorManager.ToLower(), PositionNames.MiddleManager.ToLower() };
+            if (!validManagerRoles.Contains(user.Position?.PositionName.ToLower()))
             {
                 return Result<bool>.Failure(
                     message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
@@ -411,7 +407,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 var department = departments.First();
-                if(request.DepartmentName == null || request.DepartmentCode == null)
+                if (request.DepartmentName == null || request.DepartmentCode == null)
                 {
                     return Result<DepartmentDto>.Failure(
                         message: "Cập nhật phòng ban thất bại",
@@ -732,7 +728,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 departmentDict[child.DepartmentId] = child;
 
                 // Đệ quy cập nhật các phòng ban con
-                await UpdateChildrenAfterDeleteAsync(child, newParentId, newLevel+1, departmentDict);
+                await UpdateChildrenAfterDeleteAsync(child, newParentId, newLevel + 1, departmentDict);
             }
         }
     }

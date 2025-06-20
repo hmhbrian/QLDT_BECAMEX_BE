@@ -3,7 +3,7 @@ using QLDT_Becamex.Src.Repostitories.GenericRepository;
 
 namespace QLDT_Becamex.Src.Repostitories.Interfaces
 {
-    public interface ICoursePostitionRepository : IGenericRepository<CoursePosition>
+    public interface IUserCourseRepository : IGenericRepository<UserCourse>
     {
     }
 }

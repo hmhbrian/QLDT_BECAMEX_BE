@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using QLDT_Becamex.Src.Dtos.Courses;
 using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Dtos.Positions;
 using QLDT_Becamex.Src.Dtos.Roles;
@@ -33,6 +34,17 @@ namespace QLDT_Becamex.Src.Mappings
             //Role
             CreateMap<IdentityRole, RoleDto>().ReverseMap();
             CreateMap<RoleRq, IdentityRole>();
+
+            //Course
+            CreateMap<CourseDtoRq, Course>();
+            CreateMap<Course, CourseDto>();
+            CreateMap<CourseDto, Course>();
+
+
+            //CourseStatus
+            CreateMap<CourseSatus, CourseSatusDto>().ReverseMap();
+            CreateMap<CourseStatusDtoRq, CourseSatus>().ReverseMap();
+
         }
     }
 }

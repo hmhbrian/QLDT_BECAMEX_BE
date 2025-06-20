@@ -31,6 +31,9 @@ namespace QLDT_Becamex.Src.Models // Đảm bảo namespace này khớp với n�
 
         public ICollection<ApplicationUser>? Children { get; set; }
 
+        public ICollection<UserCourse>? UserCourse { get; set; }
+
+
     }
 
 }

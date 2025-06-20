@@ -8,6 +8,11 @@ namespace QLDT_Becamex.Src.UnitOfWork
         public IDepartmentRepository DepartmentRepository { get; }
         public IPositionRepostiory PositionRepostiory { get; }
         public IUserStatusRepostiory UserStatusRepostiory { get; }
+        public ICourseDepartmentRepository CourseDepartmentRepository { get; }
+        public ICoursePostitionRepository CoursePostitionRepository { get; }
+        public ICourseStatusRepository CourseStatusRepository { get; }
+
+
 
         public Task<int> CompleteAsync();
     }

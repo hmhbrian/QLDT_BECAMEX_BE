@@ -15,6 +15,13 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
         public DbSet<Department> Departments { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<UserStatus> UserStatus { get; set; }
+        public DbSet<Course> Course { get; set; }
+        public DbSet<CourseStatus> CourseStatus { get; set; }
+        public DbSet<CourseDepartment> CourseDepartment { get; set; }
+        public DbSet<CoursePosition> CoursePosition { get; set; }
+        public DbSet<UserCourse> UserCourse { get; set; }
+
+
 
         // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
 
@@ -28,7 +35,12 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             ConfigureApplicationUser(modelBuilder);
             ConfigureDepartment(modelBuilder);
             ConfigurePosition(modelBuilder);
-            ConfigureStatus(modelBuilder);
+            ConfigureUserStatus(modelBuilder);
+            ConfigureCourse(modelBuilder);
+            ConfigureCourseSatus(modelBuilder);
+            ConfigureCourseDepartment(modelBuilder);
+            ConfigureCoursePosition(modelBuilder);
+            ConfigureUserCourse(modelBuilder);
 
         }
 
@@ -142,7 +154,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             });
         }
 
-        private void ConfigureStatus(ModelBuilder modelBuilder)
+        private void ConfigureUserStatus(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserStatus>(entity =>
             {
@@ -154,6 +166,172 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.Property(p => p.Name)
                       .IsRequired()               // Bắt buộc phải có giá trị
                       .HasMaxLength(255);         // Giới hạn độ 
+            });
+        }
+
+        private void ConfigureCourse(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Course>(entity =>
+            {
+                entity.ToTable("Course");
+
+                entity.HasKey(p => p.Id);
+
+                entity.Property(p => p.Id)
+                      .IsRequired();
+
+                entity.Property(p => p.Code)
+                      .HasMaxLength(100);
+
+                entity.Property(p => p.Name)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.Description)
+                      .HasMaxLength(1000);
+
+                entity.Property(p => p.ThumbUrl)
+                    .HasMaxLength(200);
+
+                entity.Property(p => p.Objectives)
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.Format)
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.Sessions)
+                      .HasMaxLength(100);
+                entity.Property(p => p.HoursPerSessions)
+                    .HasMaxLength(100);
+                entity.Property(p => p.Optional)
+                   .HasMaxLength(100);
+                entity.Property(p => p.MaxParticipant)
+               .HasMaxLength(100);
+
+                entity.Property(p => p.Location)
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.StartDate)
+                      .HasColumnType("datetime");
+
+                entity.Property(p => p.EndDate)
+                      .HasColumnType("datetime");
+
+                entity.Property(p => p.RegistrationStartDate)
+                      .HasColumnType("datetime");
+
+                entity.Property(p => p.RegistrationClosingDate)
+                      .HasColumnType("datetime");
+
+
+                entity.Property(p => p.StatusId);
+
+                entity.Property(p => p.CreatedAt)
+                      .HasColumnType("datetime");
+
+                entity.Property(p => p.ModifiedAt)
+                      .HasColumnType("datetime");
+
+                entity.HasOne(p => p.Status)
+                      .WithMany(s => s.Courses)
+                      .HasForeignKey(p => p.StatusId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+        }
+
+        private void ConfigureCourseSatus(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CourseStatus>(entity =>
+            {
+                entity.ToTable("CourseSatus");
+
+                entity.HasKey(s => s.Id);
+
+                entity.Property(s => s.Id)
+                      .IsRequired().ValueGeneratedOnAdd();
+
+                entity.Property(s => s.Name)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.HasMany(s => s.Courses)
+                      .WithOne(c => c.Status)
+                      .HasForeignKey(c => c.StatusId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+        }
+
+        private void ConfigureCourseDepartment(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CourseDepartment>(entity =>
+            {
+                entity.ToTable("CourseDepartment");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
+                entity.HasOne(cd => cd.Course)
+                      .WithMany(c => c.CourseDepartments)
+                      .HasForeignKey(cd => cd.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cd => cd.Department)
+                      .WithMany(d => d.CourseDepartments)
+                      .HasForeignKey(cd => cd.DepartmentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+        private void ConfigureCoursePosition(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CoursePosition>(entity =>
+            {
+                entity.ToTable("CoursePosition");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
+                entity.HasOne(cp => cp.Course)
+                      .WithMany(c => c.CoursePositions)
+                      .HasForeignKey(cp => cp.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cp => cp.Position)
+                      .WithMany(p => p.CoursePositions)
+                      .HasForeignKey(cp => cp.PositionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        private void ConfigureUserCourse(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserCourse>(entity =>
+            {
+                entity.ToTable("UserCourse");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
+                entity.Property(s => s.AssignedAt);
+                entity.Property(s => s.IsMandatory);
+                entity.Property(s => s.Status);
+
+
+
+                entity.HasOne(cp => cp.Course)
+                      .WithMany(c => c.UserCourses)
+                      .HasForeignKey(cp => cp.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cp => cp.User)
+                      .WithMany(p => p.UserCourse)
+                      .HasForeignKey(cp => cp.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

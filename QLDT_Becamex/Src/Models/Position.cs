@@ -10,6 +10,7 @@ namespace QLDT_Becamex.Src.Models
         public string? PositionName { get; set; }
 
 
+        public ICollection<CoursePosition> CoursePositions { get; set; } = new List<CoursePosition>();
 
         public ICollection<ApplicationUser>? Users { get; set; } // Collection của các User có vị trí này
     }

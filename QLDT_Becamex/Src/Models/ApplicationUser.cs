@@ -27,9 +27,12 @@ namespace QLDT_Becamex.Src.Models // Đảm bảo namespace này khớp với n�
 
 
         public DateTime? CreatedAt { get; set; }
-        public DateTime? ModifedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
 
         public ICollection<ApplicationUser>? Children { get; set; }
+
+        public ICollection<UserCourse>? UserCourse { get; set; }
+
 
     }
 

@@ -69,40 +69,38 @@ namespace QLDT_Becamex.Src.Services.Implementations
         /// <summary>
         /// Xóa một trạng thái người dùng theo ID.
         /// </summary>
-        public async Task<Result> DeleteAsync(int id)
+        public async Task<Result> DeleteAsync(List<int> ids)
         {
             try
             {
-                var userStatus = await _unitOfWork.UserStatusRepostiory.GetByIdAsync(id);
-                if (userStatus == null)
+                // Lấy tất cả các entity cần xóa
+                var entities = await _unitOfWork.UserStatusRepostiory.FindAsync(cs => ids.Contains(cs.Id));
+
+                if (entities == null || !entities.Any())
                 {
                     return Result.Failure(
-                        error: "User status not found.",
-                        code: "USER_STATUS_NOT_FOUND",
+                        error: "No Userstatus found with the provided IDs.",
+                        code: "NOT_FOUND",
                         statusCode: 404
                     );
                 }
 
-                _unitOfWork.UserStatusRepostiory.Remove(userStatus);
+                _unitOfWork.UserStatusRepostiory.RemoveRange(entities);
                 await _unitOfWork.CompleteAsync();
 
-                return Result.Success(
-                    message: "User status deleted successfully.",
-                    code: "USER_STATUS_DELETED",
-                    statusCode: 204 // No Content for successful deletion
-                );
+                return Result.Success();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] UserStatusService.DeleteAsync: {ex.Message}");
                 return Result.Failure(
                     error: ex.Message,
-                    message: "An error occurred while deleting the user status.",
+                    message: "An error occurred while deleting course statuses.",
                     code: "SYSTEM_ERROR",
                     statusCode: 500
                 );
             }
         }
+
 
         /// <summary>
         /// Lấy tất cả các trạng thái người dùng.

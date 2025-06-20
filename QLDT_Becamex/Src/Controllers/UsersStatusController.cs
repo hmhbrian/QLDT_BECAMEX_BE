@@ -137,12 +137,12 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         // --- Xóa một trạng thái người dùng ---
-        [HttpDelete("{id}")] // Route sẽ là /api/UsersStatus/{id}
+        [HttpDelete()] // Route sẽ là /api/UsersStatus/{id}
         [Authorize(Roles = "ADMIN")]
         // [Authorize(Roles = "Admin")] // Ví dụ: chỉ Admin mới được xóa
-        public async Task<IActionResult> DeleteUserStatus(int id)
+        public async Task<IActionResult> DeleteUserStatus(List<int> ids)
         {
-            var result = await _userStatusService.DeleteAsync(id);
+            var result = await _userStatusService.DeleteAsync(ids);
 
             if (result.IsSuccess)
             {

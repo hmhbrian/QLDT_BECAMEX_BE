@@ -98,8 +98,11 @@ builder.Services.AddScoped<IPositionRepostiory, PositionRepository>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<IUserStatusService, UserStatusService>();
+builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
+
 builder.Services.AddScoped<JwtService>(); // Dịch vụ JWT
 builder.Services.AddSingleton<CloudinaryService>();
 // 5. Cấu hình AutoMapper

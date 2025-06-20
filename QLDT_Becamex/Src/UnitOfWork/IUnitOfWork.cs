@@ -9,8 +9,10 @@ namespace QLDT_Becamex.Src.UnitOfWork
         public IPositionRepostiory PositionRepostiory { get; }
         public IUserStatusRepostiory UserStatusRepostiory { get; }
         public ICourseDepartmentRepository CourseDepartmentRepository { get; }
-        public ICoursePostitionRepository CoursePostitionRepository { get; }
+        public ICoursePositionRepository CoursePositionRepository { get; }
         public ICourseStatusRepository CourseStatusRepository { get; }
+        public ICourseRepository CourseRepository { get; }
+        public IUserCourseRepository UserCourseRepository { get; }
 
 
 

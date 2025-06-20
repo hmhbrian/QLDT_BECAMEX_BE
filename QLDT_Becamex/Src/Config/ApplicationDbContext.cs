@@ -37,7 +37,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             ConfigurePosition(modelBuilder);
             ConfigureUserStatus(modelBuilder);
             ConfigureCourse(modelBuilder);
-            ConfigureCourseSatus(modelBuilder);
+            ConfigureCourseStatus(modelBuilder);
             ConfigureCourseDepartment(modelBuilder);
             ConfigureCoursePosition(modelBuilder);
             ConfigureUserCourse(modelBuilder);
@@ -239,11 +239,11 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             });
         }
 
-        private void ConfigureCourseSatus(ModelBuilder modelBuilder)
+        private void ConfigureCourseStatus(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CourseStatus>(entity =>
             {
-                entity.ToTable("CourseSatus");
+                entity.ToTable("CourseStatus");
 
                 entity.HasKey(s => s.Id);
 

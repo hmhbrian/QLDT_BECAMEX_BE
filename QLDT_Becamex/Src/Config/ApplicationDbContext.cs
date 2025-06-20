@@ -16,7 +16,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
         public DbSet<Position> Positions { get; set; }
         public DbSet<UserStatus> UserStatus { get; set; }
         public DbSet<Course> Course { get; set; }
-        public DbSet<CourseSatus> CourseStatus { get; set; }
+        public DbSet<CourseStatus> CourseStatus { get; set; }
         public DbSet<CourseDepartment> CourseDepartment { get; set; }
         public DbSet<CoursePosition> CoursePosition { get; set; }
         public DbSet<UserCourse> UserCourse { get; set; }
@@ -37,7 +37,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             ConfigurePosition(modelBuilder);
             ConfigureUserStatus(modelBuilder);
             ConfigureCourse(modelBuilder);
-            ConfigureCourseSatus(modelBuilder);
+            ConfigureCourseStatus(modelBuilder);
             ConfigureCourseDepartment(modelBuilder);
             ConfigureCoursePosition(modelBuilder);
             ConfigureUserCourse(modelBuilder);
@@ -193,15 +193,15 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.Property(p => p.ThumbUrl)
                     .HasMaxLength(200);
 
-                entity.Property(p => p.Objecttives)
+                entity.Property(p => p.Objectives)
                       .HasMaxLength(255);
 
                 entity.Property(p => p.Format)
                       .HasMaxLength(255);
 
-                entity.Property(p => p.Sesstions)
+                entity.Property(p => p.Sessions)
                       .HasMaxLength(100);
-                entity.Property(p => p.HoursPerSesstions)
+                entity.Property(p => p.HoursPerSessions)
                     .HasMaxLength(100);
                 entity.Property(p => p.Optional)
                    .HasMaxLength(100);
@@ -220,7 +220,7 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
                 entity.Property(p => p.RegistrationStartDate)
                       .HasColumnType("datetime");
 
-                entity.Property(p => p.RegistrationSlosingDate)
+                entity.Property(p => p.RegistrationClosingDate)
                       .HasColumnType("datetime");
 
 
@@ -239,11 +239,11 @@ namespace QLDT_Becamex.Src.Config // Ví dụ: bạn có thể đặt nó trong 
             });
         }
 
-        private void ConfigureCourseSatus(ModelBuilder modelBuilder)
+        private void ConfigureCourseStatus(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CourseSatus>(entity =>
+            modelBuilder.Entity<CourseStatus>(entity =>
             {
-                entity.ToTable("CourseSatus");
+                entity.ToTable("CourseStatus");
 
                 entity.HasKey(s => s.Id);
 

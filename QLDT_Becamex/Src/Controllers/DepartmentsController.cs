@@ -64,7 +64,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "ADMIN, HR")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetAllDepartments()
         {
             try
@@ -101,7 +101,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet("{id}")]
-        //[Authorize(Roles = "ADMIN, HR")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
             try
@@ -138,7 +138,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpPut("{id}")]
-        //[Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentRq dto)
         {
             if (!ModelState.IsValid)
@@ -185,7 +185,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             try

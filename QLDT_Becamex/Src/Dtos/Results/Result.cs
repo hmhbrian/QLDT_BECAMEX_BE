@@ -1,6 +1,8 @@
 ﻿
 namespace QLDT_Becamex.Src.Dtos.Results
 {
+    using QLDT_Becamex.Src.Dtos.Users;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     public class Result
@@ -165,6 +167,10 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         }
 
+        public static Result<UserDto> Success(UserLoginRq dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

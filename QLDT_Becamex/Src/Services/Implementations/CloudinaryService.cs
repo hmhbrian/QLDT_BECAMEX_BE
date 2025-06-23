@@ -1,9 +1,9 @@
 ﻿using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
-
+using QLDT_Becamex.Src.Services.Interfaces;
 namespace QLDT_Becamex.Src.Services.Implementations
 {
-    public class CloudinaryService
+    public class CloudinaryService : ICloudinaryService
     {
         private readonly Cloudinary _cloudinary;
 

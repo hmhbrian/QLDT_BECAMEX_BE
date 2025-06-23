@@ -86,6 +86,18 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add Cors dành cho môi trường dev khác domain
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Chỉ cho phép frontend này
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Nếu có sử dụng cookie, session
+    });
+});
+
 // 4. Đăng ký Unit of Work, Repositories và Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -100,11 +112,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserStatusService, UserStatusService>();
 builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
-
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<JwtService>(); // Dịch vụ JWT
-builder.Services.AddSingleton<CloudinaryService>();
+
 // 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 

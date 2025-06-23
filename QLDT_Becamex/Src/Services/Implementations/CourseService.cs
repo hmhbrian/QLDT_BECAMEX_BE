@@ -20,9 +20,9 @@ namespace QLDT_Becamex.Src.Services.Implementations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly CloudinaryService _cloudinaryService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public CourseService(IMapper mapper, IUnitOfWork unitOfWork, CloudinaryService cloudinaryService)
+        public CourseService(IMapper mapper, IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -585,6 +585,48 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 code: "VALIDATION_SUCCESS",
                 statusCode: 200
             );
+        }
+        
+        public async Task<Result<CourseDto>> GetCourseAsync(string id)
+        {
+            try
+            {
+                var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
+                    predicate: u => u.Id == id,
+                    includes: q => q
+                        .Include(c => c.CourseDepartments)
+                        .Include(c => c.CoursePositions)
+                        .Include(c => c.UserCourses)
+                        .Include(c => c.Status)
+                );
+                if (course == null)
+                {
+                    return Result<CourseDto>.Failure(
+                    error: "Get course fail!",
+                    code: "NOT_FOUND",
+                    statusCode: 404
+                );
+                }
+                var courseDto = _mapper.Map<CourseDto>(course);
+
+                return Result<CourseDto>.Success(
+
+                   message: "Get course success!",
+                   code: "SUCCESS",
+                   statusCode: 200,
+                   data: courseDto
+               );
+
+            }
+            catch (Exception ex)
+            {
+                return Result<CourseDto>.Failure(
+                   error: ex.Message,
+                   message: "An error occurred while retrieving the user list.",
+                   code: "SYSTEM_ERROR",
+                   statusCode: 500
+               );
+             }
         }
 
         public async Task<Result<PagedResult<CourseDto>>> GetAllCoursesAsync(BaseQueryParam queryParam)

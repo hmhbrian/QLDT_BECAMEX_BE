@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Models;
+using QLDT_Becamex.Src.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {
-    public class JwtService
+    public class JwtService : IJwtService
     {
 
         private readonly IConfiguration _configuration;
@@ -18,7 +19,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
             _configuration = configuration;
         }
 
-        public string GenerateJwtToken(string id, string email, string role)
+        public virtual string GenerateJwtToken(string id, string email, string role)
         {
             var claims = new List<Claim>
             {
@@ -33,7 +34,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 claims.Add(new Claim(ClaimTypes.Role, role.ToUpper()));
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var jwtKey = _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured.");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.Now.AddDays(1);
 

@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Dtos.Params;
 using QLDT_Becamex.Src.Dtos.Results;
@@ -15,9 +14,9 @@ namespace QLDT_Becamex.Src.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly JwtService _jwtService;
+        private readonly IJwtService _jwtService;
 
-        public UsersController(IUserService userService, JwtService jwtService)
+        public UsersController(IUserService userService, IJwtService jwtService)
         {
             _userService = userService;
             _jwtService = jwtService;
@@ -310,6 +309,15 @@ namespace QLDT_Becamex.Src.Controllers
             try
             {
                 var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Không tìm thấy thông tin người dùng.",
+                        statusCode = 400,
+                        code = "USER_NOT_FOUND"
+                    });
+                }
                 Result result = await _userService.ChangePasswordUserAsync(userId, rq);
 
                 if (result.IsSuccess)

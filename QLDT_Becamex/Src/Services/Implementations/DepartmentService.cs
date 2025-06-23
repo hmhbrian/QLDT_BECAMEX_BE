@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using QLDT_Becamex.Src.Common;
+using QLDT_Becamex.Src.Constant;
+using QLDT_Becamex.Src.Dtos.Courses;
 using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Dtos.Results;
+using QLDT_Becamex.Src.Dtos.Users;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
@@ -31,8 +33,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<DepartmentDto>.Failure(
                         message: "Tạo phòng ban thất bại",
                         error: "Tên phòng ban hoặc mã phòng ban đã tồn tại",
-                        code: "DEPARTMENT_NAME_CODE_EXISTS",
-                        statusCode: 400
+                        code: "EXISTS",
+                        statusCode: 409
                     );
                 }
 
@@ -98,7 +100,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 return Result<DepartmentDto>.Success(
                     message: "Tạo phòng ban thành công",
-                    code: "DEPARTMENT_CREATED",
+                    code: "SUCCESS",
                     statusCode: 200,
                     data: resultDto
                 );
@@ -122,8 +124,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<bool>.Failure(
                         message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
                         error: "Chưa chọn quản lý",
-                        code: "MANAGER_REQUIRED",
-                        statusCode: StatusCodes.Status400BadRequest
+                        code: "INVALID",
+                        statusCode: 400
                     );
                 }
                 return Result<bool>.Success(data: true);
@@ -142,19 +144,19 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<bool>.Failure(
                     message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
                     error: "Người dùng không tồn tại",
-                    code: "USER_NOT_FOUND",
-                    statusCode: StatusCodes.Status404NotFound
+                    code: "NOT_FOUND",
+                    statusCode: 404
                 );
             }
 
             var validManagerRoles = new[] { PositionNames.SeniorManager.ToLower(), PositionNames.MiddleManager.ToLower() };
-            if (!validManagerRoles.Contains(user.Position?.PositionName.ToLower()))
+            if (!validManagerRoles.Contains(user.Position?.PositionName?.ToLower()))
             {
                 return Result<bool>.Failure(
                     message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
                     error: "Người dùng không phải là quản lý cấp cao hoặc cấp trung",
-                    code: "NOT_MANAGER",
-                    statusCode: StatusCodes.Status400BadRequest
+                    code: "INVALID",
+                    statusCode: 400
                 );
             }
 
@@ -169,8 +171,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<bool>.Failure(
                         message: isRequired ? "Tạo phòng ban thất bại" : "Cập nhật phòng ban thất bại",
                         error: "Quản lý đã được gán cho một phòng ban khác",
-                        code: "MANAGER_ALREADY_ASSIGNED",
-                        statusCode: StatusCodes.Status400BadRequest
+                        code: "EXISTS",
+                        statusCode: 409
                     );
                 }
             }
@@ -287,8 +289,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 return Result<List<DepartmentDto>>.Success(
                     message: "Lấy danh sách phòng ban thành công",
-                    code: "DEPARTMENTS_RETRIEVED",
-                    statusCode: StatusCodes.Status200OK,
+                    code: "SUCCESS",
+                    statusCode: 200,
                     data: departmentDtos.ToList()
                 );
             }
@@ -325,8 +327,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<DepartmentDto>.Failure(
                         message: "Không tìm thấy phòng ban",
                         error: "Phòng ban không tồn tại",
-                        code: "DEPARTMENT_NOT_FOUND",
-                        statusCode: StatusCodes.Status404NotFound
+                        code: "NOT_FOUND",
+                        statusCode: 404
                     );
                 }
 
@@ -362,8 +364,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 return Result<DepartmentDto>.Success(
                     message: "Lấy thông tin phòng ban thành công",
-                    code: "DEPARTMENT_RETRIEVED",
-                    statusCode: StatusCodes.Status200OK,
+                    code: "SUCCESS",
+                    statusCode: 200,
                     data: departmentDto
                 );
             }
@@ -401,8 +403,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<DepartmentDto>.Failure(
                         message: "Cập nhật phòng ban thất bại",
                         error: "Phòng ban không tồn tại",
-                        code: "DEPARTMENT_NOT_FOUND",
-                        statusCode: StatusCodes.Status404NotFound
+                        code: "NOT_FOUND",
+                        statusCode: 404
                     );
                 }
 
@@ -412,8 +414,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<DepartmentDto>.Failure(
                         message: "Cập nhật phòng ban thất bại",
                         error: "Tên hoặc mã phòng ban không được để trống",
-                        code: "DEPARTMENT_NAME_OR_CODE_REQUIRED",
-                        statusCode: StatusCodes.Status400BadRequest
+                        code: "INVALID",
+                        statusCode: 400
                     );
                 }
 
@@ -425,8 +427,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<DepartmentDto>.Failure(
                         message: "Cập nhật phòng ban thất bại",
                         error: "Tên phòng ban hoặc mã phòng ban đã tồn tại",
-                        code: "DEPARTMENT_NAME_CODE_EXISTS",
-                        statusCode: StatusCodes.Status400BadRequest
+                        code: "EXISTS",
+                        statusCode: 409
                     );
                 }
 
@@ -452,8 +454,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         return Result<DepartmentDto>.Failure(
                             message: "Cập nhật phòng ban thất bại",
                             error: "Phòng ban cha không tồn tại",
-                            code: "PARENT_NOT_FOUND",
-                            statusCode: StatusCodes.Status400BadRequest
+                            code: "NOT_FOUND",
+                            statusCode: 404
                         );
                     }
 
@@ -463,8 +465,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         return Result<DepartmentDto>.Failure(
                             message: "Cập nhật phòng ban thất bại",
                             error: "Thay đổi ParentId tạo ra vòng lặp trong cây phân cấp",
-                            code: "CYCLE_DETECTED",
-                            statusCode: StatusCodes.Status400BadRequest
+                            code: "INVALID",
+                            statusCode: 400
                         );
                     }
 
@@ -538,8 +540,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 return Result<DepartmentDto>.Success(
                     message: "Cập nhật phòng ban thành công",
-                    code: "DEPARTMENT_UPDATED",
-                    statusCode: StatusCodes.Status200OK,
+                    code: "SUCCESS",
+                    statusCode: 200,
                     data: resultDto
                 );
             }
@@ -549,7 +551,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     message: "Cập nhật phòng ban thất bại do lỗi hệ thống" + ex.Message,
                     error: "Vui lòng thử lại sau",
                     code: "SYSTEM_ERROR",
-                    statusCode: StatusCodes.Status500InternalServerError
+                    statusCode: 500
                 );
             }
         }
@@ -630,8 +632,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<bool>.Failure(
                         message: "Xóa phòng ban thất bại",
                         error: "Phòng ban không tồn tại",
-                        code: "DEPARTMENT_NOT_FOUND",
-                        statusCode: StatusCodes.Status404NotFound
+                        code: "NOT_FOUND",
+                        statusCode: 404
                     );
                 }
                 var department = departments.First();
@@ -689,8 +691,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<bool
                     >.Success(
                     message: "Xóa phòng ban thành công",
-                    code: "DEPARTMENT_DELETED",
-                    statusCode: StatusCodes.Status200OK,
+                    code: "SUCCESS",
+                    statusCode: 200,
                     data: true
                 );
 
@@ -701,7 +703,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     message: "Xóa phòng ban thất bại do lỗi hệ thống" + ex.Message,
                     error: "Vui lòng thử lại sau",
                     code: "SYSTEM_ERROR",
-                    statusCode: StatusCodes.Status500InternalServerError
+                    statusCode: 500
                 );
             }
 

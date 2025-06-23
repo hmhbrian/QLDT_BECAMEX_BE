@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Text.Json.Serialization;
 
 namespace QLDT_Becamex.Src.Models
 {
@@ -6,6 +7,7 @@ namespace QLDT_Becamex.Src.Models
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
+        [JsonIgnore]
         public ICollection<Course>? Courses { get; set; } = new List<Course>();
 
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Dtos.Courses;
 using QLDT_Becamex.Src.Dtos.Departments;
+using QLDT_Becamex.Src.Dtos.Params;
 using QLDT_Becamex.Src.Services.Interfaces;
 
 namespace QLDT_Becamex.Src.Controllers
@@ -112,5 +113,31 @@ namespace QLDT_Becamex.Src.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> GetAllCourses([FromQuery] BaseQueryParam queryParam)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(queryParam);
+            }
+            var result = await _courseService.GetAllCoursesAsync(queryParam);
+            if (result.IsSuccess)
+            {
+                return StatusCode(result.StatusCode ?? StatusCodes.Status201Created, new
+                {
+                    message = result.Message,
+                    code = result.Code,
+                    data = result.Data
+
+                });
+            }
+            return StatusCode(result.StatusCode ?? 500, new
+            {
+                message = result.Message,
+                errors = result.Errors.Any() ? result.Errors : new List<string> { result.Message },
+                code = result.Code
+            });
+        }
     }
 }

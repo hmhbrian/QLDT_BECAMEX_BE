@@ -44,8 +44,8 @@ namespace QLDT_Becamex.Src.Mappings
 
 
             //CourseStatus
-            CreateMap<CourseSatus, CourseSatusDto>().ReverseMap();
-            CreateMap<CourseStatusDtoRq, CourseSatus>().ReverseMap();
+            CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
+            CreateMap<CourseStatusDtoRq, CourseStatus>().ReverseMap();
 
         }
     }

@@ -2,7 +2,7 @@
 
 namespace QLDT_Becamex.Src.Models
 {
-    public class CourseSatus
+    public class CourseStatus
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

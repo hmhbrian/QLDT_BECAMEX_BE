@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Dtos.Courses;
 using QLDT_Becamex.Src.Dtos.Departments;
 using QLDT_Becamex.Src.Dtos.Results;
+using QLDT_Becamex.Src.Dtos.Params;
 using QLDT_Becamex.Src.Services.Interfaces;
 
 namespace QLDT_Becamex.Src.Controllers
@@ -113,17 +114,14 @@ namespace QLDT_Becamex.Src.Controllers
             }
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserByIdAsync(string id)
+        public async Task<IActionResult> GetCourseByIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return BadRequest(id);
             }
-            try
-            {
-                Result<CourseDto> result = await _courseService.GetCourseAsync(id);
-
-                if (result.IsSuccess)
+            Result<CourseDto> result = await _courseService.GetCourseAsync(id);
+            if (result.IsSuccess)
                 {
 
                     return Ok(new
@@ -143,15 +141,31 @@ namespace QLDT_Becamex.Src.Controllers
                     code = result.Code
                 });
             }
-            catch (Exception ex)
+        [HttpGet]
+        [Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> GetAllCourses([FromQuery] BaseQueryParam queryParam)
+        {
+            if (!ModelState.IsValid)
             {
-                return StatusCode(500, new
+                return BadRequest(queryParam);
+            }
+            var result = await _courseService.GetAllCoursesAsync(queryParam);
+            if (result.IsSuccess)
+            {
+                return StatusCode(result.StatusCode ?? StatusCodes.Status201Created, new
                 {
-                    Code = "SYSTEM_ERROR",
-                    message = "Đã xảy ra lỗi hệ thống.",
-                    error = ex.Message,
+                    message = result.Message,
+                    code = result.Code,
+                    data = result.Data
+
                 });
             }
+            return StatusCode(result.StatusCode ?? 500, new
+            {
+                message = result.Message,
+                errors = result.Errors.Any() ? result.Errors : new List<string> { result.Message },
+                code = result.Code
+            });
         }
     }
 }

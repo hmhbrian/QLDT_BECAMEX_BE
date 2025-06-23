@@ -2,7 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Dtos.Courses;
+using QLDT_Becamex.Src.Dtos.Departments;
+using QLDT_Becamex.Src.Dtos.Params;
+using QLDT_Becamex.Src.Dtos.Positions;
 using QLDT_Becamex.Src.Dtos.Results;
+using QLDT_Becamex.Src.Dtos.Users;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
@@ -517,6 +521,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
+
         private Result ValidateDateLogic(CourseDtoRq request)
         {
             // Kiểm tra ngày đăng ký phải trước ngày bắt đầu khóa học
@@ -581,6 +586,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 statusCode: 200
             );
         }
+        
         public async Task<Result<CourseDto>> GetCourseAsync(string id)
         {
             try
@@ -596,9 +602,9 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 if (course == null)
                 {
                     return Result<CourseDto>.Failure(
-                  error: "Get course success!",
-                  code: "SUCCESS",
-                  statusCode: 404
+                    error: "Get course fail!",
+                    code: "NOT_FOUND",
+                    statusCode: 404
                 );
                 }
                 var courseDto = _mapper.Map<CourseDto>(course);
@@ -620,6 +626,72 @@ namespace QLDT_Becamex.Src.Services.Implementations
                    code: "SYSTEM_ERROR",
                    statusCode: 500
                );
+             }
+        }
+
+        public async Task<Result<PagedResult<CourseDto>>> GetAllCoursesAsync(BaseQueryParam queryParam)
+        {
+            try
+            {
+                int totalItemCourse = await _unitOfWork.CourseRepository.CountAsync();
+
+                Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderByFunc = query =>
+                {
+                    bool isDesc = queryParam.SortType?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true;
+
+                    return queryParam.SortField?.ToLower() switch
+                    {
+                        "name" => isDesc ? query.OrderByDescending(c => c.Name) : query.OrderBy(c => c.Name),
+                        "created.at" => isDesc ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt), _ => query.OrderBy(c => c.Name)
+                    };
+                };
+
+                var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
+                    predicate: null,
+                    orderBy: orderByFunc,
+                    page: queryParam.Page,
+                    pageSize: queryParam.Limit,
+                    asNoTracking: true,
+                    includes: q => q
+                        .Include(c => c.CourseDepartments)!
+                            .ThenInclude(cd => cd.Department)
+                        .Include(c => c.CoursePositions)!
+                            .ThenInclude(cp => cp.Position)
+                        .Include(c => c.Status)
+                );
+
+                int effectiveLimit = queryParam.Limit;
+                int totalPages = (int)Math.Ceiling((double)totalItemCourse / effectiveLimit);
+                var pagedResultInfo = new Pagination
+                {
+                    TotalItems = totalItemCourse,
+                    ItemsPerPage = effectiveLimit,
+                    CurrentPage = queryParam.Page,
+                    TotalPages = totalPages
+                };
+                var courseDtos = _mapper.Map<List<CourseDto>>(courses);
+
+                var pagedResultData = new PagedResult<CourseDto>
+                {
+                    Items = courseDtos,
+                    Pagination = pagedResultInfo
+                };
+
+                return Result<PagedResult<CourseDto>>.Success(
+                    pagedResultData,
+                    message: "Tải danh sách khóa học thành công.",
+                    code: "SUCCESS",
+                    statusCode: 200
+                );
+            }
+            catch (Exception ex)
+            {
+                return Result<PagedResult<CourseDto>>.Failure(
+                    message: ex.Message,
+                    error: "Lỗi! Vui lòng thử lại sau.",
+                    code: "SYSTEM_ERROR",
+                    statusCode:500
+                );
             }
         }
     }

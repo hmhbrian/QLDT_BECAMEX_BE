@@ -37,7 +37,19 @@ namespace QLDT_Becamex.Src.Mappings
 
             //Course
             CreateMap<CourseDtoRq, Course>();
-            CreateMap<Course, CourseDto>();
+            CreateMap<Course, CourseDto>()
+                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentDto 
+                    { 
+                        DepartmentId = cd.DepartmentId,
+                        DepartmentName = cd.Department.DepartmentName,
+                }).ToList()))
+                .ForMember(dest => dest.Positions, opt => opt.MapFrom(src => (src.CoursePositions ?? Enumerable.Empty<CoursePosition>()).Select(cp => new PositionDto 
+                    { 
+                        PositionId = cp.PositionId,
+                        PositionName = cp.Position.PositionName,
+                }).ToList()))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
             CreateMap<CourseDto, Course>();
 
 

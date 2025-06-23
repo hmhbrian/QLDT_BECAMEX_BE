@@ -18,6 +18,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> CreateDepartment([FromBody] DepartmentRq dto)
         {
             if (!ModelState.IsValid)
@@ -30,111 +31,86 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            try
+            var result = await _departmentService.CreateDepartmentAsync(dto);
+            if (result.IsSuccess)
             {
-                var result = await _departmentService.CreateDepartmentAsync(dto);
-                if (result.IsSuccess)
-                {
-                    return StatusCode(201, new
-                    {
-                        message = result.Message,
-                        statusCode = result.StatusCode,
-                        code = result.Code,
-                        data = result.Data
-                    });
-                }
-
-                return BadRequest(new
+                return StatusCode(201, new
                 {
                     message = result.Message,
-                    errors = result.Errors,
                     statusCode = result.StatusCode,
-                    code = result.Code
+                    code = result.Code,
+                    data = result.Data
                 });
             }
-            catch (Exception ex)
+
+            return BadRequest(new
             {
-                return StatusCode(500, new
-                {
-                    Code = "SYSTEM_ERROR",
-                    message = "Đã xảy ra lỗi hệ thống.",
-                    error = ex.Message
-                });
-            }
+                message = result.Message,
+                errors = result.Errors,
+                statusCode = result.StatusCode,
+                code = result.Code
+            });
+
         }
 
         [HttpGet]
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetAllDepartments()
         {
-            try
+            var result = await _departmentService.GetAllDepartmentsAsync();
+            if (result.IsSuccess)
             {
-                var result = await _departmentService.GetAllDepartmentsAsync();
-                if (result.IsSuccess)
-                {
-                    return Ok(new
-                    {
-                        message = result.Message,
-                        statusCode = result.StatusCode,
-                        code = result.Code,
-                        data = result.Data
-                    });
-                }
-
-                return BadRequest(new
+                return Ok(new
                 {
                     message = result.Message,
-                    errors = result.Errors,
                     statusCode = result.StatusCode,
-                    code = result.Code
+                    code = result.Code,
+                    data = result.Data
                 });
             }
-            catch (Exception ex)
+
+            return BadRequest(new
             {
-                return StatusCode(500, new
-                {
-                    Code = "SYSTEM_ERROR",
-                    message = "Đã xảy ra lỗi hệ thống.",
-                    error = ex.Message,
-                });
-            }
+                message = result.Message,
+                errors = result.Errors,
+                statusCode = result.StatusCode,
+                code = result.Code
+            });
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var result = await _departmentService.GetDepartmentByIdAsync(id);
-                if (result.IsSuccess)
+                return BadRequest(new
                 {
-                    return Ok(new
-                    {
-                        message = result.Message,
-                        statusCode = result.StatusCode,
-                        code = result.Code,
-                        data = result.Data
-                    });
-                }
+                    message = "Dữ liệu không hợp lệ.",
+                    errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage)
+                });
+            }
 
-                return NotFound(new
+            var result = await _departmentService.GetDepartmentByIdAsync(id);
+            if (result.IsSuccess)
+            {
+                return Ok(new
                 {
                     message = result.Message,
-                    errors = result.Errors,
                     statusCode = result.StatusCode,
-                    code = result.Code
+                    code = result.Code,
+                    data = result.Data
                 });
             }
-            catch (Exception ex)
+
+            return NotFound(new
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    Code = "SYSTEM_ERROR",
-                    message = "Đã xảy ra lỗi hệ thống.",
-                    error = ex.Message,
-                });
-            }
+                message = result.Message,
+                errors = result.Errors,
+                statusCode = result.StatusCode,
+                code = result.Code
+            });
         }
 
         [HttpPut("{id}")]
@@ -151,74 +127,60 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            try
+            var result = await _departmentService.UpdateDepartmentAsync(id, dto);
+            if (result.IsSuccess)
             {
-                var result = await _departmentService.UpdateDepartmentAsync(id, dto);
-                if (result.IsSuccess)
-                {
-                    return Ok(new
-                    {
-                        message = result.Message,
-                        statusCode = result.StatusCode,
-                        code = result.Code,
-                        data = result.Data
-                    });
-                }
-
-                return BadRequest(new
+                return Ok(new
                 {
                     message = result.Message,
-                    errors = result.Errors,
                     statusCode = result.StatusCode,
-                    code = result.Code
+                    code = result.Code,
+                    data = result.Data
                 });
             }
-            catch (Exception)
+
+            return BadRequest(new
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    Code = "SYSTEM_ERROR",
-                    message = "Đã xảy ra lỗi hệ thống.",
-                    error = "Vui lòng thử lại sau"
-                });
-            }
+                message = result.Message,
+                errors = result.Errors,
+                statusCode = result.StatusCode,
+                code = result.Code
+            });
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var result = await _departmentService.DeleteDepartmentAsync(id);
-                if (result.IsSuccess)
+                return BadRequest(new
                 {
-                    return Ok(new
-                    {
-                        message = result.Message,
-                        statusCode = result.StatusCode,
-                        code = result.Code,
-                        data = result.Data
-                    });
-                }
+                    message = "Dữ liệu không hợp lệ.",
+                    errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage)
+                });
+            }
 
-                return NotFound(new
+            var result = await _departmentService.DeleteDepartmentAsync(id);
+            if (result.IsSuccess)
+            {
+                return Ok(new
                 {
                     message = result.Message,
-                    errors = result.Errors,
                     statusCode = result.StatusCode,
-                    code = result.Code
+                    code = result.Code,
+                    data = result.Data
                 });
             }
-            catch (Exception ex)
+
+            return NotFound(new
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    Code = "SYSTEM_ERROR",
-                    message = "Đã xảy ra lỗi hệ thống.",
-                    error = ex.Message,
-                });
-            }
+                message = result.Message,
+                errors = result.Errors,
+                statusCode = result.StatusCode,
+                code = result.Code
+            });
         }
     }
 }

@@ -1,9 +1,8 @@
-﻿using QLDT_Becamex.Src.Infrastructure;
-using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Implementations;
-using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Interfaces;
+﻿using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
 
 
-namespace QLDT_Becamex.Src.Infrastructure.Persistence.UnitOfWork
+namespace QLDT_Becamex.Src.Infrastructure.Persistence
 {
     public class UnitOfWork : IUnitOfWork
     {

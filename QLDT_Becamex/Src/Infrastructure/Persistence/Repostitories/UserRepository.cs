@@ -1,10 +1,8 @@
-﻿
+﻿using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Domain.Models;
-using QLDT_Becamex.Src.Infrastructure.Persistence.GenericRepository;
-using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Interfaces;
 
 
-namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Implementations
+namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
 {
     public class UserRepository : GenericRepository<ApplicationUser>, IUserRepository
     {

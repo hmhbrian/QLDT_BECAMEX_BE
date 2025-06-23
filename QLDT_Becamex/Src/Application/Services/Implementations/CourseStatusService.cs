@@ -3,7 +3,7 @@
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.Application.Dtos;
 using QLDT_Becamex.Src.Domain.Models;
-using QLDT_Becamex.Src.Infrastructure.Persistence.UnitOfWork; // Thêm dòng này để sử dụng LINQ
+using QLDT_Becamex.Src.Domain.Interfaces; // Thêm dòng này để sử dụng LINQ
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {

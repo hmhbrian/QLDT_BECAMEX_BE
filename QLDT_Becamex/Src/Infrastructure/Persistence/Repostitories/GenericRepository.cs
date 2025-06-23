@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure;
 using System.Linq.Expressions;
 
-namespace QLDT_Becamex.Src.Infrastructure.Persistence.GenericRepository
+namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Domain.Models;
 using QLDT_Becamex.Src.Infrastructure;
 using QLDT_Becamex.Src.Infrastructure.Mappings;
-using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Implementations;
-using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Interfaces;
-using QLDT_Becamex.Src.Infrastructure.Persistence.UnitOfWork;
+using QLDT_Becamex.Src.Infrastructure.Persistence;
+using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Services.Interfaces;
 

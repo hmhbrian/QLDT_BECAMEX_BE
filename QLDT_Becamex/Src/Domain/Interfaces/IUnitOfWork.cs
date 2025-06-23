@@ -1,6 +1,4 @@
-﻿using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Interfaces;
-
-namespace QLDT_Becamex.Src.Infrastructure.Persistence.UnitOfWork
+﻿namespace QLDT_Becamex.Src.Domain.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {

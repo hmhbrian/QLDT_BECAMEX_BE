@@ -547,6 +547,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
+
         private Result ValidateDateLogic(CourseDtoRq request)
         {
             // Kiểm tra ngày đăng ký phải trước ngày bắt đầu khóa học

@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using QLDT_Becamex.Src.Config;
-using QLDT_Becamex.Src.Mappings;
-using QLDT_Becamex.Src.Models;
-using QLDT_Becamex.Src.Repostitories.Implementations;
-using QLDT_Becamex.Src.Repostitories.Interfaces;
+using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Domain.Models;
+using QLDT_Becamex.Src.Infrastructure;
+using QLDT_Becamex.Src.Infrastructure.Mappings;
+using QLDT_Becamex.Src.Infrastructure.Persistence;
+using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Services.Interfaces;
-using QLDT_Becamex.Src.UnitOfWork;
+
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -115,8 +116,8 @@ builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserStatusService, UserStatusService>();
 builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-builder.Services.AddScoped<JwtService>(); // Dịch vụ JWT
 
 // 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);

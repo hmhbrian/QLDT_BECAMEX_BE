@@ -14,17 +14,17 @@ namespace QLDT_Becamex.Src.Dtos.Users
         [StringLength(50, MinimumLength = 10, ErrorMessage = "Code must be between 10 and 50 characters.")]
         public string? Code { get; set; } = null;
 
-        [Range(1, int.MaxValue, ErrorMessage = "PositionId có giá trị không hợp lệ.")]
+
         public int? PositionId { get; set; }
 
         public string? RoleId { get; set; }
 
         public string? ManagerUId { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "DepartmentId có giá trị không hợp lệ.")]
+
         public int? DepartmentId { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "StatusId có giá trị không hợp lệ.")]
+
         public int? StatusId { get; set; }
 
         [StringLength(50, ErrorMessage = "Number phone cannot exceed 50 characters.")]

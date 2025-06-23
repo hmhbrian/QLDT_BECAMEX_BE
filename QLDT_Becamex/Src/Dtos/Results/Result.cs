@@ -29,7 +29,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Success without data
 
-        public static Result Success(string message = "Operation successful.", int? statusCode = 200, string? code = null)
+        public static Result Success(string message = "Operation successful.", int? statusCode = 200, string? code = "SUCCESSS")
 
         {
 
@@ -53,7 +53,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Failure with multiple errors
 
-        public static Result Failure(IEnumerable<string> errors, string message = "Operation failed.", string? code = null, int? statusCode = 400)
+        public static Result Failure(IEnumerable<string> errors, string message = "Operation failed.", string? code = "FALIED", int? statusCode = 400)
 
         {
 
@@ -79,7 +79,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Failure with single error
 
-        public static Result Failure(string error, string message = "Operation failed.", string? code = null, int? statusCode = 400)
+        public static Result Failure(string error, string message = "Operation failed.", string? code = "FAILED", int? statusCode = 400)
 
         {
 
@@ -107,7 +107,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Success with data
 
-        public static Result<T> Success(T data, string message = "Operation successful.", int? statusCode = 200, string? code = null)
+        public static Result<T> Success(T data, string message = "Operation successful.", int? statusCode = 200, string? code = "SUCCESS")
 
         {
 
@@ -133,7 +133,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Failure with multiple errors
 
-        public static new Result<T> Failure(IEnumerable<string> errors, string message = "Operation failed.", string? code = null, int? statusCode = 400)
+        public static new Result<T> Failure(IEnumerable<string> errors, string message = "Operation failed.", string? code = "FAIELD", int? statusCode = 400)
 
         {
 
@@ -159,7 +159,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Failure with single error
 
-        public static new Result<T> Failure(string error, string message = "Operation failed.", string? code = null, int? statusCode = 400)
+        public static new Result<T> Failure(string error, string message = "Operation failed.", string? code = "FAILED", int? statusCode = 400)
 
         {
 

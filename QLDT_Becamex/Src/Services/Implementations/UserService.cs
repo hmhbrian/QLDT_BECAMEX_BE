@@ -5,6 +5,7 @@ using QLDT_Becamex.Src.Dtos.Params;
 using QLDT_Becamex.Src.Dtos.Positions;
 using QLDT_Becamex.Src.Dtos.Results;
 using QLDT_Becamex.Src.Dtos.Users;
+using QLDT_Becamex.Src.Helpers;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
@@ -21,13 +22,13 @@ namespace QLDT_Becamex.Src.Services.Implementations
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly CloudinaryService _cloudinaryService;
+        private readonly ICloudinaryService _cloudinaryService;
 
         public UserService(
             SignInManager<ApplicationUser> signInManager,
          UserManager<ApplicationUser> userManager,
          RoleManager<IdentityRole> roleManager,
-         CloudinaryService cloudinaryService,
+         ICloudinaryService cloudinaryService,
          IMapper mapper,
          IUnitOfWork unitOfWork,
          IHttpContextAccessor httpContextAccessor)
@@ -52,6 +53,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                                .Include(u => u.Position)
                                .Include(u => u.Department)
                                .Include(u => u.ManagerU)
+                               .Include(u => u.UserStatus)
+
                                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
             // Nếu không tìm thấy bằng email, bạn có thể cân nhắc tìm bằng username nếu muốn linh hoạt
 
@@ -184,9 +187,9 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     StartWork = registerDto.StartWork,
                     CreatedAt = DateTime.Now,
                     Code = registerDto.Code,
+                    DepartmentId = registerDto.DepartmentId,
                     PositionId = registerDto.PositionId,
                     ManagerUId = registerDto.ManagerUId,
-                    DepartmentId = registerDto.DepartmentId,
                     StatusId = registerDto.StatusId,
                     EndWork = registerDto.EndWork,
                 };
@@ -294,7 +297,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 // Nếu có thay đổi, cập nhật thời gian chỉnh sửa
-                userToUpdate.ModifedAt = DateTime.UtcNow;
+                userToUpdate.ModifiedAt = DateTime.UtcNow;
 
                 // 3. Cập nhật Email và Username (nếu thay đổi)
                 // Kiểm tra xem email mới có khác email hiện tại không
@@ -553,7 +556,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 // 3. Thực hiện xóa mềm: Cập nhật IsDeleted thành true và đặt DeletedAt
                 user.IsDeleted = true;
-                user.ModifedAt = DateTime.UtcNow; // Cập nhật cả UpdatedAt
+                user.ModifiedAt = DateTime.UtcNow; // Cập nhật cả UpdatedAt
 
                 // 4. Cập nhật người dùng trong UserManager
                 // Lưu ý: UserManager.UpdateAsync sẽ lưu các thay đổi này vào DB
@@ -623,7 +626,11 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     page: queryParams.Page,
                     pageSize: queryParams.Limit,
                      includes: q => q
-                        .Include(d => d.Position),
+                        .Include(d => d.Position)
+                        .Include(d => d.Department)
+                        .Include(d => d.ManagerU)
+                        .Include(d => d.UserStatus),
+
                     asNoTracking: true
 
                 );
@@ -687,6 +694,9 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     predicate: u => u.Id == userId,
                     includes: q => q
                         .Include(d => d.Position)
+                        .Include(d => d.Department)
+                        .Include(d => d.ManagerU)
+                        .Include(d => d.UserStatus)
                 );
                 if (user == null)
                 {
@@ -831,54 +841,49 @@ namespace QLDT_Becamex.Src.Services.Implementations
         {
             try
             {
-                IQueryable<ApplicationUser> query = _userManager.Users;
+                // 1. Lấy tất cả user (chưa phân trang)
+                var users = await _userManager.Users
+                    .Where(u => !u.IsDeleted)
+                    .AsNoTracking()
+                    .ToListAsync();
 
-                // 1. Lọc theo tên (hoặc các trường khác nếu muốn)
-                // Chuyển keyword về chữ thường để tìm kiếm không phân biệt hoa thường
+                // 2. Tìm kiếm không dấu (in-memory)
                 if (!string.IsNullOrEmpty(keyword))
                 {
-                    string lowerKeyword = keyword.ToLowerInvariant().Trim();
-                    query = query.Where(u => u.UserName.ToLower().Contains(lowerKeyword) ||
-                                             u.Email!.ToLower().Contains(lowerKeyword)); // Có thể tìm cả theo Email
+                    string normalizedKeyword = StringHelper.RemoveDiacritics(keyword).ToLowerInvariant().Trim();
+
+                    users = users.Where(u =>
+                        StringHelper.RemoveDiacritics(u.FullName ?? "").ToLower().Contains(normalizedKeyword) ||
+                        (u.Email ?? "").ToLower().Contains(normalizedKeyword)
+                    ).ToList();
                 }
 
-                // 2. Tính tổng số lượng bản ghi (trước khi phân trang và sắp xếp)
-                int totalCount = await query.CountAsync();
+                // 3. Tổng số kết quả sau lọc
+                int totalCount = users.Count;
 
-                // 3. Sắp xếp
-                // Mặc định sắp xếp theo CreatedAt giảm dần (hoặc UserName tăng dần, tùy ý)
-                // Lưu ý: IdentityUser không có CreatedAt mặc định.
-                // Nếu ApplicationUser của bạn có CreatedAt, hãy dùng nó.
-                // Nếu không, có thể sắp xếp theo UserName hoặc Id.
-                // 3. Sắp xếp (Chỉ CreatedAt)
-                Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> orderBy = q => q.OrderByDescending(u => u.CreatedAt); // Mặc định: CreatedAt DESC
-
-                // Kiểm tra nếu có yêu cầu sắp xếp CreatedAt ASC
+                // 4. Sắp xếp
                 if (queryParams.SortField?.ToLower() == "createdat")
                 {
-                    orderBy = queryParams.SortType?.ToLower() == "asc"
-                        ? q => q.OrderBy(u => u.CreatedAt)
-                        : q => q.OrderByDescending(u => u.CreatedAt);
+                    users = queryParams.SortType?.ToLower() == "asc"
+                        ? users.OrderBy(u => u.CreatedAt).ToList()
+                        : users.OrderByDescending(u => u.CreatedAt).ToList();
                 }
-                // Nếu SortField không phải "createdat", hoặc không có, sẽ dùng mặc định là CreatedAt DESC.
+                else
+                {
+                    users = users.OrderByDescending(u => u.CreatedAt).ToList(); // Mặc định
+                }
 
-                // Áp dụng sắp xếp
-                query = orderBy(query);
-
-                // 4. Phân trang
+                // 5. Phân trang
                 int skip = (queryParams.Page - 1) * queryParams.Limit;
-                query = query.Skip(skip).Take(queryParams.Limit);
+                var pagedUsers = users.Skip(skip).Take(queryParams.Limit).ToList();
 
-                // 5. Lấy dữ liệu
-                // ToListAsync() sẽ thực thi truy vấn
-                var users = await query.ToListAsync();
+                // 6. Map sang DTO
+                var userDtos = _mapper.Map<List<UserDto>>(pagedUsers);
 
-                // 6. Ánh xạ từ ApplicationUser sang UserDto
-                IEnumerable<UserDto> userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
-
+                // 7. Gán Role cho từng UserDto
                 foreach (var userDto in userDtos)
                 {
-                    var user = users.FirstOrDefault(u => u.Id == userDto.Id);
+                    var user = pagedUsers.FirstOrDefault(u => u.Id == userDto.Id);
                     if (user != null)
                     {
                         var roles = await _userManager.GetRolesAsync(user);
@@ -886,7 +891,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     }
                 }
 
-                // 7. Tạo đối tượng PagedResult
+                // 8. Kết quả phân trang
                 var pagination = new Pagination()
                 {
                     CurrentPage = queryParams.Page,
@@ -895,16 +900,12 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     TotalPages = (int)Math.Ceiling((double)totalCount / queryParams.Limit)
                 };
 
-
-
-                var pagedResult = new PagedResult<UserDto>
-                {
-                    Items = userDtos,
-                    Pagination = pagination
-                };
-
                 return Result<PagedResult<UserDto>>.Success(
-                    data: pagedResult,
+                    data: new PagedResult<UserDto>
+                    {
+                        Items = userDtos,
+                        Pagination = pagination
+                    },
                     message: "User list retrieved successfully.",
                     code: "SUCCESS",
                     statusCode: 200
@@ -912,7 +913,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] SearchUserAsync: {ex}"); // Ghi log chi tiết lỗi
+                Console.WriteLine($"[ERROR] SearchUserAsync: {ex}");
                 return Result<PagedResult<UserDto>>.Failure(
                     error: ex.Message,
                     message: "An error occurred while searching for users.",
@@ -921,7 +922,5 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 );
             }
         }
-
-
     }
 }

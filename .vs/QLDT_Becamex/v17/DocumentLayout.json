@@ -1,20 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{03D89CA7-A769-4F57-951F-2B61FC827D19}|xUnitQLDT_Becamex.Tests\\xUnitQLDT_Becamex.Tests.csproj|c:\\data\\becamex project\\qldt_becamex_be\\xunitqldt_becamex.tests\\controllers\\usercontrollertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{03D89CA7-A769-4F57-951F-2B61FC827D19}|xUnitQLDT_Becamex.Tests\\xUnitQLDT_Becamex.Tests.csproj|solutionrelative:xunitqldt_becamex.tests\\controllers\\usercontrollertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|c:\\data\\becamex project\\qldt_becamex_be\\qldt_becamex\\src\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\src\\services\\implementations\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|c:\\data\\becamex project\\qldt_becamex_be\\qldt_becamex\\src\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DBC25CAE-4790-4E4D-883F-24DAFA595A5A}|QLDT_Becamex\\QLDT_Becamex.csproj|solutionrelative:qldt_becamex\\src\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -22,7 +9,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -31,45 +18,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UserControllerTest.cs",
-              "DocumentMoniker": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Controllers\\UserControllerTest.cs",
-              "RelativeDocumentMoniker": "xUnitQLDT_Becamex.Tests\\Controllers\\UserControllerTest.cs",
-              "ToolTip": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Controllers\\UserControllerTest.cs",
-              "RelativeToolTip": "xUnitQLDT_Becamex.Tests\\Controllers\\UserControllerTest.cs",
-              "ViewState": "AQIAAHcAAAAAAAAAAAAQwIMAAAAuAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-20T00:59:32.251Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "UserService.cs",
-              "DocumentMoniker": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
-              "RelativeDocumentMoniker": "QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
-              "ToolTip": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
-              "RelativeToolTip": "QLDT_Becamex\\Src\\Services\\Implementations\\UserService.cs",
-              "ViewState": "AQIAAHwDAAAAAAAAAAAhwE4DAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-20T06:50:33.07Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "UsersController.cs",
-              "DocumentMoniker": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\QLDT_Becamex\\Src\\Controllers\\UsersController.cs",
-              "RelativeDocumentMoniker": "QLDT_Becamex\\Src\\Controllers\\UsersController.cs",
-              "ToolTip": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\QLDT_Becamex\\Src\\Controllers\\UsersController.cs",
-              "RelativeToolTip": "QLDT_Becamex\\Src\\Controllers\\UsersController.cs",
-              "ViewState": "AQIAACQAAAAAAAAAAAAAAEMAAAAYAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-20T01:02:10.143Z",
-              "EditorCaption": ""
             }
           ]
         },

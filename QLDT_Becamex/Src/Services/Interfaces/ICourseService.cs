@@ -7,5 +7,6 @@ namespace QLDT_Becamex.Src.Services.Interfaces
     {
         Task<Result> CreateAsync(CourseDtoRq request);
         Task<Result> UpdateAsync(string id, CourseDtoRq request);
+        Task<Result<CourseDto>> GetCourseAsync(string id);
     }
 }

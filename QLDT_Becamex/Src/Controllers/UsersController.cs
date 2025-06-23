@@ -23,7 +23,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpPost("create")]
-        //[Authorize(Roles = "ADMIN, HR")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> CreateUser([FromBody] UserDtoRq dto)
         {
             if (!ModelState.IsValid)

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QLDT_Becamex")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09bd1c743bb5317b0f33c27007f20b0ee712a08e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b15f6db33d246729aecbe4c2d7fd3ee5d62eb6b")]
 [assembly: System.Reflection.AssemblyProductAttribute("QLDT_Becamex")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QLDT_Becamex")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

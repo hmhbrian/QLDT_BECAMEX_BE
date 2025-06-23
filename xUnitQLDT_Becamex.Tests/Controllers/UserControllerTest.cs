@@ -18,6 +18,8 @@ using System.Text;
 using Newtonsoft.Json;
 using Microsoft.Win32;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace xUnitQLDT_Becamex.Tests.Controllers
 {
@@ -25,13 +27,12 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
     {
         private readonly Mock<IUserService> _userServiceMock;
         private readonly UsersController _userController;
-
         public UserControllerTest()
         {
             // Tạo IConfiguration giả
             var inMemorySettings = new Dictionary<string, string>
             {
-                {"Jwt:Key", "your_fake_jwt_key"},
+                {"Jwt:Key", "your_fake_jwt_key_128bit_long_enough"},
                 {"Jwt:Issuer", "your_fake_issuer"},
                 {"Jwt:Audience", "your_fake_audience"}
             };
@@ -44,13 +45,17 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             _userServiceMock = new Mock<IUserService>();
             _userController = new UsersController(_userServiceMock.Object, jwtService);
 
-            // Thiết lập ControllerContext tối thiểu
-            _userController.ControllerContext = new ControllerContext
+            // Thiết lập ControllerContext với ClaimsPrincipal
+            var claims = new List<Claim>
             {
-                HttpContext = new DefaultHttpContext()
+                new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                new Claim(ClaimTypes.Role, "USER")
             };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var principal = new ClaimsPrincipal(identity);
+            var httpContext = new DefaultHttpContext { User = principal };
+            _userController.ControllerContext = new ControllerContext { HttpContext = httpContext };
         }
-
         [Fact]
         public async Task CreateUser_ReturnsOk()
         {
@@ -110,13 +115,66 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             _userServiceMock.Verify(s => s.CreateUserAsync(It.IsAny<UserDtoRq>()), Times.Once());
         }
         [Fact]
+        public async Task CreateUser_ServiceFailure_ReturnsBadRequest()
+        {
+            // Arrange
+            var userDtoRq = new UserDtoRq
+            {
+                FullName = "Nguyen Van Test",
+                IdCard = "123456789012",
+                Code = "EMP123456789",
+                PositionId = 1,
+                RoleId = "b22145f9-3184-4e8f-9e31-b33ad0d007c0",
+                ManagerUId = null,
+                DepartmentId = 1,
+                StatusId = 1,
+                NumberPhone = "0987654321",
+                StartWork = DateTime.Now,
+                EndWork = null,
+                Email = "test@becamex.com",
+                Password = "Password123!",
+                ConfirmPassword = "Password123!"
+            };
+
+            var expectedResult = Result.Failure(
+                error: "Email đã được sử dụng.",
+                message: "Email đã tồn tại.",
+                code: "EMAIL_EXISTS",
+                statusCode: 400
+            );
+
+            _userServiceMock
+                .Setup(s => s.CreateUserAsync(It.Is<UserDtoRq>(dto => dto.Email == userDtoRq.Email)))
+                .ReturnsAsync(expectedResult);
+
+            // Act
+            var response = await _userController.CreateUser(userDtoRq);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
+            Assert.Equal(400, badRequestResult.StatusCode);
+
+            var responseValue = badRequestResult.Value;
+            var message = responseValue.GetType().GetProperty("message")?.GetValue(responseValue)?.ToString();
+            var errors = responseValue.GetType().GetProperty("errors")?.GetValue(responseValue) as IEnumerable<string>;
+            var code = responseValue.GetType().GetProperty("code")?.GetValue(responseValue)?.ToString();
+            var statusCode = responseValue.GetType().GetProperty("statusCode")?.GetValue(responseValue)?.ToString();
+
+            Assert.Equal("Email đã tồn tại.", message);
+            Assert.Contains("Email đã được sử dụng.", errors);
+            Assert.Equal("EMAIL_EXISTS", code);
+            Assert.Equal("400", statusCode);
+
+            _userServiceMock.Verify(s => s.CreateUserAsync(It.IsAny<UserDtoRq>()), Times.Once());
+        }
+        [Fact]
         public async Task Login_ReturnsOk()
         {
             // Arrange
             var request = new UserLoginRq
             {
                 Email = "user@becamex.com",
-                Password = "123456"
+                Password = "Password123!"
             };
 
             var validationContext = new ValidationContext(request);
@@ -128,14 +186,14 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var userDto = new UserDto
             {
                 Id = "123",
-                Email = request.Email,
+                Email = "user@becamex.com",
                 FullName = "Nguyen Van Admin",
                 Role = "ADMIN"
             };
 
             var expectedResult = Result<UserDto>.Success(
                 message: "Đăng nhập thành công.",
-                code: "LOGIN_SUCCESS",
+                code: "SUCCESS",
                 statusCode: 200,
                 data: userDto
             );
@@ -157,29 +215,43 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             }
 
             // Assert
-            var okResult = Assert.IsAssignableFrom<ObjectResult>(result);
-            // Wrong: Return 500
-            Assert.Equal(200, okResult.StatusCode);
+            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            if (objectResult.StatusCode != 200)
+            {
+                Console.WriteLine($"Response: {JsonConvert.SerializeObject(objectResult.Value)}");
+                Assert.Fail($"Expected StatusCode 200, but got {objectResult.StatusCode}");
+            }
+            Assert.Equal(200, objectResult.StatusCode);
 
-            var json = JsonConvert.SerializeObject(okResult.Value);
-            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json)!;
+            var responseValue = objectResult.Value;
+            Assert.NotNull(responseValue);
 
-            Assert.Equal("Đăng nhập thành công.", dict["message"]?.ToString());
-            Assert.Equal("LOGIN_SUCCESS", dict["code"]?.ToString());
-            Assert.Equal("200", dict["statusCode"]?.ToString());
-            Assert.NotNull(dict["accessToken"]);
-            Assert.NotNull(dict["data"]);
+            var message = responseValue.GetType().GetProperty("message")?.GetValue(responseValue)?.ToString();
+            var statusCode = responseValue.GetType().GetProperty("statusCode")?.GetValue(responseValue)?.ToString();
+            var code = responseValue.GetType().GetProperty("code")?.GetValue(responseValue)?.ToString();
+            var data = responseValue.GetType().GetProperty("data")?.GetValue(responseValue) as UserDto;
+            var accessToken = responseValue.GetType().GetProperty("accessToken")?.GetValue(responseValue)?.ToString();
 
-            var userJson = dict["data"]!.ToString();
-            var data = JsonConvert.DeserializeObject<UserDto>(userJson!);
+            Assert.Equal("Đăng nhập thành công.", message);
+            Assert.Equal("200", statusCode);
+            Assert.Equal("SUCCESS", code);
+            Assert.NotNull(data);
+            Assert.Equal(userDto.Id, data.Id);
+            Assert.Equal(userDto.Email, data.Email);
+            Assert.Equal(userDto.FullName, data.FullName);
+            Assert.Equal(userDto.Role, data.Role);
+            Assert.NotNull(accessToken);
 
-            Assert.Equal("user@becamex.com", data!.Email);
-            Assert.Equal("Nguyen Van Admin", data.FullName);
-            Assert.Equal("ADMIN", data.Role);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadToken(accessToken) as JwtSecurityToken;
+            Assert.NotNull(jwtToken);
+            var claims = jwtToken.Claims;
+            Assert.Equal("123", claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+            Assert.Equal("user@becamex.com", claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value);
+            Assert.Equal("ADMIN", claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value);
 
-            _userServiceMock.Verify(x => x.LoginAsync(It.Is<UserLoginRq>(r => r.Email == request.Email)), Times.Once);
+            _userServiceMock.Verify(x => x.LoginAsync(It.Is<UserLoginRq>(r => r.Email == request.Email && r.Password == request.Password)), Times.Once());
         }
-
         [Fact]
         public async Task GetUserById_ReturnsOk()
         {
@@ -300,7 +372,6 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             _userServiceMock.Verify(x => x.UpdateMyProfileAsync("test-user-id", It.IsAny<UserUpdateSelfDtoRq>()), Times.Once());
             _userServiceMock.Verify(x => x.GetCurrentUserAuthenticationInfo(), Times.Once());
         }
-
         // Helper method to create a mock IFormFile
         private IFormFile CreateMockFormFile(string fileName, string contentType)
         {
@@ -371,7 +442,6 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
 
             _userServiceMock.Verify(x => x.UpdateUserByAdmin(userId, request), Times.Once);
         }
-
         [Fact]
         public async Task GetAllUsers_ReturnsOk()
         {

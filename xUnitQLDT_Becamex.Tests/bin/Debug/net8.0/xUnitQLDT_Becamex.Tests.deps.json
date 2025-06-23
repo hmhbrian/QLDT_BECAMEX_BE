@@ -38,6 +38,8 @@
         "dependencies": {
           "Microsoft.AspNetCore.Mvc.Testing": "8.0.17",
           "Microsoft.NET.Test.Sdk": "17.8.0",
+          "MockQueryable.Moq": "7.0.3",
+          "Moq.EntityFrameworkCore": "9.0.0.5",
           "QLDT_Becamex": "1.0.0",
           "coverlet.collector": "6.0.0",
           "xunit": "2.9.3",
@@ -1911,6 +1913,47 @@
           "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {}
         }
       },
+      "MockQueryable.Core/7.0.3": {
+        "runtime": {
+          "lib/netstandard2.1/MockQueryable.Core.dll": {
+            "assemblyVersion": "7.0.0.3",
+            "fileVersion": "7.0.0.3"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.1/MockQueryable.Core.dll": {}
+        }
+      },
+      "MockQueryable.EntityFrameworkCore/7.0.3": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "9.0.5",
+          "MockQueryable.Core": "7.0.3"
+        },
+        "runtime": {
+          "lib/net6.0/MockQueryable.EntityFrameworkCore.dll": {
+            "assemblyVersion": "7.0.0.3",
+            "fileVersion": "7.0.0.3"
+          }
+        },
+        "compile": {
+          "lib/net6.0/MockQueryable.EntityFrameworkCore.dll": {}
+        }
+      },
+      "MockQueryable.Moq/7.0.3": {
+        "dependencies": {
+          "MockQueryable.EntityFrameworkCore": "7.0.3",
+          "Moq": "4.20.72"
+        },
+        "runtime": {
+          "lib/net6.0/MockQueryable.Moq.dll": {
+            "assemblyVersion": "7.0.0.3",
+            "fileVersion": "7.0.0.3"
+          }
+        },
+        "compile": {
+          "lib/net6.0/MockQueryable.Moq.dll": {}
+        }
+      },
       "Moq/4.20.72": {
         "dependencies": {
           "Castle.Core": "5.1.1"
@@ -1923,6 +1966,21 @@
         },
         "compile": {
           "lib/net6.0/Moq.dll": {}
+        }
+      },
+      "Moq.EntityFrameworkCore/9.0.0.5": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "9.0.5",
+          "Moq": "4.20.72"
+        },
+        "runtime": {
+          "lib/net8.0/Moq.EntityFrameworkCore.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.2.0"
+          }
+        },
+        "compile": {
+          "lib/net8.0/Moq.EntityFrameworkCore.dll": {}
         }
       },
       "NETStandard.Library/1.6.1": {
@@ -3089,6 +3147,7 @@
           "Microsoft.AspNetCore.Mvc.Testing": "8.0.17",
           "Microsoft.EntityFrameworkCore.SqlServer": "9.0.5",
           "Moq": "4.20.72",
+          "Moq.EntityFrameworkCore": "9.0.0.5",
           "Swashbuckle.AspNetCore": "6.6.2",
           "xunit": "2.9.3"
         },
@@ -5624,12 +5683,40 @@
       "path": "microsoft.win32.systemevents/6.0.0",
       "hashPath": "microsoft.win32.systemevents.6.0.0.nupkg.sha512"
     },
+    "MockQueryable.Core/7.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ittsOy5XMXtTC72dXmpDCCKF1dzJeOM5kEeYUL5vI6TTtI6K15zdyET+GSGuMz59S/VwTIuR0pnyeo7Wfilfog==",
+      "path": "mockqueryable.core/7.0.3",
+      "hashPath": "mockqueryable.core.7.0.3.nupkg.sha512"
+    },
+    "MockQueryable.EntityFrameworkCore/7.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-W/4WOG+5g/ZNsuRG0oM++zLxvqdKOUH94Hg8VC/CVpmIPAfMXgOKfW3rDGeLQXguWTa5/5qy2c1pH/9btGMw5A==",
+      "path": "mockqueryable.entityframeworkcore/7.0.3",
+      "hashPath": "mockqueryable.entityframeworkcore.7.0.3.nupkg.sha512"
+    },
+    "MockQueryable.Moq/7.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AUCgJj84DZQnGxGNKlqzTRqnMspZCljD4oY85paoXIX3/9p1ACCq8RZ6H1t0R0G2fKcCl8KM018wiRdIrWxdOg==",
+      "path": "mockqueryable.moq/7.0.3",
+      "hashPath": "mockqueryable.moq.7.0.3.nupkg.sha512"
+    },
     "Moq/4.20.72": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-EA55cjyNn8eTNWrgrdZJH5QLFp2L43oxl1tlkoYUKIE9pRwL784OWiTXeCV5ApS+AMYEAlt7Fo03A2XfouvHmQ==",
       "path": "moq/4.20.72",
       "hashPath": "moq.4.20.72.nupkg.sha512"
+    },
+    "Moq.EntityFrameworkCore/9.0.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9Vihf1nHittiT4rdsBGnModjNpGdgKmJRlALGczqFopRzVedVWzahcpulQ4VgCovo8Nlt9PgfkKBCHm1WTXdhA==",
+      "path": "moq.entityframeworkcore/9.0.0.5",
+      "hashPath": "moq.entityframeworkcore.9.0.0.5.nupkg.sha512"
     },
     "NETStandard.Library/1.6.1": {
       "type": "package",

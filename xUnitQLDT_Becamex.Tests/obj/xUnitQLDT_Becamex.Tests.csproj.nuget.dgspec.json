@@ -88,6 +88,10 @@
               "target": "Package",
               "version": "[4.20.72, )"
             },
+            "Moq.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.0.5, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
@@ -177,6 +181,14 @@
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[17.8.0, )"
+            },
+            "MockQueryable.Moq": {
+              "target": "Package",
+              "version": "[7.0.3, )"
+            },
+            "Moq.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.0.5, )"
             },
             "coverlet.collector": {
               "target": "Package",

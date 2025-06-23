@@ -37,6 +37,8 @@ namespace QLDT_Becamex.Src.Mappings
 
             //Course
             CreateMap<CourseDtoRq, Course>();
+            CreateMap<CourseDtoRq, Course>();
+
             CreateMap<Course, CourseDto>();
             CreateMap<CourseDto, Course>();
 

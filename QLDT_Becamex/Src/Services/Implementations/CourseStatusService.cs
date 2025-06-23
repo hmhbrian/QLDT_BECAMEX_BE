@@ -18,17 +18,17 @@ namespace QLDT_Becamex.Src.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<CourseSatusDto>>> GetAllAsync()
+        public async Task<Result<IEnumerable<CourseStatusDto>>> GetAllAsync()
         {
             try
             {
                 var list = await _unitOfWork.CourseStatusRepository.GetAllAsync();
-                var mapped = _mapper.Map<IEnumerable<CourseSatusDto>>(list);
-                return Result<IEnumerable<CourseSatusDto>>.Success(data: mapped);
+                var mapped = _mapper.Map<IEnumerable<CourseStatusDto>>(list);
+                return Result<IEnumerable<CourseStatusDto>>.Success(data: mapped);
             }
             catch (Exception ex)
             {
-                return Result<IEnumerable<CourseSatusDto>>.Failure(
+                return Result<IEnumerable<CourseStatusDto>>.Failure(
                     error: ex.Message,
                     message: "An error occurred while retrieving course statuses.",
                     code: "SYSTEM_ERROR",
@@ -54,7 +54,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     );
                 }
 
-                var courseStatus = new CourseSatus { Name = rq.Name };
+                var courseStatus = new CourseStatus { Name = rq.Name };
 
                 await _unitOfWork.CourseStatusRepository.AddAsync(courseStatus);
                 await _unitOfWork.CompleteAsync();

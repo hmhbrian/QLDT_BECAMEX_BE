@@ -12,13 +12,13 @@ namespace QLDT_Becamex.Src.Dtos.Courses
         [Required]
         public string? Description { get; set; }
         [Required]
-        public string Objecttives { get; set; } = null!;
+        public string Objectives { get; set; } = null!;
         public IFormFile? ThumbUrl { get; set; }
 
         [RegularExpression("^(online|offline)$", ErrorMessage = "Giá trị chỉ được là 'online' hoặc 'offline'.")]
         public string? Format { get; set; } = "online";
-        public int? Sesstions { get; set; }
-        public int? HoursPerSesstions { get; set; }
+        public int? Sessions { get; set; }
+        public int? HoursPerSessions { get; set; }
 
         [RegularExpression($"^({ConstantCourse.OPTIONAL_TUYCHON}|{ConstantCourse.OPTIONAL_BATBUOC})$",
                              ErrorMessage = "Giá trị chỉ được là 'tùy chọn' hoặc 'bắt buộc'.")]
@@ -29,7 +29,7 @@ namespace QLDT_Becamex.Src.Dtos.Courses
         public DateTime? StartDate { get; set; } = DateTime.Now;
         public DateTime? EndDate { get; set; } = DateTime.Now;
         public DateTime? RegistrationStartDate { get; set; } = DateTime.Now;
-        public DateTime? RegistrationSlosingDate { get; set; } = DateTime.Now;
+        public DateTime? RegistrationClosingDate { get; set; } = DateTime.Now;
         public string? Location { get; set; }
         public int? StatusId { get; set; }
         public List<int>? DepartmentIds { get; set; }

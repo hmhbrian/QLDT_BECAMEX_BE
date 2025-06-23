@@ -534,9 +534,9 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
 
             // Kiểm tra ngày kết thúc đăng ký phải trước hoặc bằng ngày bắt đầu khóa học
-            if (request.RegistrationSlosingDate.HasValue && request.StartDate.HasValue)
+            if (request.RegistrationClosingDate.HasValue && request.StartDate.HasValue)
             {
-                if (request.RegistrationSlosingDate.Value > request.StartDate.Value)
+                if (request.RegistrationClosingDate.Value > request.StartDate.Value)
                 {
                     return Result.Failure(
                         message: "Ngày kết thúc đăng ký phải trước hoặc bằng ngày bắt đầu khóa học",
@@ -548,9 +548,9 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
 
             // Kiểm tra ngày bắt đầu đăng ký phải trước ngày kết thúc đăng ký
-            if (request.RegistrationStartDate.HasValue && request.RegistrationSlosingDate.HasValue)
+            if (request.RegistrationStartDate.HasValue && request.RegistrationClosingDate.HasValue)
             {
-                if (request.RegistrationStartDate.Value >= request.RegistrationSlosingDate.Value)
+                if (request.RegistrationStartDate.Value >= request.RegistrationClosingDate.Value)
                 {
                     return Result.Failure(
                         message: "Ngày bắt đầu đăng ký phải trước ngày kết thúc đăng ký",

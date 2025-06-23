@@ -5,7 +5,7 @@ using QLDT_Becamex.Src.Repostitories.Interfaces;
 
 namespace QLDT_Becamex.Src.Repostitories.Implementations
 {
-    public class CourseStatusRepository : GenericRepository<CourseSatus>, ICourseStatusRepository
+    public class CourseStatusRepository : GenericRepository<CourseStatus>, ICourseStatusRepository
     {
         public CourseStatusRepository(ApplicationDbContext dbContext) : base(dbContext)
         {

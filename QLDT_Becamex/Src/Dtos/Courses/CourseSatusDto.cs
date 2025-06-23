@@ -2,7 +2,7 @@
 
 namespace QLDT_Becamex.Src.Dtos.Courses
 {
-    public class CourseSatusDto
+    public class CourseStatusDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

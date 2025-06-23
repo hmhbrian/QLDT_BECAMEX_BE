@@ -1,6 +1,4 @@
 ﻿using QLDT_Becamex.Src.Dtos;
-using QLDT_Becamex.Src.Dtos.Departments;
-using QLDT_Becamex.Src.Dtos.Results;
 
 namespace QLDT_Becamex.Src.Services.Interfaces
 {

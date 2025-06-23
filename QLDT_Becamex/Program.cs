@@ -102,9 +102,9 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<IUserStatusService, UserStatusService>();
 builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
-builder.Services.AddScoped<JwtService>(); // Dịch vụ JWT
-builder.Services.AddSingleton<CloudinaryService>();
 // 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 

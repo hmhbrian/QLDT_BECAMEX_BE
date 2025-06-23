@@ -1,23 +1,37 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Dtos.Roles;
 using QLDT_Becamex.Src.Services.Interfaces;
-using QLDT_Becamex.Src.Dtos.Results;
+using System; // Thêm để sử dụng Exception
+using System.Collections.Generic; // Thêm để sử dụng IEnumerable và List
+using System.Linq;
+using QLDT_Becamex.Src.Dtos; // Thêm để sử dụng LINQ
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {
+    /// <summary>
+    /// Triển khai dịch vụ quản lý vai trò.
+    /// </summary>
     public class RoleService : IRoleService
     {
         private readonly RoleManager<IdentityRole> _roleManager; // Hoặc RoleManager<ApplicationRole>
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Khởi tạo một phiên bản mới của lớp <see cref="RoleService"/>.
+        /// </summary>
+        /// <param name="roleManager">Đối tượng RoleManager để quản lý vai trò.</param>
+        /// <param name="mapper">Đối tượng AutoMapper để ánh xạ giữa các đối tượng.</param>
         public RoleService(RoleManager<IdentityRole> roleManager, IMapper mapper)
         {
             _roleManager = roleManager;
             _mapper = mapper;
         }
 
-        // --- CREATE ---
+        /// <summary>
+        /// Tạo một vai trò mới.
+        /// </summary>
+        /// <param name="rq">Đối tượng chứa thông tin yêu cầu tạo vai trò.</param>
+        /// <returns>Đối tượng Result chứa thông tin vai trò đã tạo hoặc lỗi nếu thất bại.</returns>
         public async Task<Result<RoleDto>> CreateRoleAsync(RoleRq rq)
         {
             try
@@ -29,8 +43,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<RoleDto>.Failure(
                         message: "Tạo vai trò thất bại",
                         error: $"Vai trò '{rq.RoleName}' đã tồn tại.",
-                        code: "ROLE_ALREADY_EXISTS",
-                        statusCode: 400
+                        code: "EXISTS", // Thay đổi mã lỗi theo bảng: ROLE_ALREADY_EXISTS -> EXISTS
+                        statusCode: 409 // 409: Xung đột dữ liệu
                     );
                 }
 
@@ -47,7 +61,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     var roleDto = _mapper.Map<RoleDto>(role);
                     return Result<RoleDto>.Success(
                         message: "Tạo vai trò thành công.",
-                        code: "CREATE_ROLE_SUCCESS",
+                        code: "SUCCESS", // Thay đổi mã lỗi theo bảng: CREATE_ROLE_SUCCESS -> SUCCESS
                         statusCode: 201,
                         data: roleDto
                     );
@@ -57,7 +71,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<RoleDto>.Failure(
                         message: "Tạo vai trò thất bại",
                         errors: result.Errors.Select(e => e.Description),
-                        code: "CREATE_ROLE_FAILED",
+                        code: "INVALID", // Thay đổi mã lỗi theo bảng: CREATE_ROLE_FAILED -> INVALID (dữ liệu đầu vào không hợp lệ)
                         statusCode: 400
                     );
                 }
@@ -68,13 +82,17 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<RoleDto>.Failure(
                     message: "Tạo vai trò thất bại",
                     error: $"Đã xảy ra lỗi hệ thống: {ex.Message}",
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Mã lỗi chung: SYSTEM_ERROR
                     statusCode: 500
                 );
             }
         }
 
-        // --- READ by ID ---
+        /// <summary>
+        /// Lấy thông tin vai trò theo ID.
+        /// </summary>
+        /// <param name="roleId">ID của vai trò cần lấy.</param>
+        /// <returns>Đối tượng Result chứa thông tin vai trò hoặc lỗi nếu không tìm thấy.</returns>
         public async Task<Result<RoleDto>> GetRoleByIdAsync(string roleId)
         {
             try
@@ -85,14 +103,14 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<RoleDto>.Failure(
                         message: "Lấy thông tin vai trò thất bại",
                         error: "Vai trò không tồn tại.",
-                        code: "ROLE_NOT_FOUND",
+                        code: "NOT_FOUND", // Thay đổi mã lỗi theo bảng: ROLE_NOT_FOUND -> NOT_FOUND
                         statusCode: 404
                     );
                 }
                 var roleDto = _mapper.Map<RoleDto>(role);
                 return Result<RoleDto>.Success(
                     message: "Lấy thông tin vai trò thành công.",
-                    code: "GET_ROLE_SUCCESS",
+                    code: "SUCCESS", // Thay đổi mã lỗi theo bảng: GET_ROLE_SUCCESS -> SUCCESS
                     statusCode: 200,
                     data: roleDto
                 );
@@ -103,13 +121,17 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<RoleDto>.Failure(
                     message: "Lấy thông tin vai trò thất bại",
                     error: $"Đã xảy ra lỗi hệ thống: {ex.Message}",
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Mã lỗi chung: SYSTEM_ERROR
                     statusCode: 500
                 );
             }
         }
 
-        // --- READ by Name ---
+        /// <summary>
+        /// Lấy thông tin vai trò theo tên.
+        /// </summary>
+        /// <param name="roleName">Tên của vai trò cần lấy.</param>
+        /// <returns>Đối tượng Result chứa thông tin vai trò hoặc lỗi nếu không tìm thấy.</returns>
         public async Task<Result<RoleDto>> GetRoleByNameAsync(string roleName)
         {
             try
@@ -120,14 +142,14 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<RoleDto>.Failure(
                         message: "Lấy thông tin vai trò thất bại",
                         error: "Vai trò không tồn tại.",
-                        code: "ROLE_NOT_FOUND",
+                        code: "NOT_FOUND", // Thay đổi mã lỗi theo bảng: ROLE_NOT_FOUND -> NOT_FOUND
                         statusCode: 404
                     );
                 }
                 var roleDto = _mapper.Map<RoleDto>(role);
                 return Result<RoleDto>.Success(
                     message: "Lấy thông tin vai trò thành công.",
-                    code: "GET_ROLE_SUCCESS",
+                    code: "SUCCESS", // Thay đổi mã lỗi theo bảng: GET_ROLE_SUCCESS -> SUCCESS
                     statusCode: 200,
                     data: roleDto
                 );
@@ -138,13 +160,16 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<RoleDto>.Failure(
                     message: "Lấy thông tin vai trò thất bại",
                     error: $"Đã xảy ra lỗi hệ thống: {ex.Message}",
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Mã lỗi chung: SYSTEM_ERROR
                     statusCode: 500
                 );
             }
         }
 
-        // --- READ All ---
+        /// <summary>
+        /// Lấy tất cả các vai trò.
+        /// </summary>
+        /// <returns>Đối tượng Result chứa danh sách các vai trò hoặc lỗi nếu thất bại.</returns>
         public async Task<Result<IEnumerable<RoleDto>>> GetAllRolesAsync()
         {
             try
@@ -153,7 +178,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var roleDtos = _mapper.Map<IEnumerable<RoleDto>>(roles);
                 return Result<IEnumerable<RoleDto>>.Success(
                     message: "Lấy danh sách vai trò thành công.",
-                    code: "GET_ALL_ROLES_SUCCESS",
+                    code: "SUCCESS", // Thay đổi mã lỗi theo bảng: GET_ALL_ROLES_SUCCESS -> SUCCESS
                     statusCode: 200,
                     data: roleDtos
                 );
@@ -164,13 +189,18 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<IEnumerable<RoleDto>>.Failure(
                     message: "Lấy danh sách vai trò thất bại",
                     error: $"Đã xảy ra lỗi hệ thống: {ex.Message}",
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Mã lỗi chung: SYSTEM_ERROR
                     statusCode: 500
                 );
             }
         }
 
-        // --- UPDATE ---
+        /// <summary>
+        /// Cập nhật thông tin một vai trò hiện có.
+        /// </summary>
+        /// <param name="roleId">ID của vai trò cần cập nhật.</param>
+        /// <param name="rq">Đối tượng chứa thông tin yêu cầu cập nhật vai trò.</param>
+        /// <returns>Đối tượng Result chứa thông tin vai trò đã cập nhật hoặc lỗi nếu thất bại.</returns>
         public async Task<Result<RoleDto>> UpdateRoleAsync(string roleId, RoleRq rq)
         {
             try
@@ -181,7 +211,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<RoleDto>.Failure(
                         message: "Cập nhật vai trò thất bại",
                         error: "Vai trò không tồn tại.",
-                        code: "ROLE_NOT_FOUND",
+                        code: "NOT_FOUND", // Thay đổi mã lỗi theo bảng: ROLE_NOT_FOUND -> NOT_FOUND
                         statusCode: 404
                     );
                 }
@@ -195,8 +225,8 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         return Result<RoleDto>.Failure(
                             message: "Cập nhật vai trò thất bại",
                             error: $"Tên vai trò '{rq.RoleName}' đã được sử dụng bởi vai trò khác.",
-                            code: "ROLE_NAME_ALREADY_EXISTS",
-                            statusCode: 400
+                            code: "EXISTS", // Thay đổi mã lỗi theo bảng: ROLE_NAME_ALREADY_EXISTS -> EXISTS
+                            statusCode: 409 // 409: Xung đột dữ liệu
                         );
                     }
                 }
@@ -214,7 +244,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     var roleDto = _mapper.Map<RoleDto>(role);
                     return Result<RoleDto>.Success(
                         message: "Cập nhật vai trò thành công.",
-                        code: "UPDATE_ROLE_SUCCESS",
+                        code: "SUCCESS", // Thay đổi mã lỗi theo bảng: UPDATE_ROLE_SUCCESS -> SUCCESS
                         statusCode: 200,
                         data: roleDto
                     );
@@ -224,7 +254,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     return Result<RoleDto>.Failure(
                         message: "Cập nhật vai trò thất bại",
                         errors: result.Errors.Select(e => e.Description),
-                        code: "UPDATE_ROLE_FAILED",
+                        code: "INVALID", // Thay đổi mã lỗi theo bảng: UPDATE_ROLE_FAILED -> INVALID (dữ liệu đầu vào không hợp lệ)
                         statusCode: 400
                     );
                 }
@@ -235,24 +265,28 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<RoleDto>.Failure(
                     message: "Cập nhật vai trò thất bại",
                     error: $"Đã xảy ra lỗi hệ thống: {ex.Message}",
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Mã lỗi chung: SYSTEM_ERROR
                     statusCode: 500
                 );
             }
         }
 
-        // --- DELETE ---
-        public async Task<Result> DeleteRoleAsync(string roleId)
+        /// <summary>
+        /// Xóa một vai trò.
+        /// </summary>
+        /// <param name="roleId">ID của vai trò cần xóa.</param>
+        /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
+        public async Task<ApiResponse> DeleteRoleAsync(string roleId)
         {
             try
             {
                 var role = await _roleManager.FindByIdAsync(roleId);
                 if (role == null)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Xóa vai trò thất bại",
                         error: "Vai trò không tồn tại.",
-                        code: "ROLE_NOT_FOUND",
+                        code: "NOT_FOUND", // Thay đổi mã lỗi theo bảng: ROLE_NOT_FOUND -> NOT_FOUND
                         statusCode: 404
                     );
                 }
@@ -266,18 +300,18 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 if (result.Succeeded)
                 {
-                    return Result.Success(
+                    return ApiResponse.Success(
                         message: "Xóa vai trò thành công.",
-                        code: "DELETE_ROLE_SUCCESS",
+                        code: "SUCCESS", // Thay đổi mã lỗi theo bảng: DELETE_ROLE_SUCCESS -> SUCCESS
                         statusCode: 200
                     );
                 }
                 else
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Xóa vai trò thất bại",
                         errors: result.Errors.Select(e => e.Description),
-                        code: "DELETE_ROLE_FAILED",
+                        code: "INVALID", // Thay đổi mã lỗi theo bảng: DELETE_ROLE_FAILED -> INVALID (có thể do ràng buộc)
                         statusCode: 400
                     );
                 }
@@ -285,10 +319,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
             catch (Exception ex)
             {
                 // Ghi log lỗi
-                return Result.Failure(
+                return ApiResponse.Failure(
                     message: "Xóa vai trò thất bại",
                     error: $"Đã xảy ra lỗi hệ thống: {ex.Message}",
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Mã lỗi chung: SYSTEM_ERROR
                     statusCode: 500
                 );
             }

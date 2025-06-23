@@ -1,5 +1,4 @@
-﻿using QLDT_Becamex.Src.Dtos.Params;
-using QLDT_Becamex.Src.Dtos.Results;
+﻿
 using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Repostitories.GenericRepository

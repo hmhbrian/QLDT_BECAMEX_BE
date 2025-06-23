@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Config;
-using QLDT_Becamex.Src.Dtos.Results;
 using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Repostitories.GenericRepository

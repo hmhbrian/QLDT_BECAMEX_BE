@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Common;
-using QLDT_Becamex.Src.Dtos.Departments;
-using QLDT_Becamex.Src.Dtos.Results;
+using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;

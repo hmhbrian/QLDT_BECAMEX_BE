@@ -1,5 +1,4 @@
-﻿using QLDT_Becamex.Src.Dtos.Results;
-using QLDT_Becamex.Src.Dtos.Roles;
+﻿using QLDT_Becamex.Src.Dtos;
 
 namespace QLDT_Becamex.Src.Services.Interfaces
 {
@@ -17,6 +16,6 @@ namespace QLDT_Becamex.Src.Services.Interfaces
         public Task<Result<RoleDto>> UpdateRoleAsync(string roleId, RoleRq rq);
 
         // Delete
-        public Task<Result> DeleteRoleAsync(string roleId);
+        public Task<ApiResponse> DeleteRoleAsync(string roleId);
     }
 }

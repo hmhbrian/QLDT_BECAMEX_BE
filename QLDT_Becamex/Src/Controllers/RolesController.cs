@@ -1,33 +1,48 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
-using QLDT_Becamex.Src.Dtos.Roles;
+﻿using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Services.Interfaces;
-
+using System.Collections.Generic; // Cần thiết cho List<string>
+using System.Linq; // Cần thiết cho .Any()
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using QLDT_Becamex.Src.Dtos; // Cần thiết cho StatusCodes
 
 namespace QLDT_Becamex.Src.Controllers
 {
+    /// <summary>
+    /// API Controller để quản lý các vai trò (Role).
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")] // Tiền tố 'api' là phổ biến
     public class RolesController : ControllerBase
     {
         private readonly IRoleService _roleService;
 
+        /// <summary>
+        /// Khởi tạo một phiên bản mới của lớp <see cref="RolesController"/>.
+        /// </summary>
+        /// <param name="roleService">Dịch vụ quản lý vai trò.</param>
         public RolesController(IRoleService roleService)
         {
             _roleService = roleService;
         }
 
+        /// <summary>
+        /// Tạo một vai trò mới.
+        /// </summary>
+        /// <param name="request">Đối tượng chứa thông tin yêu cầu tạo vai trò.</param>
+        /// <returns>ActionResult chứa kết quả của thao tác tạo vai trò.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateRole([FromBody] RoleRq request)
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
                 return StatusCode(StatusCodes.Status400BadRequest, new
                 {
                     message = "Dữ liệu đầu vào không hợp lệ.",
-                    errors = errors,
-                    code = "INVALID_INPUT"
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList(),
+                    code = "INVALID", // Thay đổi từ "INVALID_INPUT" sang "INVALID"
+                    statusCode = StatusCodes.Status400BadRequest
                 });
             }
 
@@ -35,6 +50,7 @@ namespace QLDT_Becamex.Src.Controllers
 
             if (result.IsSuccess)
             {
+                // Sử dụng ?? StatusCodes.Status201Created cho trường hợp tạo thành công
                 return StatusCode(result.StatusCode ?? StatusCodes.Status201Created, new
                 {
                     message = result.Message,
@@ -44,22 +60,37 @@ namespace QLDT_Becamex.Src.Controllers
             }
             else
             {
-                return StatusCode(result.StatusCode ?? StatusCodes.Status500InternalServerError, new
+                // Sử dụng StatusCode từ Result, nếu không thì mặc định là 500 (hoặc 400 tùy ngữ cảnh lỗi)
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
                 {
                     message = result.Message,
                     errors = result.Errors != null && result.Errors.Any() ? result.Errors : new List<string> { result.Message },
-                    code = result.Code
+                    code = result.Code,
+
                 });
             }
         }
 
+        /// <summary>
+        /// Lấy thông tin vai trò theo ID.
+        /// </summary>
+        /// <param name="id">ID của vai trò cần lấy.</param>
+        /// <returns>ActionResult chứa thông tin vai trò hoặc lỗi nếu không tìm thấy.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoleById(string id)
         {
+            // Có thể thêm kiểm tra id rỗng ở đây nếu muốn, tương tự như CoursesController
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest(new { message = "ID không được để trống.", code = "INVALID", statusCode = StatusCodes.Status400BadRequest });
+            }
+
             var result = await _roleService.GetRoleByIdAsync(id);
 
             if (result.IsSuccess)
             {
+                // Sử dụng ?? StatusCodes.Status200OK cho trường hợp thành công
                 return StatusCode(result.StatusCode ?? StatusCodes.Status200OK, new
                 {
                     message = result.Message,
@@ -69,18 +100,31 @@ namespace QLDT_Becamex.Src.Controllers
             }
             else
             {
-                return StatusCode(result.StatusCode ?? StatusCodes.Status500InternalServerError, new
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError; // Mặc định 500 cho lỗi không xác định
+                return StatusCode(statusCode, new
                 {
                     message = result.Message,
                     errors = result.Errors != null && result.Errors.Any() ? result.Errors : new List<string> { result.Message },
-                    code = result.Code
+                    code = result.Code,
+
                 });
             }
         }
 
+        /// <summary>
+        /// Lấy thông tin vai trò theo tên.
+        /// </summary>
+        /// <param name="name">Tên của vai trò cần lấy.</param>
+        /// <returns>ActionResult chứa thông tin vai trò hoặc lỗi nếu không tìm thấy.</returns>
         [HttpGet("byName/{name}")] // Endpoint riêng để tránh xung đột với GetById
         public async Task<IActionResult> GetRoleByName(string name)
         {
+            // Có thể thêm kiểm tra name rỗng ở đây
+            if (string.IsNullOrEmpty(name))
+            {
+                return BadRequest(new { message = "Tên vai trò không được để trống.", code = "INVALID", statusCode = StatusCodes.Status400BadRequest });
+            }
+
             var result = await _roleService.GetRoleByNameAsync(name);
 
             if (result.IsSuccess)
@@ -94,15 +138,21 @@ namespace QLDT_Becamex.Src.Controllers
             }
             else
             {
-                return StatusCode(result.StatusCode ?? StatusCodes.Status500InternalServerError, new
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
                 {
                     message = result.Message,
                     errors = result.Errors != null && result.Errors.Any() ? result.Errors : new List<string> { result.Message },
-                    code = result.Code
+                    code = result.Code,
+
                 });
             }
         }
 
+        /// <summary>
+        /// Lấy tất cả các vai trò.
+        /// </summary>
+        /// <returns>ActionResult chứa danh sách tất cả các vai trò hoặc lỗi nếu thất bại.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllRoles()
         {
@@ -119,18 +169,32 @@ namespace QLDT_Becamex.Src.Controllers
             }
             else
             {
-                return StatusCode(result.StatusCode ?? StatusCodes.Status500InternalServerError, new
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
                 {
                     message = result.Message,
                     errors = result.Errors != null && result.Errors.Any() ? result.Errors : new List<string> { result.Message },
-                    code = result.Code
+                    code = result.Code,
+
                 });
             }
         }
 
+        /// <summary>
+        /// Cập nhật thông tin của một vai trò hiện có.
+        /// </summary>
+        /// <param name="id">ID của vai trò cần cập nhật.</param>
+        /// <param name="request">Đối tượng chứa thông tin yêu cầu cập nhật vai trò.</param>
+        /// <returns>ActionResult chứa kết quả của thao tác cập nhật vai trò.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRole(string id, [FromBody] RoleRq request)
         {
+            // Kiểm tra ID trống
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest(new { message = "ID không được để trống.", code = "INVALID", statusCode = StatusCodes.Status400BadRequest });
+            }
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -138,7 +202,8 @@ namespace QLDT_Becamex.Src.Controllers
                 {
                     message = "Dữ liệu đầu vào không hợp lệ.",
                     errors = errors,
-                    code = "INVALID_INPUT"
+                    code = "INVALID", // Thay đổi từ "INVALID_INPUT" sang "INVALID"
+                    statusCode = StatusCodes.Status400BadRequest
                 });
             }
 
@@ -150,16 +215,18 @@ namespace QLDT_Becamex.Src.Controllers
                 {
                     message = result.Message,
                     code = result.Code,
-                    data = result.Data
+                    data = result.Data // Có thể có dữ liệu trả về nếu service trả về Result<T>
                 });
             }
             else
             {
-                return StatusCode(result.StatusCode ?? StatusCodes.Status500InternalServerError, new
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
                 {
                     message = result.Message,
                     errors = result.Errors != null && result.Errors.Any() ? result.Errors : new List<string> { result.Message },
-                    code = result.Code
+                    code = result.Code,
+
                 });
             }
         }
@@ -175,6 +242,12 @@ namespace QLDT_Becamex.Src.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteRole(string id)
         {
+            // Có thể thêm kiểm tra id rỗng ở đây
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest(new { message = "ID không được để trống.", code = "INVALID", statusCode = StatusCodes.Status400BadRequest });
+            }
+
             var result = await _roleService.DeleteRoleAsync(id);
 
             if (result.IsSuccess)
@@ -187,11 +260,13 @@ namespace QLDT_Becamex.Src.Controllers
             }
             else
             {
-                return StatusCode(result.StatusCode ?? StatusCodes.Status500InternalServerError, new
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
                 {
                     message = result.Message,
                     errors = result.Errors != null && result.Errors.Any() ? result.Errors : new List<string> { result.Message },
-                    code = result.Code
+                    code = result.Code,
+
                 });
             }
         }

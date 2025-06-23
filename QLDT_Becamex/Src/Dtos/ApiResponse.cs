@@ -1,12 +1,10 @@
 ﻿
-namespace QLDT_Becamex.Src.Dtos.Results
+namespace QLDT_Becamex.Src.Dtos
 {
     using System.Collections.Generic;
     using System.Linq;
-    public class Result
-
+    public class ApiResponse
     {
-
         public bool IsSuccess { get; protected set; }
 
         public bool IsFailure => !IsSuccess;
@@ -21,17 +19,17 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
 
 
-        protected Result() { }
+        protected ApiResponse() { }
 
 
 
         // Success without data
 
-        public static Result Success(string message = "Operation successful.", int? statusCode = 200, string? code = "SUCCESSS")
+        public static ApiResponse Success(string message = "Operation successful.", int? statusCode = 200, string? code = "SUCCESSS")
 
         {
 
-            return new Result
+            return new ApiResponse
 
             {
 
@@ -51,11 +49,11 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Failure with multiple errors
 
-        public static Result Failure(IEnumerable<string> errors, string message = "Operation failed.", string? code = "FALIED", int? statusCode = 400)
+        public static ApiResponse Failure(IEnumerable<string> errors, string message = "Operation failed.", string? code = "FALIED", int? statusCode = 400)
 
         {
 
-            return new Result
+            return new ApiResponse
 
             {
 
@@ -77,7 +75,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
         // Failure with single error
 
-        public static Result Failure(string error, string message = "Operation failed.", string? code = "FAILED", int? statusCode = 400)
+        public static ApiResponse Failure(string error, string message = "Operation failed.", string? code = "FAILED", int? statusCode = 400)
 
         {
 
@@ -87,11 +85,7 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
     }
 
-
-
-
-
-    public class Result<T> : Result
+    public class Result<T> : ApiResponse
 
     {
 
@@ -167,4 +161,9 @@ namespace QLDT_Becamex.Src.Dtos.Results
 
     }
 
+    public class PagedResult<T>
+    {
+        public IEnumerable<T>? Items { get; set; } = new List<T>();
+        public Pagination? Pagination { get; set; }
+    }
 }

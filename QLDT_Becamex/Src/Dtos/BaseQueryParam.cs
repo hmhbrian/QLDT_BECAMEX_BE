@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QLDT_Becamex.Src.Dtos.Params
+namespace QLDT_Becamex.Src.Dtos
 {
     public class BaseQueryParam
     {
@@ -12,5 +12,13 @@ namespace QLDT_Becamex.Src.Dtos.Params
 
         [RegularExpression("^(asc|desc)$", ErrorMessage = "SortType must be 'asc' or 'desc'.")]
         public string SortType { get; set; } = "desc";
+    }
+
+    public class Pagination
+    {
+        public int? TotalItems { get; set; }
+        public int? ItemsPerPage { get; set; }
+        public int? CurrentPage { get; set; }
+        public int? TotalPages { get; set; }
     }
 }

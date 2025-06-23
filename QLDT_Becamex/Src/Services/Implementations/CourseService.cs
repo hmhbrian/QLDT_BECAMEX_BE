@@ -1,49 +1,75 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Constant;
-using QLDT_Becamex.Src.Dtos.Courses;
-using QLDT_Becamex.Src.Dtos.Results;
+using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.UnitOfWork;
+using System;
 using System.Collections.Generic; // Add this for HashSet
 using System.Linq; // Add this for LINQ methods like ToList()
 using System.Threading.Tasks;
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {
+    /// <summary>
+    /// Triển khai dịch vụ quản lý khóa học.
+    /// </summary>
     public class CourseService : ICourseService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly CloudinaryService _cloudinaryService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public CourseService(IMapper mapper, IUnitOfWork unitOfWork, CloudinaryService cloudinaryService)
+        /// <summary>
+        /// Khởi tạo một phiên bản mới của lớp <see cref="CourseService"/>.
+        /// </summary>
+        /// <param name="mapper">Đối tượng AutoMapper để ánh xạ giữa các đối tượng.</param>
+        /// <param name="unitOfWork">Đối tượng Unit of Work để quản lý các repositories và giao dịch cơ sở dữ liệu.</param>
+        /// <param name="cloudinaryService">Dịch vụ Cloudinary để tải ảnh lên.</param>
+        public CourseService(IMapper mapper, IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
         }
 
-        // Helper method to get all child department IDs recursively
+        /// <summary>
+        /// Phương thức trợ giúp để lấy tất cả các ID phòng ban con một cách đệ quy.
+        /// </summary>
+        /// <param name="parentDepartmentId">ID của phòng ban cha.</param>
+        /// <returns>Một danh sách các ID phòng ban con.</returns>
         private async Task<List<int>> GetAllChildDepartmentIds(int parentDepartmentId)
         {
-            var childDepartmentIds = new List<int>();
-            // Sử dụng Repository để truy vấn trực tiếp các phòng ban con
-            var directChildren = await _unitOfWork.DepartmentRepository
-                                                .FindAsync(d => d.ParentId == parentDepartmentId);
-
-            foreach (var child in directChildren)
+            try
             {
-                childDepartmentIds.Add(child.DepartmentId);
-                // Đệ quy để lấy các phòng ban con của phòng ban con này
-                childDepartmentIds.AddRange(await GetAllChildDepartmentIds(child.DepartmentId));
+                var childDepartmentIds = new List<int>();
+                // Sử dụng Repository để truy vấn trực tiếp các phòng ban con
+                var directChildren = await _unitOfWork.DepartmentRepository
+                                                            .FindAsync(d => d.ParentId == parentDepartmentId);
+
+                foreach (var child in directChildren)
+                {
+                    childDepartmentIds.Add(child.DepartmentId);
+                    // Đệ quy để lấy các phòng ban con của phòng ban con này
+                    childDepartmentIds.AddRange(await GetAllChildDepartmentIds(child.DepartmentId));
+                }
+                return childDepartmentIds;
             }
-            return childDepartmentIds;
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần thiết
+                Console.WriteLine($"Lỗi khi lấy ID phòng ban con: {ex.Message}");
+                return new List<int>(); // Trả về danh sách rỗng nếu có lỗi
+            }
         }
 
-
-        public async Task<Result> CreateAsync(CourseDtoRq request)
+        /// <summary>
+        /// Tạo một khóa học mới.
+        /// </summary>
+        /// <param name="request">Đối tượng chứa thông tin yêu cầu tạo khóa học.</param>
+        /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
+        public async Task<ApiResponse> CreateAsync(CourseDtoRq request)
         {
             try
             {
@@ -51,10 +77,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var codeExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Code == request.Code.Trim().ToLower());
                 if (codeExists)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Tạo khóa học thất bại",
                         error: "Mã khóa học đã tồn tại",
-                        code: "COURSE_CODE_EXISTS",
+                        code: "EXISTS", // Thay đổi mã lỗi theo bảng: CONFLICT -> EXISTS
                         statusCode: 409
                     );
                 }
@@ -63,10 +89,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var nameExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Name == request.Name);
                 if (nameExists)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Tạo khóa học thất bại",
                         error: "Tên khóa học đã tồn tại",
-                        code: "COURSE_NAME_EXISTS",
+                        code: "EXISTS", // Thay đổi mã lỗi theo bảng: CONFLICT -> EXISTS
                         statusCode: 409
                     );
                 }
@@ -77,10 +103,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     var statusExists = await _unitOfWork.CourseStatusRepository.AnyAsync(s => s.Id == request.StatusId.Value);
                     if (!statusExists)
                     {
-                        return Result.Failure(
+                        return ApiResponse.Failure(
                             message: "Tạo khóa học thất bại",
                             error: "Trạng thái khóa học không hợp lệ",
-                            code: "INVALID_COURSE_STATUS",
+                            code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_COURSE_STATUS -> INVALID
                             statusCode: 400
                         );
                     }
@@ -90,10 +116,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var dateValidationResult = ValidateDateLogic(request);
                 if (!dateValidationResult.IsSuccess)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: dateValidationResult.Message,
                         error: dateValidationResult.Errors.First(),
-                        code: dateValidationResult.Code,
+                        code: dateValidationResult.Code, // Mã lỗi đã được thay đổi trong ValidateDateLogic
                         statusCode: dateValidationResult.StatusCode
                     );
                 }
@@ -126,10 +152,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                     if (invalidDepartments.Any())
                     {
-                        return Result.Failure(
+                        return ApiResponse.Failure(
                             message: "Tạo khóa học thất bại",
                             error: $"Phòng ban không hợp lệ: {string.Join(", ", invalidDepartments)}",
-                            code: "INVALID_DEPARTMENTS",
+                            code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_DEPARTMENTS -> INVALID
                             statusCode: 400
                         );
                     }
@@ -153,10 +179,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                     if (invalidPositions.Any())
                     {
-                        return Result.Failure(
+                        return ApiResponse.Failure(
                             message: "Tạo khóa học thất bại",
                             error: $"Vị trí không hợp lệ: {string.Join(", ", invalidPositions)}",
-                            code: "INVALID_POSITIONS",
+                            code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_POSITIONS -> INVALID
                             statusCode: 400
                         );
                     }
@@ -215,7 +241,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         // Lấy tất cả người dùng thuộc các phòng ban đã gán và các vị trí đã gán
                         var matchingUsers = await _unitOfWork.UserRepository
                             .FindAsync(u => u.DepartmentId.HasValue && request.DepartmentIds.Contains(u.DepartmentId.Value) &&
-                                            u.PositionId.HasValue && request.PositionIds.Contains(u.PositionId.Value));
+                                             u.PositionId.HasValue && request.PositionIds.Contains(u.PositionId.Value));
 
                         foreach (var user in matchingUsers)
                         {
@@ -246,23 +272,29 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 await _unitOfWork.CompleteAsync();
 
-                return Result.Success(
+                return ApiResponse.Success(
                     message: "Tạo khóa học thành công",
-                    code: "COURSE_CREATED",
+                    code: "SUCCESS", // Giữ nguyên SUCCESS cho trường hợp thành công
                     statusCode: 201
                 );
             }
             catch (Exception ex)
             {
-                return Result.Failure(
+                return ApiResponse.Failure(
                     error: "Lỗi hệ thống: " + ex.Message,
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Thay đổi mã lỗi theo bảng: SYSTEM_ERROR
                     statusCode: 500
                 );
             }
         }
 
-        public async Task<Result> UpdateAsync(string id, CourseDtoRq request)
+        /// <summary>
+        /// Cập nhật thông tin một khóa học hiện có.
+        /// </summary>
+        /// <param name="id">ID của khóa học cần cập nhật.</param>
+        /// <param name="request">Đối tượng chứa thông tin yêu cầu cập nhật khóa học.</param>
+        /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
+        public async Task<ApiResponse> UpdateAsync(string id, CourseDtoRq request)
         {
             try
             {
@@ -270,10 +302,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var existingCourse = await _unitOfWork.CourseRepository.GetByIdAsync(id);
                 if (existingCourse == null)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Cập nhật khóa học thất bại",
                         error: "Khóa học không tồn tại",
-                        code: "COURSE_NOT_FOUND",
+                        code: "NOT_FOUND", // Thay đổi mã lỗi theo bảng: COURSE_NOT_FOUND -> NOT_FOUND
                         statusCode: 404
                     );
                 }
@@ -282,11 +314,11 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var codeExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Code == request.Code && c.Id != id);
                 if (codeExists)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Cập nhật khóa học thất bại",
                         error: "Mã khóa học đã tồn tại",
-                        code: "COURSE_CODE_EXISTS",
-                        statusCode: 400
+                        code: "EXISTS", // Thay đổi mã lỗi theo bảng: COURSE_CODE_EXISTS -> EXISTS
+                        statusCode: 409
                     );
                 }
 
@@ -294,11 +326,11 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var nameExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Name == request.Name && c.Id != id);
                 if (nameExists)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Cập nhật khóa học thất bại",
                         error: "Tên khóa học đã tồn tại",
-                        code: "COURSE_NAME_EXISTS",
-                        statusCode: 400
+                        code: "EXISTS", // Thay đổi mã lỗi theo bảng: COURSE_NAME_EXISTS -> EXISTS
+                        statusCode: 409
                     );
                 }
 
@@ -308,10 +340,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     var statusExists = await _unitOfWork.CourseStatusRepository.AnyAsync(s => s.Id == request.StatusId.Value);
                     if (!statusExists)
                     {
-                        return Result.Failure(
+                        return ApiResponse.Failure(
                             message: "Cập nhật khóa học thất bại",
                             error: "Trạng thái khóa học không hợp lệ",
-                            code: "INVALID_COURSE_STATUS",
+                            code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_COURSE_STATUS -> INVALID
                             statusCode: 400
                         );
                     }
@@ -321,10 +353,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 var dateValidationResult = ValidateDateLogic(request);
                 if (!dateValidationResult.IsSuccess)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: dateValidationResult.Message,
                         error: dateValidationResult.Errors.First(),
-                        code: dateValidationResult.Code,
+                        code: dateValidationResult.Code, // Mã lỗi đã được thay đổi trong ValidateDateLogic
                         statusCode: dateValidationResult.StatusCode
                     );
                 }
@@ -355,10 +387,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                     if (invalidDepartments.Any())
                     {
-                        return Result.Failure(
+                        return ApiResponse.Failure(
                             message: "Cập nhật khóa học thất bại",
                             error: $"Phòng ban không hợp lệ: {string.Join(", ", invalidDepartments)}",
-                            code: "INVALID_DEPARTMENTS",
+                            code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_DEPARTMENTS -> INVALID
                             statusCode: 400
                         );
                     }
@@ -380,10 +412,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                     if (invalidPositions.Any())
                     {
-                        return Result.Failure(
+                        return ApiResponse.Failure(
                             message: "Cập nhật khóa học thất bại",
                             error: $"Vị trí không hợp lệ: {string.Join(", ", invalidPositions)}",
-                            code: "INVALID_POSITIONS",
+                            code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_POSITIONS -> INVALID
                             statusCode: 400
                         );
                     }
@@ -411,6 +443,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         CourseId = id,
                         DepartmentId = deptId
                     }).ToList();
+
                     await _unitOfWork.CourseDepartmentRepository.AddRangeAsync(courseDepartments);
                 }
                 else
@@ -432,6 +465,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                         CourseId = id,
                         PositionId = posId
                     }).ToList();
+
                     await _unitOfWork.CoursePositionRepository.AddRangeAsync(coursePositions);
                 }
                 else
@@ -443,7 +477,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 // --- LOGIC MỚI BỊ THIẾU TRƯỚC ĐÂY: Xử lý UserCourse nếu Optional là "bắt buộc" ---
                 // Điều quan trọng là phải kiểm tra trạng thái 'Optional' mới của yêu cầu cập nhật.
-                if (request.Optional == "bắt buộc")
+                if (request.Optional == ConstantCourse.OPTIONAL_BATBUOC)
                 {
                     // Lấy danh sách UserCourse hiện tại của khóa học.
                     // Cần cẩn trọng khi xóa tất cả:
@@ -465,7 +499,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     {
                         var matchingUsers = await _unitOfWork.UserRepository
                             .FindAsync(u => u.DepartmentId.HasValue && request.DepartmentIds.Contains(u.DepartmentId.Value) &&
-                                            u.PositionId.HasValue && request.PositionIds.Contains(u.PositionId.Value));
+                                             u.PositionId.HasValue && request.PositionIds.Contains(u.PositionId.Value));
 
                         foreach (var user in matchingUsers)
                         {
@@ -502,32 +536,38 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 _unitOfWork.CourseRepository.Update(existingCourse);
                 await _unitOfWork.CompleteAsync();
 
-                return Result.Success(
+                return ApiResponse.Success(
                     message: "Cập nhật khóa học thành công",
-                    code: "COURSE_UPDATED",
+                    code: "SUCCESS", // Giữ nguyên SUCCESS cho trường hợp thành công
                     statusCode: 200
                 );
             }
             catch (Exception ex)
             {
-                return Result.Failure(
+                return ApiResponse.Failure(
                     error: "Lỗi hệ thống: " + ex.Message,
-                    code: "SYSTEM_ERROR",
+                    code: "SYSTEM_ERROR", // Thay đổi mã lỗi theo bảng: SYSTEM_ERROR
                     statusCode: 500
                 );
             }
         }
-        private Result ValidateDateLogic(CourseDtoRq request)
+
+        /// <summary>
+        /// Xác thực logic ngày tháng cho yêu cầu khóa học.
+        /// </summary>
+        /// <param name="request">Đối tượng chứa thông tin yêu cầu khóa học.</param>
+        /// <returns>Đối tượng Result cho biết kết quả xác thực.</returns>
+        private ApiResponse ValidateDateLogic(CourseDtoRq request)
         {
             // Kiểm tra ngày đăng ký phải trước ngày bắt đầu khóa học
             if (request.RegistrationStartDate.HasValue && request.StartDate.HasValue)
             {
                 if (request.RegistrationStartDate.Value >= request.StartDate.Value)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Ngày bắt đầu đăng ký phải trước ngày bắt đầu khóa học",
                         error: "Ngày đăng ký không hợp lệ",
-                        code: "INVALID_REGISTRATION_START_DATE",
+                        code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_REGISTRATION_START_DATE -> INVALID
                         statusCode: 400
                     );
                 }
@@ -538,10 +578,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
             {
                 if (request.RegistrationClosingDate.Value > request.StartDate.Value)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Ngày kết thúc đăng ký phải trước hoặc bằng ngày bắt đầu khóa học",
                         error: "Ngày kết thúc đăng ký không hợp lệ",
-                        code: "INVALID_REGISTRATION_END_DATE",
+                        code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_REGISTRATION_END_DATE -> INVALID
                         statusCode: 400
                     );
                 }
@@ -552,10 +592,10 @@ namespace QLDT_Becamex.Src.Services.Implementations
             {
                 if (request.RegistrationStartDate.Value >= request.RegistrationClosingDate.Value)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Ngày bắt đầu đăng ký phải trước ngày kết thúc đăng ký",
                         error: "Khoảng thời gian đăng ký không hợp lệ",
-                        code: "INVALID_REGISTRATION_PERIOD",
+                        code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_REGISTRATION_PERIOD -> INVALID
                         statusCode: 400
                     );
                 }
@@ -566,18 +606,18 @@ namespace QLDT_Becamex.Src.Services.Implementations
             {
                 if (request.StartDate.Value >= request.EndDate.Value)
                 {
-                    return Result.Failure(
+                    return ApiResponse.Failure(
                         message: "Ngày bắt đầu khóa học phải trước ngày kết thúc",
                         error: "Thời gian khóa học không hợp lệ",
-                        code: "INVALID_COURSE_PERIOD",
+                        code: "INVALID", // Thay đổi mã lỗi theo bảng: INVALID_COURSE_PERIOD -> INVALID
                         statusCode: 400
                     );
                 }
             }
 
-            return Result.Success(
+            return ApiResponse.Success(
                 message: "Validation thành công",
-                code: "VALIDATION_SUCCESS",
+                code: "SUCCESS", // Giữ nguyên SUCCESS cho trường hợp thành công
                 statusCode: 200
             );
         }

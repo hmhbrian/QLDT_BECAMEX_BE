@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Dtos.Courses;
-using QLDT_Becamex.Src.Dtos.Departments;
-using QLDT_Becamex.Src.Dtos.Positions;
-using QLDT_Becamex.Src.Dtos.Roles;
-using QLDT_Becamex.Src.Dtos.Users;
-using QLDT_Becamex.Src.Dtos.UserStatus;
+using QLDT_Becamex.Src.Dtos;
 using QLDT_Becamex.Src.Models;
 
 namespace QLDT_Becamex.Src.Mappings

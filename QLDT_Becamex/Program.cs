@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using QLDT_Becamex.Src.Config;
-using QLDT_Becamex.Src.Mappings;
-using QLDT_Becamex.Src.Models;
-using QLDT_Becamex.Src.Repostitories.Implementations;
-using QLDT_Becamex.Src.Repostitories.Interfaces;
+using QLDT_Becamex.Src.Domain.Models;
+using QLDT_Becamex.Src.Infrastructure;
+using QLDT_Becamex.Src.Infrastructure.Mappings;
+using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Implementations;
+using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Persistence.UnitOfWork;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Services.Interfaces;
-using QLDT_Becamex.Src.UnitOfWork;
+
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -86,6 +87,18 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add Cors dành cho môi trường dev khác domain
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Chỉ cho phép frontend này
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Nếu có sử dụng cookie, session
+    });
+});
+
 // 4. Đăng ký Unit of Work, Repositories và Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -100,6 +113,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserStatusService, UserStatusService>();
 builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
 builder.Services.AddScoped<IJwtService, JwtService>();

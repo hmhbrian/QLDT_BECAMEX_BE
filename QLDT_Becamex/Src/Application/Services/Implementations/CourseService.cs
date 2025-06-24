@@ -5,6 +5,10 @@ using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Domain.Models;
 using QLDT_Becamex.Src.Services.Interfaces;
+using QLDT_Becamex.Src.Shared.Helpers;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Services.Implementations
 {
@@ -716,6 +720,165 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<PagedResult<CourseDto>>.Failure(
                     message: ex.Message,
                     error: "Lỗi! Vui lòng thử lại sau.",
+                    code: "SYSTEM_ERROR",
+                    statusCode: 500
+                );
+            }
+        }
+
+        public async Task<Result<PagedResult<CourseDto>>> SearchCoursesAsync(BaseQueryParamFilter queryParam)
+        {
+            try
+            {
+                //Xây dựng predicate
+                Expression<Func<Course, bool>>? predicate = null;
+
+                //lọc theo StatusIds
+                if (!string.IsNullOrEmpty(queryParam.StatusIds))
+                {
+                    var statusIds = queryParam.StatusIds.Split(',')
+                        .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
+                        .Where(id => id != -1)
+                        .ToList();
+                    if (statusIds.Any())
+                    {
+                        Expression<Func<Course, bool>> statusPredicate = c => statusIds.Contains(c.Status.Id);
+                        predicate = predicate == null ? statusPredicate : predicate.And(statusPredicate);
+                    }
+                }
+
+                // Lọc theo DepartmentIds
+                if (!string.IsNullOrEmpty(queryParam.DepartmentIds))
+                {
+                    var departmentIds = queryParam.DepartmentIds.Split(',')
+                        .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
+                        .Where(id => id != -1)
+                        .ToList();
+                    if (departmentIds.Any())
+                    {
+                        Expression<Func<Course, bool>> deptPredicate = c =>
+                            c.CourseDepartments != null && c.CourseDepartments.Any(cd => departmentIds.Contains(cd.DepartmentId));
+                        predicate = predicate == null ? deptPredicate : predicate.And(deptPredicate);
+                    }
+                }
+
+                // Lọc theo PositionIds
+                if (!string.IsNullOrEmpty(queryParam.PositionIds))
+                {
+                    var positionIds = queryParam.PositionIds.Split(',')
+                        .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
+                        .Where(id => id != -1)
+                        .ToList();
+                    if (positionIds.Any())
+                    {
+                        Expression<Func<Course, bool>> posPredicate = c =>
+                            c.CoursePositions != null && c.CoursePositions.Any(cp => positionIds.Contains(cp.PositionId));
+                        predicate = predicate == null ? posPredicate : predicate.And(posPredicate);
+                    }
+                }
+
+                // Lọc theo CreatedAt
+                if (!string.IsNullOrEmpty(queryParam.FromDate) || !string.IsNullOrEmpty(queryParam.ToDate))
+                {
+                    if (!DateTime.TryParseExact(queryParam.FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fromDate))
+                        fromDate = DateTime.MinValue;
+                    if (!DateTime.TryParseExact(queryParam.ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var toDate))
+                        toDate = DateTime.MaxValue;
+                    else
+                        toDate = toDate.AddDays(1).AddTicks(-1); // Bao gồm cả ngày toDate
+
+                    if (fromDate != DateTime.MinValue || toDate != DateTime.MaxValue)
+                    {
+                        Expression<Func<Course, bool>> datePredicate = c => c.CreatedAt >= fromDate && c.CreatedAt <= toDate;
+                        predicate = predicate == null ? datePredicate : predicate.And(datePredicate);
+                    }
+                }
+
+                // Xác định cách sắp xếp
+                Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderByFunc = query =>
+                {
+                    bool isDesc = queryParam.SortType?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true;
+                    return queryParam.SortField?.ToLower() switch
+                    {
+                        "name" => isDesc ? query.OrderByDescending(c => c.Name) : query.OrderBy(c => c.Name),
+                        "createdAt" => isDesc ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt),
+                        _ => query.OrderBy(c => c.Name)
+                    };
+                };
+
+                // Lấy queryable với include
+                var query = _unitOfWork.CourseRepository.GetQueryable()
+                    .Include(c => c.CourseDepartments)!
+                        .ThenInclude(cd => cd.Department)
+                    .Include(c => c.CoursePositions)!
+                        .ThenInclude(cp => cp.Position)
+                    .Include(c => c.Status)
+                    .AsNoTracking();
+
+                // Áp dụng predicate nếu có
+                if (predicate != null)
+                    query = query.Where(predicate);
+
+                // Lọc theo keyword trên client-side
+                List<Course> courses;
+                if (!string.IsNullOrEmpty(queryParam.Keyword))
+                {
+                    string normalizedKeyword = StringHelper.RemoveDiacritics(queryParam.Keyword).ToLowerInvariant().Trim();
+                    courses = await query.ToListAsync(); // Chuyển sang client-side
+                    courses = courses
+                        .Where(c =>
+                            StringHelper.RemoveDiacritics(c.Name ?? "").ToLowerInvariant().Contains(normalizedKeyword) ||
+                            StringHelper.RemoveDiacritics(c.Code ?? "").ToLowerInvariant().Contains(normalizedKeyword))
+                        .ToList();
+                }
+                else
+                {
+                    courses = await query.ToListAsync();
+                }
+
+                // Lấy tổng số khóa học tìm được
+                int totalItemCourse = courses.Count;
+
+                // Áp dụng phân trang
+                var pagedCourses = courses
+                    .Skip((queryParam.Page - 1) * queryParam.Limit)
+                    .Take(queryParam.Limit)
+                    .ToList();
+
+                // Tính toán phân trang
+                int effectiveLimit = queryParam.Limit > 0 ? queryParam.Limit : 10; // Tránh chia cho 0
+                int totalPages = (int)Math.Ceiling((double)totalItemCourse / effectiveLimit);
+                var pagedResultInfo = new Pagination
+                {
+                    TotalItems = totalItemCourse,
+                    ItemsPerPage = effectiveLimit,
+                    CurrentPage = queryParam.Page,
+                    TotalPages = totalPages
+                };
+
+                // Ánh xạ sang CourseDto
+                var courseDtos = _mapper.Map<List<CourseDto>>(pagedCourses);
+
+                // Tạo kết quả phân trang
+                var PagedResultData = new PagedResult<CourseDto>
+                {
+                    Items = courseDtos,
+                    Pagination = pagedResultInfo
+                };
+
+                return Result<PagedResult<CourseDto>>.Success(
+                    PagedResultData,
+                    message: "Tìm kiếm khóa học thành công.",
+                    code: "SUCCESS",
+                    statusCode: 200
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] SearchCourseAsync: {ex}");
+                return Result<PagedResult<CourseDto>>.Failure(
+                    error: ex.Message,
+                    message: "Đã xảy ra lỗi khi tìm kiếm khóa học.",
                     code: "SYSTEM_ERROR",
                     statusCode: 500
                 );

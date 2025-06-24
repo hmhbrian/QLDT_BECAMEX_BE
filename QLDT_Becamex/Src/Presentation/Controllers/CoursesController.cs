@@ -1,9 +1,7 @@
-﻿
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using QLDT_Becamex.Src.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Services.Interfaces;
 
 
 namespace QLDT_Becamex.Src.Controllers
@@ -129,6 +127,7 @@ namespace QLDT_Becamex.Src.Controllers
             }
 
         }
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCourseByIdAsync(string id)
         {
@@ -157,6 +156,7 @@ namespace QLDT_Becamex.Src.Controllers
                 code = result.Code
             });
         }
+        
         [HttpGet]
         [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> GetAllCourses([FromQuery] BaseQueryParam queryParam)
@@ -182,6 +182,52 @@ namespace QLDT_Becamex.Src.Controllers
                 errors = result.Errors.Any() ? result.Errors : new List<string> { result.Message },
                 code = result.Code
             });
+        }
+
+        [HttpGet("search")]
+        //[Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> SearchUser([FromQuery] BaseQueryParamFilter  rq) // Lấy keyword từ query param
+        {
+            //if (string.IsNullOrEmpty(keyword))
+            //{
+            //    return BadRequest(new { message = "Từ khóa tìm kiếm không được để trống.", code = "INVALID", statusCode = 404 });
+            //}
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Dữ liệu truy vấn không hợp lệ.",
+                    errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage),
+                    code = "INVALID",
+                    statusCode = 404
+                });
+            }
+
+            Result<PagedResult<CourseDto>> result = await _courseService.SearchCoursesAsync(rq);
+
+            if (result.IsSuccess)
+            {
+                return StatusCode(result.StatusCode ?? StatusCodes.Status200OK, new // Mặc định 200OK cho thành công
+                {
+                    message = result.Message,
+                    statusCode = result.StatusCode ?? StatusCodes.Status200OK,
+                    code = result.Code,
+                    data = result.Data
+                });
+            }
+            else
+            {
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+
+                    code = result.Code
+                });
+            }
         }
     }
 }

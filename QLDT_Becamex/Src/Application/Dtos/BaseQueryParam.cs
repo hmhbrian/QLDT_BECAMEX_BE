@@ -21,4 +21,14 @@ namespace QLDT_Becamex.Src.Application.Dtos
         public int? CurrentPage { get; set; }
         public int? TotalPages { get; set; }
     }
+
+    public class BaseQueryParamFilter : BaseQueryParam
+    {
+        public string? Keyword { get; set; }
+        public string? StatusIds { get; set; } 
+        public string? DepartmentIds { get; set; } 
+        public string? PositionIds { get; set; } 
+        public string? FromDate { get; set; } 
+        public string? ToDate { get; set; }
+    }
 }

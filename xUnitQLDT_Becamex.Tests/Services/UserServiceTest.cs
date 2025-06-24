@@ -1,29 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 using MockQueryable;
 using Moq;
-using QLDT_Becamex.Src.Dtos.Params;
-using QLDT_Becamex.Src.Dtos.Positions;
-using QLDT_Becamex.Src.Dtos.Results;
-using QLDT_Becamex.Src.Dtos.Users;
-using QLDT_Becamex.Src.Models;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Services.Interfaces;
-using QLDT_Becamex.Src.UnitOfWork;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-
+using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Domain.Models;
+using QLDT_Becamex.Src.Application.Dtos;
+using Microsoft.Extensions.Configuration;
 namespace xUnitQLDT_Becamex.Tests.Services
 {
     public class UserServiceTest
@@ -36,6 +23,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
         private readonly Mock<RoleManager<IdentityRole>> _roleManager;
         private readonly Mock<ICloudinaryService> _cloudinaryService;
         private readonly UserService _userService;
+        private readonly Mock<IJwtService> _jwtService;
         public UserServiceTest()
         {
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
@@ -56,15 +44,29 @@ namespace xUnitQLDT_Becamex.Tests.Services
             _unitOfWork = new Mock<IUnitOfWork>();
             _httpContextAccessor = new Mock<IHttpContextAccessor>();
             _cloudinaryService = new Mock<ICloudinaryService>();
+            _jwtService = new Mock<IJwtService>();
+            //var inMemorySettings = new Dictionary<string, string>
+            //{
+            //    {"Jwt:Key", "your_fake_jwt_key_128bit_long_enough"},
+            //    {"Jwt:Issuer", "your_fake_issuer"},
+            //    {"Jwt:Audience", "your_fake_audience"}
+            //};
 
+            //var configuration = new ConfigurationBuilder()
+            //    .AddInMemoryCollection(inMemorySettings)
+            //    .Build();
+
+            //var jwtService = new JwtService(configuration);
             _userService = new UserService(
                 _signInManager.Object,
                 _userManager.Object,
                 _roleManager.Object,
                 _cloudinaryService.Object,
+                _jwtService.Object,
                 _mapper.Object,
                 _unitOfWork.Object,
-                _httpContextAccessor.Object);
+                _httpContextAccessor.Object
+            );
         }
         [Fact]
         public async Task LoginAsync_ReturnsOk()
@@ -300,6 +302,8 @@ namespace xUnitQLDT_Becamex.Tests.Services
 
             // Mock Save
             _unitOfWork.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+            _userManager.Setup(u => u.UpdateAsync(It.IsAny<ApplicationUser>()))
+                .ReturnsAsync(IdentityResult.Success);
 
             // Act
             var result = await _userService.UpdateMyProfileAsync(userId, dto);
@@ -311,7 +315,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
                     ? string.Join(" | ", result.Errors)
                     : "Không rõ lỗi";
 
-                Assert.False(true, $"❌ UpdateUserByAdmin failed: {result.Message} → {errorDetail}");
+                Assert.False(true, $"❌ UpdateMyProfileAsync failed: {result.Message} → {errorDetail}");
             }
 
             Assert.True(result.IsSuccess);
@@ -352,7 +356,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
 
             Assert.True(result.IsSuccess);
             Assert.Equal(200, result.StatusCode);
-            Assert.Equal("SOFT_DELETE_USER_SUCCESS", result.Code);
+            Assert.Equal("SUCCESS", result.Code);
             Assert.True(user.IsDeleted);
             Assert.NotNull(user.ModifiedAt);
         }
@@ -368,7 +372,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Equal("USER_NOT_FOUND", result.Code);
+            Assert.Equal("NOT_FOUND", result.Code);
             Assert.Equal(404, result.StatusCode);
             Assert.Contains("không tồn tại", result.Errors.FirstOrDefault() ?? "", StringComparison.OrdinalIgnoreCase);
         }
@@ -386,8 +390,8 @@ namespace xUnitQLDT_Becamex.Tests.Services
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Equal("USER_ALREADY_DELETED", result.Code);
-            Assert.Equal(400, result.StatusCode);
+            Assert.Equal("EXISTS", result.Code);
+            Assert.Equal(409, result.StatusCode);
             Assert.Contains("đã bị xóa", result.Errors.FirstOrDefault() ?? "", StringComparison.OrdinalIgnoreCase);
         }
         [Fact]
@@ -450,7 +454,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
 
             Assert.True(result.IsSuccess);
             Assert.Equal(200, result.StatusCode);
-            Assert.Equal("GET_ALL_USERS_SUCCESS", result.Code);
+            Assert.Equal("SUCCESS", result.Code);
             Assert.NotNull(result.Data);
             Assert.Equal(users.Count, result.Data!.Items!.Count());
             Assert.All(result.Data.Items!, item => Assert.Equal("User", item.Role));
@@ -559,7 +563,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
             Assert.True(result.IsSuccess);
             Assert.Equal("SUCCESS", result.Code);
             Assert.Equal(200, result.StatusCode);
-            Assert.Equal("Password changed successfully!", result.Message);
+            Assert.Equal("Đổi mật khẩu thành công!", result.Message);
         }
         [Fact]
         public async Task ResetPasswordByAdminAsync_ReturnsOk()
@@ -607,7 +611,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
             Assert.True(result.IsSuccess);
             Assert.Equal(200, result.StatusCode);
             Assert.Equal("SUCCESS", result.Code);
-            Assert.Equal("Password reset successfully.", result.Message);
+            Assert.Equal("Đặt lại mật khẩu thành công.", result.Message);
         }
         [Fact]
         public async Task SearchUserAsync_ReturnsOk()

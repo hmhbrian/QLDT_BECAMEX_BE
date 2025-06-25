@@ -1,4 +1,5 @@
-﻿using QLDT_Becamex.Src.Constant;
+﻿using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
+using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Models;
 using System.ComponentModel.DataAnnotations;
 

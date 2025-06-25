@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
-using QLDT_Becamex.Src.Application.Features.Departments.Helpers;
+using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Application.Features.Departments.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
 
@@ -13,11 +13,13 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IBaseService _baseService;
 
-        public GetDepartmentByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetDepartmentByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IBaseService baseService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _baseService = baseService;
         }
 
         public async Task<DepartmentDto> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
@@ -70,7 +72,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                 var pathCache = new Dictionary<int, List<string>>();
 
                 // ánh xạ Department sang DepartmentDto
-                var departmentDto = await DepartmentHelper.MapToDtoAsync(dept, departmentDict, userDict, pathCache, _mapper);
+                var departmentDto = await _baseService.MapToDtoAsync(dept, departmentDict, userDict, pathCache, _mapper);
 
                 return departmentDto;
             }

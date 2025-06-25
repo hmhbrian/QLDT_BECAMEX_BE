@@ -94,7 +94,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new AppException("Vui lòng thử lại sau", 500);
             }

@@ -7,7 +7,8 @@ namespace QLDT_Becamex.Src.Services.Interfaces
         Task<Result> CreateAsync(CourseDtoRq request);
         Task<Result> UpdateAsync(string id, CourseDtoRq request);
         Task<Result<CourseDto>> GetCourseAsync(string id);
-        Task<Result<PagedResult<CourseDto>>> GetAllCoursesAsync(BaseQueryParam queryParam);
+        Task<Result<PagedResult<CourseDto>>> GetAllCoursesAsync(bool isDeleted, BaseQueryParam queryParam);
         Task<Result<PagedResult<CourseDto>>> SearchCoursesAsync(BaseQueryParamFilter queryParam);
+        Task<Result<bool>> DeleteCourseAsync(string id);
     }
 }

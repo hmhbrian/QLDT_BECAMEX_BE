@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Models;
 
@@ -19,7 +20,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
 
             //Department
-            CreateMap<DepartmentRq, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId));
+            CreateMap<DepartmentRequestDto, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId));
             CreateMap<Department, DepartmentDto>();
 
             //Position

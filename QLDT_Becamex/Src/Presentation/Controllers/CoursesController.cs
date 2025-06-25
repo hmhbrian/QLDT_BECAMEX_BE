@@ -159,13 +159,13 @@ namespace QLDT_Becamex.Src.Controllers
         
         [HttpGet]
         [Authorize(Roles = "ADMIN,HR")]
-        public async Task<IActionResult> GetAllCourses([FromQuery] BaseQueryParam queryParam)
+        public async Task<IActionResult> GetAllCourses(bool isDeleted, [FromQuery] BaseQueryParam queryParam)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(queryParam);
             }
-            var result = await _courseService.GetAllCoursesAsync(queryParam);
+            var result = await _courseService.GetAllCoursesAsync(isDeleted, queryParam);
             if (result.IsSuccess)
             {
                 return StatusCode(result.StatusCode ?? StatusCodes.Status201Created, new
@@ -185,14 +185,9 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet("search")]
-        //[Authorize(Roles = "ADMIN,HR")]
-        public async Task<IActionResult> SearchUser([FromQuery] BaseQueryParamFilter  rq) // Lấy keyword từ query param
+        [Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> SearchCourses([FromQuery] BaseQueryParamFilter  rq) // Lấy keyword từ query param
         {
-            //if (string.IsNullOrEmpty(keyword))
-            //{
-            //    return BadRequest(new { message = "Từ khóa tìm kiếm không được để trống.", code = "INVALID", statusCode = 404 });
-            //}
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(new
@@ -213,6 +208,47 @@ namespace QLDT_Becamex.Src.Controllers
                 {
                     message = result.Message,
                     statusCode = result.StatusCode ?? StatusCodes.Status200OK,
+                    code = result.Code,
+                    data = result.Data
+                });
+            }
+            else
+            {
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+
+                    code = result.Code
+                });
+            }
+        }
+
+        [HttpDelete("soft-delete")]
+        [Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> DeleteCourse([FromQuery] string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Dữ liệu truy vấn không hợp lệ.",
+                    errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage),
+                    code = "INVALID",
+                    statusCode = 404
+                });
+            }
+
+            var result = await _courseService.DeleteCourseAsync(id);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = result.Message,
+                    statusCode = result.StatusCode,
                     code = result.Code,
                     data = result.Data
                 });

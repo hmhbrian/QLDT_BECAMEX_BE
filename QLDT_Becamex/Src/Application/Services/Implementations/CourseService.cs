@@ -21,6 +21,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
+        private const int CancelledStatusId = 5;
 
         /// <summary>
         /// Khởi tạo một phiên bản mới của lớp <see cref="CourseService"/>.
@@ -660,11 +661,11 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
-        public async Task<Result<PagedResult<CourseDto>>> GetAllCoursesAsync(BaseQueryParam queryParam)
+        public async Task<Result<PagedResult<CourseDto>>> GetAllCoursesAsync(bool isDeleted, BaseQueryParam queryParam)
         {
             try
             {
-                int totalItemCourse = await _unitOfWork.CourseRepository.CountAsync();
+                int totalItemCourse = await _unitOfWork.CourseRepository.CountAsync(c => isDeleted ? (c.StatusId != CancelledStatusId) : (c.StatusId == CancelledStatusId));
 
                 Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderByFunc = query =>
                 {
@@ -679,7 +680,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 };
 
                 var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                    predicate: null,
+                    predicate: c => isDeleted ? (c.StatusId != CancelledStatusId) : (c.StatusId == CancelledStatusId),
                     orderBy: orderByFunc,
                     page: queryParam.Page,
                     pageSize: queryParam.Limit,
@@ -867,7 +868,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     Pagination = pagedResultInfo
                 };
 
-                if(PagedResultData == null || !PagedResultData.Items.Any())
+                if (PagedResultData == null || !PagedResultData.Items.Any())
                 {
                     return Result<PagedResult<CourseDto>>.Failure(
                         error: "Không tìm thấy khóa học nào phù hợp với tiêu chí tìm kiếm.",
@@ -890,6 +891,56 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 return Result<PagedResult<CourseDto>>.Failure(
                     error: ex.Message,
                     message: "Đã xảy ra lỗi khi tìm kiếm khóa học.",
+                    code: "SYSTEM_ERROR",
+                    statusCode: 500
+                );
+            }
+        }
+
+        public async Task<Result<bool>> DeleteCourseAsync(string id)
+        {
+            try
+            {
+                // Kiểm tra khóa học có tồn tại không
+                var course = await _unitOfWork.CourseRepository.GetByIdAsync(id);
+                if (course == null)
+                {
+                    return Result<bool>.Failure(
+                        message: "Xóa khóa học thất bại",
+                        error: "Khóa học không tồn tại",
+                        code: "NOT_FOUND",
+                        statusCode: 404
+                    );
+                }
+
+                //Kiểm tra ngày xóa phải trước ngày bắt đầu đăng ký
+                if(course.RegistrationStartDate.HasValue && DateTime.Now > course.RegistrationStartDate.Value)
+                {
+                    return Result<bool>.Failure(
+                        message: "Xóa khóa học thất bại",
+                        error: "Ngày xóa phải trước ngày bắt đầu đăng ký",
+                        code: "INVALID",
+                        statusCode: 400
+                    );
+                }
+
+                course.StatusId = CancelledStatusId; //CancelledStatusId là trạng thái "Hủy"
+                course.ModifiedAt = DateTime.Now;
+
+                _unitOfWork.CourseRepository.Update(course);
+                await _unitOfWork.CompleteAsync();
+
+                return Result<bool>.Success(
+                    message: "Xóa khóa học thành công",
+                    code: "SUCCESS",
+                    statusCode: 200,
+                    data: true
+                );
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(
+                    error: "Lỗi hệ thống: " + ex.Message,
                     code: "SYSTEM_ERROR",
                     statusCode: 500
                 );

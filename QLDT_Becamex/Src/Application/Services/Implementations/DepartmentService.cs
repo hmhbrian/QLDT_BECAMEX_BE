@@ -418,16 +418,19 @@ namespace QLDT_Becamex.Src.Services.Implementations
                 }
 
                 // Kiểm tra tên phòng ban đã tồn tại chưa (ngoại trừ chính nó)
-                var nameExists = await _unitOfWork.DepartmentRepository
-                    .AnyAsync(d => d.DepartmentName == request.DepartmentName || d.DepartmentCode == request.DepartmentCode && d.DepartmentId != id);
-                if (nameExists)
+                if (request.DepartmentName != department.DepartmentName || request.DepartmentCode != department.DepartmentCode)
                 {
-                    return Result<DepartmentDto>.Failure(
-                        message: "Cập nhật phòng ban thất bại",
-                        error: "Tên phòng ban hoặc mã phòng ban đã tồn tại",
-                        code: "EXISTS",
-                        statusCode: 409
-                    );
+                    var nameExists = await _unitOfWork.DepartmentRepository
+                        .AnyAsync(d => d.DepartmentName == request.DepartmentName || d.DepartmentCode == request.DepartmentCode && d.DepartmentId != id);
+                    if (nameExists)
+                    {
+                        return Result<DepartmentDto>.Failure(
+                            message: "Cập nhật phòng ban thất bại",
+                            error: "Tên phòng ban hoặc mã phòng ban đã tồn tại",
+                            code: "EXISTS",
+                            statusCode: 409
+                        );
+                    }
                 }
 
                 // Tải tất cả phòng ban để tra cứu và kiểm tra vòng lặp

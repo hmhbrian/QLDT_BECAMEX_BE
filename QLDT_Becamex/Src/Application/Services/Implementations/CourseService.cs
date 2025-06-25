@@ -802,7 +802,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     {
                         "name" => isDesc ? query.OrderByDescending(c => c.Name) : query.OrderBy(c => c.Name),
                         "createdAt" => isDesc ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt),
-                        _ => query.OrderBy(c => c.Name)
+                        _ => query.OrderBy(c => c.CreatedAt)
                     };
                 };
 
@@ -865,6 +865,16 @@ namespace QLDT_Becamex.Src.Services.Implementations
                     Items = courseDtos,
                     Pagination = pagedResultInfo
                 };
+
+                if(PagedResultData == null || !PagedResultData.Items.Any())
+                {
+                    return Result<PagedResult<CourseDto>>.Failure(
+                        error: "Không tìm thấy khóa học nào phù hợp với tiêu chí tìm kiếm.",
+                        message: "Không tìm thấy khóa học nào phù hợp với tiêu chí tìm kiếm.",
+                        code: "NOT_FOUND",
+                        statusCode: 404
+                    );
+                }
 
                 return Result<PagedResult<CourseDto>>.Success(
                     PagedResultData,

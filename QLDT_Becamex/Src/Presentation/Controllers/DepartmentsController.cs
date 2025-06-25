@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;
-using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Services.Interfaces;
 
 namespace QLDT_Becamex.Src.Controllers

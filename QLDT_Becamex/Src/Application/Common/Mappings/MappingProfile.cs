@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
+using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
+using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
+using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
-using QLDT_Becamex.Src.Domain.Models;
+using QLDT_Becamex.Src.Domain.Entities;
 
 namespace QLDT_Becamex.Src.Application.Common.Mappings
 {
@@ -24,15 +28,14 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //Position
             CreateMap<Position, PositionDto>().ReverseMap();
-
-            CreateMap<PositionRq, Position>();
+            CreateMap<CreatePositionDto, Position>();
 
             //Role
             CreateMap<IdentityRole, RoleDto>().ReverseMap();
-            CreateMap<RoleRq, IdentityRole>();
+            CreateMap<CreateRoleDto, IdentityRole>();
 
             //Course
-            CreateMap<CourseDtoRq, Course>();
+            CreateMap<CreateCourseDto, Course>();
             CreateMap<Course, CourseDto>()
                 .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentDto
                 {
@@ -51,7 +54,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //CourseStatus
             CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
-            CreateMap<CourseStatusDtoRq, CourseStatus>().ReverseMap();
+            CreateMap<CreateCourseStatusDto, CourseStatus>().ReverseMap();
 
         }
     }

@@ -1,4 +1,5 @@
-﻿using QLDT_Becamex.Src.Domain.Models;
+﻿using QLDT_Becamex.Src.Domain.Entities;
+
 using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Domain.Interfaces

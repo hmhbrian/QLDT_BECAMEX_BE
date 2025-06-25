@@ -25,8 +25,8 @@ public class ExceptionHandlingMiddleware
             {
                 Title = "Lỗi nghiệp vụ",
                 Success = false,
-                Detail = ex.Message,
-                Status = ex.StatusCode
+                Detail = ex.Message
+
             });
         }
         catch (Exception ex)
@@ -36,8 +36,8 @@ public class ExceptionHandlingMiddleware
             {
                 Title = "Lỗi hệ thống",
                 Success = false,
-                Detail = ex.Message,
-                Status = 500
+                Detail = ex.Message
+
             });
         }
     }

@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿
 
-namespace QLDT_Becamex.Src.Domain.Models
+namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class Department
     {

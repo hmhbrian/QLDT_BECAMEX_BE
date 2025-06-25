@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using QLDT_Becamex.Src.Domain.Models;
+using QLDT_Becamex.Src.Domain.Entities;
 
 namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có thể đặt nó trong thư mục Data
 {

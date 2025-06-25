@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QLDT_Becamex.Src.Application.Dtos
+namespace QLDT_Becamex.Src.Application.Common.Dtos
 {
     public class DepartmentDto
     {

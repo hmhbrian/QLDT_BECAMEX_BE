@@ -1,8 +1,9 @@
-﻿using QLDT_Becamex.Src.Application.Common.Dtos;
+﻿
+using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
-using QLDT_Becamex.Src.Constant;
+
 using QLDT_Becamex.Src.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
 {
@@ -33,7 +34,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public ICollection<PositionDto>? Positions { get; set; } = new List<PositionDto>();
     }
 
-   
+
 
 
 }

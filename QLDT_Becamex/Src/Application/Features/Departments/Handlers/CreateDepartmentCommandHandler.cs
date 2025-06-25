@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
-using Castle.Components.DictionaryAdapter.Xml;
 using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Commands;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Helpers;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Domain.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using QLDT_Becamex.Src.Infrastructure.Services;
+
+
 
 namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 {
@@ -15,10 +16,14 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public CreateDepartmentCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IBaseService _baseService;
+
+        public CreateDepartmentCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IBaseService baseService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _baseService = baseService;
+
         }
         public async Task<string> Handle(CreateDepartmentCommand command, CancellationToken cancellationToken)
         {
@@ -40,7 +45,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
             }
 
             // Kiểm tra ManagerId
-            await DepartmentHelper.ValidateManagerIdAsync(request.ManagerId, true, null, null, _unitOfWork);
+            await _baseService.ValidateManagerIdDeparmentAsync(request.ManagerId, true, null, null);
 
 
             var department = _mapper.Map<Department>(request);

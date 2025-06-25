@@ -4,5 +4,6 @@
     {
         public (string? UserId, string? Role) GetCurrentUserAuthenticationInfo();
         public Task<List<int>> GetAllChildDepartmentIds(int parentDepartmentId);
+        public Task ValidateManagerIdDeparmentAsync(string? managerId, bool isRequired, string? currentManagerId, int? departmentId);
     }
 }

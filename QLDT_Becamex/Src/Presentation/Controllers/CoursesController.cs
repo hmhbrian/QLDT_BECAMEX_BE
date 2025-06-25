@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
@@ -74,41 +75,8 @@ namespace QLDT_Becamex.Src.Controllers
         [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> DeleteCourse([FromQuery] string id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    message = "Dữ liệu truy vấn không hợp lệ.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage),
-                    code = "INVALID",
-                    statusCode = 404
-                });
-            }
-
-            var result = await _courseService.DeleteCourseAsync(id);
-
-            if (result.IsSuccess)
-            {
-                return Ok(new
-                {
-                    message = result.Message,
-                    statusCode = result.StatusCode,
-                    code = result.Code,
-                    data = result.Data
-                });
-            }
-            else
-            {
-                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
-                return StatusCode(statusCode, new
-                {
-                    message = result.Message,
-                    errors = result.Errors,
-
-                    code = result.Code
-                });
-            }
+            var result = await _mediator.Send(new DeleteCourseCommand(id));
+            return Ok(ApiResponse.Ok(result));
         }
     }
 }

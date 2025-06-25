@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QLDT_Becamex.Src.Services.Implementations; // Giữ nếu JwtService nằm trong cùng namespace này
 using QLDT_Becamex.Src.Services.Interfaces;
-using System.Linq; // Cần thiết cho .SelectMany(), .Any()
-using System.Collections.Generic; // Cần thiết cho List<string>
-using Microsoft.AspNetCore.Http;
-using QLDT_Becamex.Src.Application.Dtos; // Cần thiết cho StatusCodes
+using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
+using QLDT_Becamex.Src.Application.Features.Users.Commands;
+using MediatR; // Cần thiết cho StatusCodes
+
+using QLDT_Becamex.Src.Application.Common.Dtos;
 
 namespace QLDT_Becamex.Src.Controllers
 {
@@ -17,16 +18,17 @@ namespace QLDT_Becamex.Src.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-
+        private readonly IMediator _mediator;
 
         /// <summary>
         /// Khởi tạo một phiên bản mới của lớp <see cref="UsersController"/>.
         /// </summary>
         /// <param name="userService">Dịch vụ người dùng.</param>
         /// <param name="jwtService">Dịch vụ JWT để tạo token (nếu được sử dụng trực tiếp trong controller).</param>
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IMediator mediator)
         {
             _userService = userService;
+            _mediator = mediator;
 
         }
 
@@ -37,43 +39,10 @@ namespace QLDT_Becamex.Src.Controllers
         /// <returns>ActionResult chứa kết quả của thao tác tạo người dùng.</returns>
         [HttpPost("create")]
         [Authorize(Roles = "ADMIN, HR")]
-        public async Task<IActionResult> CreateUser([FromBody] UserDtoRq dto)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    message = "Dữ liệu không hợp lệ.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage),
-                    code = "INVALID", // Mã lỗi chung cho dữ liệu không hợp lệ
-                    statusCode = StatusCodes.Status400BadRequest
-                });
-            }
-
-            Result result = await _userService.CreateUserAsync(dto);
-
-            if (result.IsSuccess)
-            {
-                return StatusCode(result.StatusCode ?? StatusCodes.Status200OK, new // Mặc định 200OK cho thành công tạo nếu service không trả về 201
-                {
-                    message = result.Message,
-                    statusCode = result.StatusCode ?? StatusCodes.Status200OK,
-                    code = result.Code
-                });
-            }
-            else
-            {
-                // Khi là lỗi, có thể sử dụng statusCode từ Result hoặc mặc định là BadRequest (400)
-                var statusCode = result.StatusCode ?? StatusCodes.Status400BadRequest;
-                return StatusCode(statusCode, new // Sử dụng StatusCode thay vì BadRequest để linh hoạt hơn
-                {
-                    message = result.Message,
-                    errors = result.Errors,
-
-                    code = result.Code
-                });
-            }
+            var userId = await _mediator.Send(new CreateUserCommand(request));
+            return Ok(ApiResponse<string>.Ok(userId)); // Bao kết quả tại đây
         }
 
         /// <summary>
@@ -82,7 +51,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <param name="dto">Đối tượng chứa thông tin đăng nhập (email và mật khẩu).</param>
         /// <returns>ActionResult chứa thông tin người dùng và token nếu đăng nhập thành công, hoặc lỗi nếu thất bại.</returns>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserLoginRq dto)
+        public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -96,7 +65,7 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            Result<UserDto> result = await _userService.LoginAsync(dto);
+            Application.Dtos.Result<UserDto> result = await _userService.LoginAsync(dto);
 
             if (result.IsSuccess)
             {
@@ -136,7 +105,7 @@ namespace QLDT_Becamex.Src.Controllers
                 return BadRequest(new { message = "ID người dùng không được để trống.", code = "INVALID", statusCode = StatusCodes.Status400BadRequest });
             }
 
-            Result<UserDto> result = await _userService.GetUserAsync(userId);
+            Application.Dtos.Result<UserDto> result = await _userService.GetUserAsync(userId);
 
             if (result.IsSuccess)
             {
@@ -170,7 +139,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <returns>ActionResult chứa kết quả của thao tác cập nhật.</returns>
         [HttpPut("update")]
         [Authorize]
-        public async Task<IActionResult> UpdateMyProfile([FromForm] UserUpdateSelfDtoRq rq)
+        public async Task<IActionResult> UpdateMyProfile([FromForm] UserUserUpdateDto rq)
         {
             // Lấy ID người dùng hiện tại từ token
             var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
@@ -193,7 +162,7 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            Result result = await _userService.UpdateMyProfileAsync(userId, rq);
+            Application.Dtos.Result result = await _userService.UpdateMyProfileAsync(userId, rq);
 
             if (result.IsSuccess)
             {
@@ -225,7 +194,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <returns>ActionResult chứa kết quả của thao tác cập nhật.</returns>
         [HttpPut("admin/{userId}/update")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdateUserByAdmin(string userId, [FromBody] AdminUpdateUserDtoRq rq)
+        public async Task<IActionResult> UpdateUserByAdmin(string userId, [FromBody] UserAdminUpdateDto rq)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -244,7 +213,7 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            Result result = await _userService.UpdateUserByAdmin(userId, rq);
+            Application.Dtos.Result result = await _userService.UpdateUserByAdmin(userId, rq);
 
             if (result.IsSuccess)
             {
@@ -320,7 +289,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <returns>ActionResult chứa kết quả của thao tác đổi mật khẩu.</returns>
         [HttpPatch("change-password")]
         [Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordRq rq)
+        public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordDto rq)
         {
             if (!ModelState.IsValid)
             {
@@ -340,7 +309,7 @@ namespace QLDT_Becamex.Src.Controllers
                 return Unauthorized(new { message = "Không tìm thấy thông tin người dùng xác thực.", code = "UNAUTHORIZED", statusCode = StatusCodes.Status401Unauthorized });
             }
 
-            Result result = await _userService.ChangePasswordUserAsync(userId, rq);
+            Application.Dtos.Result result = await _userService.ChangePasswordUserAsync(userId, rq);
 
             if (result.IsSuccess)
             {
@@ -372,7 +341,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <returns>ActionResult chứa kết quả của thao tác đặt lại mật khẩu.</returns>
         [HttpPatch("{userId}/reset-password")] // Sửa lại route cho rõ ràng hơn
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> ResetPasswordByAdmin(string userId, [FromBody] UserResetPasswordRq rq)
+        public async Task<IActionResult> ResetPasswordByAdmin(string userId, [FromBody] UserResetPasswordDto rq)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -391,7 +360,7 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            Result result = await _userService.ResetPasswordByAdminAsync(userId, rq);
+            Application.Dtos.Result result = await _userService.ResetPasswordByAdminAsync(userId, rq);
 
             if (result.IsSuccess)
             {
@@ -444,7 +413,7 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            Result<PagedResult<UserDto>> result = await _userService.SearchUserAsync(keyword, rq);
+            Application.Dtos.Result<PagedResult<UserDto>> result = await _userService.SearchUserAsync(keyword, rq);
 
             if (result.IsSuccess)
             {
@@ -495,7 +464,7 @@ namespace QLDT_Becamex.Src.Controllers
                 });
             }
 
-            Result result = await _userService.SoftDeleteUserAsync(userId);
+            Application.Dtos.Result result = await _userService.SoftDeleteUserAsync(userId);
 
             if (result.IsSuccess)
             {

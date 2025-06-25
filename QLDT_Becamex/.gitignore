@@ -1,4 +1,5 @@
-﻿.vs/
+﻿../.vs/
+.vs/
 bin/
 obj/
 ../xUnitQLDT_Becamex.Tests/bin/

@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Domain.Models;
-using QLDT_Becamex.Src.Shared.Helpers;
+using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Services.Interfaces;
+using QLDT_Becamex.Src.Shared.Helpers;
 using System.Security.Claims;
 
 namespace QLDT_Becamex.Src.Services.Implementations
@@ -56,110 +58,11 @@ namespace QLDT_Becamex.Src.Services.Implementations
         }
 
         /// <summary>
-        /// Xử lý yêu cầu đăng nhập của người dùng.
-        /// </summary>
-        /// <param name="loginDto">Đối tượng chứa thông tin đăng nhập.</param>
-        /// <returns>Đối tượng Result chứa thông tin người dùng nếu đăng nhập thành công hoặc lỗi nếu thất bại.</returns>
-        public async Task<Result<UserDto>> LoginAsync(UserLoginRq loginDto)
-        {
-            try
-            {
-                // Hãy đảm bảo rằng LoginDto.Email thực sự chứa email, và bạn tìm theo email.
-                var user = await _userManager.Users
-                               .Include(u => u.Position)
-                               .Include(u => u.Department)
-                               .Include(u => u.ManagerU)
-                               .Include(u => u.UserStatus)
-                               .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-                // Nếu không tìm thấy bằng email, bạn có thể cân nhắc tìm bằng username nếu muốn linh hoạt
-
-                if (user == null)
-                {
-                    // Trả về lỗi chung để tránh lộ thông tin liệu email/username có tồn tại hay không.
-                    return Result<UserDto>.Failure(
-                        message: "Đăng nhập thất bại",
-                        error: "Tên đăng nhập hoặc mật khẩu không chính xác.",
-                        code: "UNAUTHORIZED", // Dựa vào Status Code 401: Lỗi xác thực
-                        statusCode: 401 // Unauthorized
-                    );
-                }
-
-                // 2. Xác thực mật khẩu
-                var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, lockoutOnFailure: false);
-
-                if (result.Succeeded)
-                {
-                    // Đăng nhập thành công
-                    // Tạo UserDto
-                    PositionDto positionDto = _mapper.Map<PositionDto>(user.Position);
-                    var roles = await _userManager.GetRolesAsync(user);
-                    UserDto userDto = _mapper.Map<UserDto>(user);
-                    userDto.Role = roles.FirstOrDefault();
-                    userDto.Position = positionDto;
-
-                    string id = userDto?.Id!;
-                    string email = userDto?.Email!;
-                    string role = userDto?.Role!;
-
-                    string accessToken = _jwtService.GenerateJwtToken(id, email, role);
-
-                    userDto.AccessToken = accessToken;
-
-                    // Trả về Result.Success với UserDto
-                    return Result<UserDto>.Success(
-                        message: "Đăng nhập thành công.",
-                        code: "SUCCESS", // Dựa vào Status Code 200: Thành công
-                        statusCode: 200,
-                        data: userDto
-                    );
-                }
-                else if (result.IsLockedOut)
-                {
-                    // Tài khoản bị khóa
-                    return Result<UserDto>.Failure(
-                        message: "Đăng nhập thất bại",
-                        error: "Tài khoản của bạn đã bị khóa.",
-                        code: "FORBIDDEN", // Dựa vào Status Code 403: Cấm, phân quyền
-                        statusCode: 403 // Forbidden
-                    );
-                }
-                else if (result.IsNotAllowed)
-                {
-                    // Đăng nhập không được phép (ví dụ: email chưa xác nhận)
-                    return Result<UserDto>.Failure(
-                        message: "Đăng nhập thất bại",
-                        error: "Đăng nhập không được phép. Tài khoản của bạn chưa được xác nhận hoặc có vấn đề.",
-                        code: "FORBIDDEN", // Dựa vào Status Code 403: Cấm, phân quyền
-                        statusCode: 403 // Forbidden hoặc 400 Bad Request, tùy ngữ cảnh
-                    );
-                }
-                else
-                {
-                    // Các trường hợp thất bại khác (ví dụ: sai mật khẩu)
-                    return Result<UserDto>.Failure(
-                        message: "Đăng nhập thất bại",
-                        error: "Tên đăng nhập hoặc mật khẩu không chính xác.",
-                        code: "UNAUTHORIZED", // Dựa vào Status Code 401: Lỗi xác thực
-                        statusCode: 401 // Unauthorized
-                    );
-                }
-            }
-            catch (Exception ex)
-            {
-                return Result<UserDto>.Failure(
-                    error: "Lỗi hệ thống: " + ex.Message,
-                    code: "SYSTEM_ERROR", // Dựa vào Status Code 500: Lỗi chung liên quan đến network, database
-                    statusCode: 500
-                );
-            }
-        }
-
-        /// <summary>
         /// Tạo một người dùng mới.
         /// </summary>
         /// <param name="registerDto">Đối tượng chứa thông tin đăng ký người dùng.</param>
         /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
-        public async Task<Result> CreateUserAsync(UserDtoRq registerDto)
+        public async Task<Result> CreateUserAsync(UserCreateDto registerDto)
         {
             try
             {
@@ -282,13 +185,115 @@ namespace QLDT_Becamex.Src.Services.Implementations
             }
         }
 
+
+
+        /// <summary>
+        /// Xử lý yêu cầu đăng nhập của người dùng.
+        /// </summary>
+        /// <param name="loginDto">Đối tượng chứa thông tin đăng nhập.</param>
+        /// <returns>Đối tượng Result chứa thông tin người dùng nếu đăng nhập thành công hoặc lỗi nếu thất bại.</returns>
+        public async Task<Result<UserDto>> LoginAsync(UserLoginDto loginDto)
+        {
+            try
+            {
+                // Hãy đảm bảo rằng LoginDto.Email thực sự chứa email, và bạn tìm theo email.
+                var user = await _userManager.Users
+                               .Include(u => u.Position)
+                               .Include(u => u.Department)
+                               .Include(u => u.ManagerU)
+                               .Include(u => u.UserStatus)
+                               .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+                // Nếu không tìm thấy bằng email, bạn có thể cân nhắc tìm bằng username nếu muốn linh hoạt
+
+                if (user == null)
+                {
+                    // Trả về lỗi chung để tránh lộ thông tin liệu email/username có tồn tại hay không.
+                    return Result<UserDto>.Failure(
+                        message: "Đăng nhập thất bại",
+                        error: "Tên đăng nhập hoặc mật khẩu không chính xác.",
+                        code: "UNAUTHORIZED", // Dựa vào Status Code 401: Lỗi xác thực
+                        statusCode: 401 // Unauthorized
+                    );
+                }
+
+                // 2. Xác thực mật khẩu
+                var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, lockoutOnFailure: false);
+
+                if (result.Succeeded)
+                {
+                    // Đăng nhập thành công
+                    // Tạo UserDto
+                    PositionDto positionDto = _mapper.Map<PositionDto>(user.Position);
+                    var roles = await _userManager.GetRolesAsync(user);
+                    UserDto userDto = _mapper.Map<UserDto>(user);
+                    userDto.Role = roles.FirstOrDefault();
+                    userDto.Position = positionDto;
+
+                    string id = userDto?.Id!;
+                    string email = userDto?.Email!;
+                    string role = userDto?.Role!;
+
+                    string accessToken = _jwtService.GenerateJwtToken(id, email, role);
+
+                    userDto.AccessToken = accessToken;
+
+                    // Trả về Result.Success với UserDto
+                    return Result<UserDto>.Success(
+                        message: "Đăng nhập thành công.",
+                        code: "SUCCESS", // Dựa vào Status Code 200: Thành công
+                        statusCode: 200,
+                        data: userDto
+                    );
+                }
+                else if (result.IsLockedOut)
+                {
+                    // Tài khoản bị khóa
+                    return Result<UserDto>.Failure(
+                        message: "Đăng nhập thất bại",
+                        error: "Tài khoản của bạn đã bị khóa.",
+                        code: "FORBIDDEN", // Dựa vào Status Code 403: Cấm, phân quyền
+                        statusCode: 403 // Forbidden
+                    );
+                }
+                else if (result.IsNotAllowed)
+                {
+                    // Đăng nhập không được phép (ví dụ: email chưa xác nhận)
+                    return Result<UserDto>.Failure(
+                        message: "Đăng nhập thất bại",
+                        error: "Đăng nhập không được phép. Tài khoản của bạn chưa được xác nhận hoặc có vấn đề.",
+                        code: "FORBIDDEN", // Dựa vào Status Code 403: Cấm, phân quyền
+                        statusCode: 403 // Forbidden hoặc 400 Bad Request, tùy ngữ cảnh
+                    );
+                }
+                else
+                {
+                    // Các trường hợp thất bại khác (ví dụ: sai mật khẩu)
+                    return Result<UserDto>.Failure(
+                        message: "Đăng nhập thất bại",
+                        error: "Tên đăng nhập hoặc mật khẩu không chính xác.",
+                        code: "UNAUTHORIZED", // Dựa vào Status Code 401: Lỗi xác thực
+                        statusCode: 401 // Unauthorized
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result<UserDto>.Failure(
+                    error: "Lỗi hệ thống: " + ex.Message,
+                    code: "SYSTEM_ERROR", // Dựa vào Status Code 500: Lỗi chung liên quan đến network, database
+                    statusCode: 500
+                );
+            }
+        }
+
+
         /// <summary>
         /// Cập nhật thông tin người dùng bởi quản trị viên.
         /// </summary>
         /// <param name="userId">ID của người dùng cần cập nhật.</param>
         /// <param name="rq">Đối tượng chứa thông tin cập nhật.</param>
         /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
-        public async Task<Result> UpdateUserByAdmin(string userId, AdminUpdateUserDtoRq rq)
+        public async Task<Result> UpdateUserByAdmin(string userId, UserAdminUpdateDto rq)
         {
             try
             {
@@ -543,7 +548,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
         /// <param name="userId">ID của người dùng cần cập nhật.</param>
         /// <param name="rq">Đối tượng chứa thông tin cập nhật hồ sơ cá nhân.</param>
         /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
-        public async Task<Result> UpdateMyProfileAsync(string userId, UserUpdateSelfDtoRq rq)
+        public async Task<Result> UpdateMyProfileAsync(string userId, UserUserUpdateDto rq)
         {
             try
             {
@@ -826,7 +831,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
         /// <param name="userId">ID của người dùng cần đổi mật khẩu.</param>
         /// <param name="rq">Đối tượng chứa mật khẩu cũ và mật khẩu mới.</param>
         /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
-        public async Task<Result> ChangePasswordUserAsync(string userId, UserChangePasswordRq rq)
+        public async Task<Result> ChangePasswordUserAsync(string userId, UserChangePasswordDto rq)
         {
             try
             {
@@ -888,7 +893,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
         /// <param name="userId">ID của người dùng cần đặt lại mật khẩu.</param>
         /// <param name="rq">Đối tượng chứa mật khẩu mới.</param>
         /// <returns>Đối tượng Result cho biết kết quả của thao tác.</returns>
-        public async Task<Result> ResetPasswordByAdminAsync(string userId, UserResetPasswordRq rq)
+        public async Task<Result> ResetPasswordByAdminAsync(string userId, UserResetPasswordDto rq)
         {
             try
             {

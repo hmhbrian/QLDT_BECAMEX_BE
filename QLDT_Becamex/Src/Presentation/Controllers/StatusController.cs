@@ -1,0 +1,90 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.Status.Commands;
+using QLDT_Becamex.Src.Application.Features.Status.Dtos;
+using QLDT_Becamex.Src.Application.Features.Status.Queries;
+using QLDT_Becamex.Src.Application.Features.Users.Commands;
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
+using QLDT_Becamex.Src.Application.Features.Users.Queries;
+
+namespace QLDT_Becamex.Src.Presentation.Controllers
+{
+    [ApiController]
+    [Route("api/status")]
+    public class StatusController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+
+        public StatusController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        // ===== Course Status =====
+
+        [HttpGet("courses")]
+        public async Task<IActionResult> GetAllCourseStatuses()
+        {
+            var result = await _mediator.Send(new GetAllCourseStatusesQuery());
+            return Ok(ApiResponse<IEnumerable<CourseStatusDto>>.Ok(result));
+        }
+
+        [HttpPost("courses")]
+        public async Task<IActionResult> CreateCourseStatus([FromBody] CreateCourseStatusDto dto)
+        {
+            await _mediator.Send(new CreateCourseStatusCommand(dto));
+            return StatusCode(201, ApiResponse.Ok("Tạo thành công"));
+        }
+
+        [HttpPut("courses/{id:int}")]
+        public async Task<IActionResult> UpdateCourseStatus(int id, [FromBody] CreateCourseStatusDto dto)
+        {
+            await _mediator.Send(new UpdateCourseStatusCommand(id, dto));
+            return Ok(ApiResponse.Ok("Cập nhật thành công"));
+        }
+
+        [HttpDelete("courses")]
+        public async Task<IActionResult> DeleteCourseStatuses([FromBody] List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+                return BadRequest(ApiResponse.Fail("Danh sách ID không được để trống"));
+
+            await _mediator.Send(new DeleteCourseStatusesCommand(ids));
+            return Ok(ApiResponse.Ok("Xóa thành công"));
+        }
+
+        // ===== User Status =====
+
+        [HttpGet("users")]
+        public async Task<IActionResult> GetAllUserStatuses()
+        {
+            var result = await _mediator.Send(new GetAllUserStatusesQuery());
+            return Ok(ApiResponse<IEnumerable<UserStatusDto>>.Ok(result));
+        }
+
+        [HttpPost("users")]
+        public async Task<IActionResult> CreateUserStatus([FromBody] UserStatusDtoRq dto)
+        {
+            var result = await _mediator.Send(new CreateUserStatusCommand(dto));
+            return StatusCode(201, ApiResponse.Ok("Tạo thành công"));
+        }
+
+        [HttpPut("users/{id:int}")]
+        public async Task<IActionResult> UpdateUserStatus(int id, [FromBody] UserStatusDtoRq dto)
+        {
+            await _mediator.Send(new UpdateUserStatusCommand(id, dto));
+            return Ok(ApiResponse.Ok("Cập nhật thành công"));
+        }
+
+        [HttpDelete("users")]
+        public async Task<IActionResult> DeleteUserStatuses([FromBody] List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+                return BadRequest(ApiResponse.Fail("Danh sách ID không được để trống"));
+
+            await _mediator.Send(new DeleteUserStatusesCommand(ids));
+            return Ok(ApiResponse.Ok("Xóa thành công"));
+        }
+    }
+}

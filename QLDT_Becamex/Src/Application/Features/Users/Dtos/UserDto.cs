@@ -1,5 +1,6 @@
-﻿using QLDT_Becamex.Src.Application.Dtos;
+﻿
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
+using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using System.ComponentModel.DataAnnotations;
 
 namespace QLDT_Becamex.Src.Application.Features.Users.Dtos

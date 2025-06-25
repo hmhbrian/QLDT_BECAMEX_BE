@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace QLDT_Becamex.Src.Domain.Models
+namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class CourseDepartment
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QLDT_Becamex.Src.Application.Dtos
+namespace QLDT_Becamex.Src.Application.Common.Dtos
 {
     public class BaseQueryParam
     {
@@ -25,10 +25,10 @@ namespace QLDT_Becamex.Src.Application.Dtos
     public class BaseQueryParamFilter : BaseQueryParam
     {
         public string? Keyword { get; set; }
-        public string? StatusIds { get; set; } 
-        public string? DepartmentIds { get; set; } 
-        public string? PositionIds { get; set; } 
-        public string? FromDate { get; set; } 
+        public string? StatusIds { get; set; }
+        public string? DepartmentIds { get; set; }
+        public string? PositionIds { get; set; }
+        public string? FromDate { get; set; }
         public string? ToDate { get; set; }
     }
 }

@@ -4,7 +4,7 @@
 
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Domain.Models; // ApplicationUser entity
+using QLDT_Becamex.Src.Domain.Entities;
 using FluentResults; // FluentResults for rich result handling
 using System.Linq;
 using System.Threading;
@@ -31,6 +31,8 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
 
         public async Task<string> Handle(CreateUserCommand command, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var request = command.Request;
 
             // 1. Kiểm tra role

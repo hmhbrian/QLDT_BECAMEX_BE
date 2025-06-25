@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QLDT_Becamex.Src.Domain.Models // Đảm bảo namespace này khớp với nơi bạn định nghĩa ApplicationUser
+namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp với nơi bạn định nghĩa ApplicationUser
 {
     public class ApplicationUser : IdentityUser
     {

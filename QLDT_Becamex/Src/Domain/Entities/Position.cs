@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Identity;
 
-namespace QLDT_Becamex.Src.Domain.Models
+namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class Position
     {

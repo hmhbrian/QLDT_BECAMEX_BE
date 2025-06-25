@@ -7,12 +7,11 @@ using Microsoft.OpenApi.Models;
 using QLDT_Becamex.Src.Application.Common.Mappings;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Domain.Models;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
 using QLDT_Becamex.Src.Infrastructure.Services;
-using QLDT_Becamex.Src.Services.Implementations;
-using QLDT_Becamex.Src.Services.Interfaces;
+
 
 using System.Text;
 
@@ -118,20 +117,10 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IPositionRepostiory, PositionRepository>();
 
 // Services
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<IPositionService, PositionService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IUserStatusService, UserStatusService>();
-builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-
-
-
+builder.Services.AddScoped<IBaseService, BaseService>();
 
 
 // 6. Cấu hình Controllers và Swagger/OpenAPI

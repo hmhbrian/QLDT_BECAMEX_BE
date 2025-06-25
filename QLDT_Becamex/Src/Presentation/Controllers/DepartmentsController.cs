@@ -1,14 +1,12 @@
-﻿using Azure.Core;
+﻿
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Application.Common.Dtos;
-using QLDT_Becamex.Src.Application.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Commands;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
-using QLDT_Becamex.Src.Services.Interfaces;
+using QLDT_Becamex.Src.Application.Features.Departments.Queries;
+
 
 namespace QLDT_Becamex.Src.Controllers
 {
@@ -36,7 +34,7 @@ namespace QLDT_Becamex.Src.Controllers
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetAllDepartments()
         {
-            var result = await _mediator.Send(new GetAllDepartmentCommand());
+            var result = await _mediator.Send(new GetAllDepartmentQuery());
             return Ok(ApiResponse<List<DepartmentDto>>.Ok(result));
         }
 
@@ -44,7 +42,7 @@ namespace QLDT_Becamex.Src.Controllers
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
-            var result = await _mediator.Send(new GetDepartmentByIdCommand(id));
+            var result = await _mediator.Send(new GetDepartmentByIdQuery(id));
             return Ok(ApiResponse<DepartmentDto>.Ok(result));
         }
 

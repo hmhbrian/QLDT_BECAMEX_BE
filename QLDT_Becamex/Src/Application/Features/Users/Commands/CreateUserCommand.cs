@@ -1,5 +1,4 @@
-﻿// File: QLDT_Becamex.Src/Application/Commands/Users/CreateUser/CreateUserCommand.cs
-using FluentResults;
+﻿
 using MediatR;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 

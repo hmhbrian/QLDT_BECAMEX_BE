@@ -5,8 +5,10 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Commands;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Helpers;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Domain.Models;
+using QLDT_Becamex.Src.Infrastructure.Services;
+
 
 namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 {
@@ -14,11 +16,13 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IBaseService _baseService;
 
-        public UpdateDepartmentCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public UpdateDepartmentCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IBaseService baseService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _baseService = baseService;
         }
 
         public async Task<DepartmentDto> Handle(UpdateDepartmentCommand command, CancellationToken cancellationToken)
@@ -110,7 +114,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 
                 // Kiểm tra và cập nhật ManagerId
                 var managerId = request.ManagerId?.Trim();
-                await DepartmentHelper.ValidateManagerIdAsync(managerId, false, department.ManagerId, id, _unitOfWork);
+                await _baseService.ValidateManagerIdDeparmentAsync(managerId, false, department.ManagerId, id);
 
                 // Cập nhật thông tin phòng ban
                 department.DepartmentName = request.DepartmentName;

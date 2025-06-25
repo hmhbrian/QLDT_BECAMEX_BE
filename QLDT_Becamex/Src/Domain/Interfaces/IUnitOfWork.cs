@@ -4,7 +4,7 @@
     {
         public IUserRepository UserRepository { get; }
         public IDepartmentRepository DepartmentRepository { get; }
-        public IPositionRepostiory PositionRepostiory { get; }
+        public IPositionRepostiory PositionRepository { get; }
         public IUserStatusRepostiory UserStatusRepostiory { get; }
         public ICourseDepartmentRepository CourseDepartmentRepository { get; }
         public ICoursePositionRepository CoursePositionRepository { get; }

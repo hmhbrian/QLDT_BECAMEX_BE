@@ -9,7 +9,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         private readonly ApplicationDbContext _dbContext;
         public IUserRepository UserRepository { get; }
         public IDepartmentRepository DepartmentRepository { get; }
-        public IPositionRepostiory PositionRepostiory { get; }
+        public IPositionRepostiory PositionRepository { get; }
         public IUserStatusRepostiory UserStatusRepostiory { get; }
 
         public ICourseDepartmentRepository CourseDepartmentRepository { get; }
@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             _dbContext = dbContext;
             UserRepository = new UserRepository(dbContext);
             DepartmentRepository = new DepartmentRepository(dbContext);
-            PositionRepostiory = new PositionRepository(dbContext);
+            PositionRepository = new PositionRepository(dbContext);
             UserStatusRepostiory = new UserStatusRepostiory(dbContext);
             CourseDepartmentRepository = new CourseDepartmentRepository(dbContext);
             CoursePositionRepository = new CoursePositionRepository(dbContext);

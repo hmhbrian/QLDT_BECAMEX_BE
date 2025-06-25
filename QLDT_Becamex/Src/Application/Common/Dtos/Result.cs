@@ -1,10 +1,8 @@
 ﻿
-namespace QLDT_Becamex.Src.Application.Dtos
+
+namespace QLDT_Becamex.Src.Application.Common.Dtos
 {
-    using QLDT_Becamex.Src.Application.Features.Users.Dtos;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+
     public class Result
     {
         public bool IsSuccess { get; protected set; }
@@ -161,11 +159,5 @@ namespace QLDT_Becamex.Src.Application.Dtos
 
         }
 
-    }
-
-    public class PagedResult<T>
-    {
-        public IEnumerable<T>? Items { get; set; } = new List<T>();
-        public Pagination? Pagination { get; set; }
     }
 }

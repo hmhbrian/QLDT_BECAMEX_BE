@@ -24,7 +24,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// </summary>
         /// <param name="userService">Dịch vụ người dùng.</param>
         /// <param name="jwtService">Dịch vụ JWT để tạo token (nếu được sử dụng trực tiếp trong controller).</param>
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, JwtService jwtService)
         {
             _userService = userService;
 

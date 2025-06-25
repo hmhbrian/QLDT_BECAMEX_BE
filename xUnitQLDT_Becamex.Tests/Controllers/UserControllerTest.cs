@@ -2,24 +2,15 @@
 using QLDT_Becamex.Src.Services.Interfaces;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Controllers;
-using QLDT_Becamex.Src.Dtos.Users;
-using QLDT_Becamex.Src.Dtos.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 using Microsoft.AspNetCore.Http;
-using QLDT_Becamex.Src.Dtos.Params;
 using System.Text;
 using Newtonsoft.Json;
-using Microsoft.Win32;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using QLDT_Becamex.Src.Application.Dtos;
 
 namespace xUnitQLDT_Becamex.Tests.Controllers
 {
@@ -703,7 +694,7 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
                 .ReturnsAsync(expectedResult);
 
             // Act
-            var result = await _userController.SoftDeletePasswordByAdmin(targetUserId);
+            var result = await _userController.SoftDeleteUser(targetUserId);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);

@@ -1,28 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 using MockQueryable;
 using Moq;
-using QLDT_Becamex.Src.Dtos.Params;
-using QLDT_Becamex.Src.Dtos.Positions;
-using QLDT_Becamex.Src.Dtos.Results;
-using QLDT_Becamex.Src.Dtos.Users;
-using QLDT_Becamex.Src.Models;
+using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Domain.Models;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Services.Interfaces;
-using QLDT_Becamex.Src.UnitOfWork;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace xUnitQLDT_Becamex.Tests.Services
 {
@@ -36,6 +24,8 @@ namespace xUnitQLDT_Becamex.Tests.Services
         private readonly Mock<RoleManager<IdentityRole>> _roleManager;
         private readonly Mock<ICloudinaryService> _cloudinaryService;
         private readonly UserService _userService;
+        private readonly Mock<IJwtService> _jwtService;
+
         public UserServiceTest()
         {
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
@@ -51,20 +41,24 @@ namespace xUnitQLDT_Becamex.Tests.Services
 
             var roleStoreMock = new Mock<IRoleStore<IdentityRole>>();
             _roleManager = new Mock<RoleManager<IdentityRole>>(roleStoreMock.Object, null, null, null, null);
-
             _mapper = new Mock<IMapper>();
             _unitOfWork = new Mock<IUnitOfWork>();
             _httpContextAccessor = new Mock<IHttpContextAccessor>();
             _cloudinaryService = new Mock<ICloudinaryService>();
+            _jwtService = new Mock<IJwtService>();
 
             _userService = new UserService(
                 _signInManager.Object,
                 _userManager.Object,
                 _roleManager.Object,
                 _cloudinaryService.Object,
+                _jwtService.Object,
                 _mapper.Object,
                 _unitOfWork.Object,
-                _httpContextAccessor.Object);
+                _httpContextAccessor.Object
+
+
+               );
         }
         [Fact]
         public async Task LoginAsync_ReturnsOk()
@@ -408,7 +402,7 @@ namespace xUnitQLDT_Becamex.Tests.Services
                 new ApplicationUser { Id = "2", Email = "user2@example.com" }
             };
 
-                    var userDtos = new List<UserDto>
+            var userDtos = new List<UserDto>
             {
                 new UserDto { Id = "1", Email = "user1@example.com" },
                 new UserDto { Id = "2", Email = "user2@example.com" }

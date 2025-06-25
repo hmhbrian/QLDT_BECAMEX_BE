@@ -11,7 +11,6 @@ using QLDT_Becamex.Src.Domain.Models;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
 using QLDT_Becamex.Src.Infrastructure.Services;
-using QLDT_Becamex.Src.Presentation.Middleware;
 using QLDT_Becamex.Src.Services.Implementations;
 using QLDT_Becamex.Src.Services.Interfaces;
 

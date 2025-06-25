@@ -5,9 +5,9 @@ using QLDT_Becamex.Src.Application.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Domain.Models;
-using QLDT_Becamex.Src.Helpers;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Services.Interfaces;
+using QLDT_Becamex.Src.Shared.Helpers;
 using System.Security.Claims;
 
 namespace QLDT_Becamex.Src.Services.Implementations

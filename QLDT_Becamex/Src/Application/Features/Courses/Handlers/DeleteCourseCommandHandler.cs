@@ -9,7 +9,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        private const int CancelledStatusId = 99; // ✅ Đổi lại theo ID thực tế của trạng thái "Huỷ"
+        private const int CancelledStatusId = 5; // ✅ Đổi lại theo ID thực tế của trạng thái "Huỷ"
 
         public DeleteCourseCommandHandler(IUnitOfWork unitOfWork)
         {

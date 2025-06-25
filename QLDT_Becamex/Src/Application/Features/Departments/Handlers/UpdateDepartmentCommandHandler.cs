@@ -4,10 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Commands;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
-using QLDT_Becamex.Src.Application.Features.Departments.Helpers;
+using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Infrastructure.Services;
 
 
 namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
@@ -152,7 +151,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                 var pathCache = new Dictionary<int, List<string>>();
 
                 // Ánh xạ sang DepartmentDto
-                var resultDto = await DepartmentHelper.MapToDtoAsync(department, departmentDict, userDict, pathCache, _mapper);
+                var resultDto = await _baseService.MapToDtoAsync(department, departmentDict, userDict, pathCache, _mapper);
 
                 return resultDto;
             }

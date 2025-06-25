@@ -23,7 +23,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
 
             //Department
-            CreateMap<DepartmentRq, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId));
+            CreateMap<DepartmentRequestDto, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId));
             CreateMap<Department, DepartmentDto>();
 
             //Position

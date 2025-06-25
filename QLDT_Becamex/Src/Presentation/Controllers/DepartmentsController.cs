@@ -1,7 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Core;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Application.Features.Departments.Commands;
+using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Services.Interfaces;
 
 namespace QLDT_Becamex.Src.Controllers
@@ -10,46 +16,19 @@ namespace QLDT_Becamex.Src.Controllers
     [Route("api/[controller]")]
     public class DepartmentsController : ControllerBase
     {
-        private readonly IDepartmentService _departmentService;
+        private readonly IMediator _mediator;
 
-        public DepartmentsController(IDepartmentService departmentService)
+        public DepartmentsController(IMediator mediator)
         {
-            _departmentService = departmentService;
+            _mediator = mediator;
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> CreateDepartment([FromBody] DepartmentRq dto)
+        public async Task<IActionResult> CreateDepartment([FromBody] DepartmentRequestDto request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    message = "Dữ liệu không hợp lệ.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage)
-                });
-            }
-
-            var result = await _departmentService.CreateDepartmentAsync(dto);
-            if (result.IsSuccess)
-            {
-                return StatusCode(201, new
-                {
-                    message = result.Message,
-                    statusCode = result.StatusCode,
-                    code = result.Code,
-                    data = result.Data
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = result.Message,
-                errors = result.Errors,
-                statusCode = result.StatusCode,
-                code = result.Code
-            });
+            var result = await _mediator.Send(new CreateDepartmentCommand(request));
+            return Ok(ApiResponse<string>.Ok(result));
 
         }
 
@@ -57,130 +36,32 @@ namespace QLDT_Becamex.Src.Controllers
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetAllDepartments()
         {
-            var result = await _departmentService.GetAllDepartmentsAsync();
-            if (result.IsSuccess)
-            {
-                return Ok(new
-                {
-                    message = result.Message,
-                    statusCode = result.StatusCode,
-                    code = result.Code,
-                    data = result.Data
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = result.Message,
-                errors = result.Errors,
-                statusCode = result.StatusCode,
-                code = result.Code
-            });
+            var result = await _mediator.Send(new GetAllDepartmentCommand());
+            return Ok(ApiResponse<List<DepartmentDto>>.Ok(result));
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    message = "Dữ liệu không hợp lệ.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage)
-                });
-            }
-
-            var result = await _departmentService.GetDepartmentByIdAsync(id);
-            if (result.IsSuccess)
-            {
-                return Ok(new
-                {
-                    message = result.Message,
-                    statusCode = result.StatusCode,
-                    code = result.Code,
-                    data = result.Data
-                });
-            }
-
-            return NotFound(new
-            {
-                message = result.Message,
-                errors = result.Errors,
-                statusCode = result.StatusCode,
-                code = result.Code
-            });
+            var result = await _mediator.Send(new GetDepartmentByIdCommand(id));
+            return Ok(ApiResponse<DepartmentDto>.Ok(result));
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentRq dto)
+        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentRequestDto request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    message = "Dữ liệu không hợp lệ.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage)
-                });
-            }
-
-            var result = await _departmentService.UpdateDepartmentAsync(id, dto);
-            if (result.IsSuccess)
-            {
-                return Ok(new
-                {
-                    message = result.Message,
-                    statusCode = result.StatusCode,
-                    code = result.Code,
-                    data = result.Data
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = result.Message,
-                errors = result.Errors,
-                statusCode = result.StatusCode,
-                code = result.Code
-            });
+            var result = await _mediator.Send(new UpdateDepartmentCommand(id, request));
+            return Ok(ApiResponse<DepartmentDto>.Ok(result));
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    message = "Dữ liệu không hợp lệ.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage)
-                });
-            }
-
-            var result = await _departmentService.DeleteDepartmentAsync(id);
-            if (result.IsSuccess)
-            {
-                return Ok(new
-                {
-                    message = result.Message,
-                    statusCode = result.StatusCode,
-                    code = result.Code,
-                    data = result.Data
-                });
-            }
-
-            return NotFound(new
-            {
-                message = result.Message,
-                errors = result.Errors,
-                statusCode = result.StatusCode,
-                code = result.Code
-            });
+            var result = await _mediator.Send(new DeleteDepartmentCommand(id));
+            return Ok(ApiResponse<bool>.Ok(result));
         }
     }
 }

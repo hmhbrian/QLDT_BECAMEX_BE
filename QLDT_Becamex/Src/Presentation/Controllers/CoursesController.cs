@@ -69,5 +69,46 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new SearchCoursesQuery(queryParam));
             return Ok(ApiResponse<PagedResult<CourseDto>>.Ok(result));
         }
+
+        [HttpDelete("soft-delete")]
+        [Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> DeleteCourse([FromQuery] string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Dữ liệu truy vấn không hợp lệ.",
+                    errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage),
+                    code = "INVALID",
+                    statusCode = 404
+                });
+            }
+
+            var result = await _courseService.DeleteCourseAsync(id);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = result.Message,
+                    statusCode = result.StatusCode,
+                    code = result.Code,
+                    data = result.Data
+                });
+            }
+            else
+            {
+                var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+                return StatusCode(statusCode, new
+                {
+                    message = result.Message,
+                    errors = result.Errors,
+
+                    code = result.Code
+                });
+            }
+        }
     }
 }

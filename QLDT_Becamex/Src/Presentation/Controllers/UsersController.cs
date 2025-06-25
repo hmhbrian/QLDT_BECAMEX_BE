@@ -5,7 +5,7 @@ using QLDT_Becamex.Src.Application.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using MediatR; // Cần thiết cho StatusCodes
-using FluentResults;
+
 using QLDT_Becamex.Src.Application.Common.Dtos;
 
 namespace QLDT_Becamex.Src.Controllers
@@ -37,47 +37,6 @@ namespace QLDT_Becamex.Src.Controllers
         /// </summary>
         /// <param name="dto">Đối tượng chứa thông tin người dùng cần tạo.</param>
         /// <returns>ActionResult chứa kết quả của thao tác tạo người dùng.</returns>
-        //[HttpPost("create")]
-        //[Authorize(Roles = "ADMIN, HR")]
-        //public async Task<IActionResult> CreateUser([FromBody] UserCreateDto dto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            message = "Dữ liệu không hợp lệ.",
-        //            errors = ModelState.Values.SelectMany(v => v.Errors)
-        //                                      .Select(e => e.ErrorMessage),
-        //            code = "INVALID", // Mã lỗi chung cho dữ liệu không hợp lệ
-        //            statusCode = StatusCodes.Status400BadRequest
-        //        });
-        //    }
-
-        //    Result result = await _userService.CreateUserAsync(dto);
-
-        //    if (result.IsSuccess)
-        //    {
-        //        return StatusCode(result.StatusCode ?? StatusCodes.Status200OK, new // Mặc định 200OK cho thành công tạo nếu service không trả về 201
-        //        {
-        //            message = result.Message,
-        //            statusCode = result.StatusCode ?? StatusCodes.Status200OK,
-        //            code = result.Code
-        //        });
-        //    }
-        //    else
-        //    {
-        //        // Khi là lỗi, có thể sử dụng statusCode từ Result hoặc mặc định là BadRequest (400)
-        //        var statusCode = result.StatusCode ?? StatusCodes.Status400BadRequest;
-        //        return StatusCode(statusCode, new // Sử dụng StatusCode thay vì BadRequest để linh hoạt hơn
-        //        {
-        //            message = result.Message,
-        //            errors = result.Errors,
-
-        //            code = result.Code
-        //        });
-        //    }
-        //}
-
         [HttpPost("create")]
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto request)

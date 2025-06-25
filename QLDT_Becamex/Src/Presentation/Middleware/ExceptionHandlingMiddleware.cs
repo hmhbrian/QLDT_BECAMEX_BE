@@ -7,6 +7,11 @@ public class ExceptionHandlingMiddleware
     private readonly RequestDelegate _next;
     public ExceptionHandlingMiddleware(RequestDelegate next) => _next = next;
 
+    public class ExtendedProblemDetails : ProblemDetails
+    {
+        public bool Success { get; set; } = false;
+    }
+
     public async Task Invoke(HttpContext context)
     {
         try
@@ -16,9 +21,10 @@ public class ExceptionHandlingMiddleware
         catch (AppException ex)
         {
             context.Response.StatusCode = ex.StatusCode;
-            await context.Response.WriteAsJsonAsync(new ProblemDetails
+            await context.Response.WriteAsJsonAsync(new ExtendedProblemDetails
             {
                 Title = "Lỗi nghiệp vụ",
+                Success = false,
                 Detail = ex.Message,
                 Status = ex.StatusCode
             });
@@ -26,9 +32,10 @@ public class ExceptionHandlingMiddleware
         catch (Exception ex)
         {
             context.Response.StatusCode = 500;
-            await context.Response.WriteAsJsonAsync(new ProblemDetails
+            await context.Response.WriteAsJsonAsync(new ExtendedProblemDetails
             {
                 Title = "Lỗi hệ thống",
+                Success = false,
                 Detail = ex.Message,
                 Status = 500
             });

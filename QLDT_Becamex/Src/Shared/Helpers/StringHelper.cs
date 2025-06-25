@@ -1,8 +1,7 @@
-﻿
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
-namespace QLDT_Becamex.Src.Helpers
+namespace QLDT_Becamex.Src.Shared.Helpers
 {
 
 

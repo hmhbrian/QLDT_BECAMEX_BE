@@ -7,9 +7,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         protected readonly ApplicationDbContext _dbContext;
+        private readonly DbSet<T> _dbSet;
         public GenericRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
+            _dbSet = dbContext.Set<T>();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -135,5 +137,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
             return await query.ToListAsync();
         }
 
+        public IQueryable<T> GetQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

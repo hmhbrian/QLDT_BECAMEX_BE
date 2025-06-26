@@ -26,7 +26,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         public async Task<PagedResult<CourseDto>> Handle(SearchCoursesQuery request, CancellationToken cancellationToken)
         {
             var queryParam = request.QueryParam;
-            Expression<Func<Course, bool>>? predicate = null;
+            Expression<Func<Course, bool>>? predicate = c => c.IsDeleted == false;
 
             // Filter by StatusIds
             if (!string.IsNullOrEmpty(queryParam.StatusIds))

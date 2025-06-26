@@ -14,7 +14,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private const int CancelledStatusId = 5;
 
         public GetCoursesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -26,7 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         {
             var queryParam = request.QueryParam;
 
-            int totalItems = await _unitOfWork.CourseRepository.CountAsync(c => request.isDeleted ? (c.StatusId != CancelledStatusId) : (c.StatusId == CancelledStatusId));
+            int totalItems = await _unitOfWork.CourseRepository.CountAsync(c => c.IsDeleted == false);
 
             Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderBy = query =>
             {
@@ -41,7 +40,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             };
 
             var courseEntities = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                predicate: c => request.isDeleted ? (c.StatusId != CancelledStatusId) : (c.StatusId == CancelledStatusId),
+                predicate: c => c.IsDeleted == false,
                 orderBy: orderBy,
                 page: queryParam.Page,
                 pageSize: queryParam.Limit,

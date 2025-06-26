@@ -232,6 +232,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(p => p.ModifiedAt)
                       .HasColumnType("datetime");
 
+                entity.Property(p => p.IsDeleted)
+                      .HasDefaultValue(false);
+
                 entity.HasOne(p => p.Status)
                       .WithMany(s => s.Courses)
                       .HasForeignKey(p => p.StatusId)

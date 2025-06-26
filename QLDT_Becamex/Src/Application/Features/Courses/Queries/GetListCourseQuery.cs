@@ -4,6 +4,6 @@ using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Queries
 {
-    public record GetListCourseQuery(bool isDeleted, BaseQueryParamFilter QueryParam) : IRequest<PagedResult<CourseDto>>;
+    public record GetListCourseQuery(BaseQueryParam QueryParam) : IRequest<PagedResult<CourseDto>>;
 
 }

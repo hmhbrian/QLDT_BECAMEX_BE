@@ -9,8 +9,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        private const int CancelledStatusId = 5; // ✅ Đổi lại theo ID thực tế của trạng thái "Huỷ"
-
         public DeleteCourseCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -25,7 +23,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (course.RegistrationStartDate.HasValue && DateTime.Now > course.RegistrationStartDate.Value)
                 throw new AppException("Ngày xóa phải trước ngày bắt đầu đăng ký", 400);
 
-            course.StatusId = CancelledStatusId;
+            course.IsDeleted = true;
             course.ModifiedAt = DateTime.Now;
 
             _unitOfWork.CourseRepository.Update(course);

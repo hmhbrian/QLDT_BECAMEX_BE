@@ -55,9 +55,9 @@ namespace QLDT_Becamex.Src.Controllers
         /// Lấy danh sách khóa học (dùng phân trang và sắp xếp).
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetCourses(bool isDeleted, [FromQuery] BaseQueryParamFilter queryParam)
+        public async Task<IActionResult> GetCourses( [FromQuery] BaseQueryParam queryParam)
         {
-            var result = await _mediator.Send(new GetListCourseQuery(isDeleted, queryParam));
+            var result = await _mediator.Send(new GetListCourseQuery( queryParam));
             return Ok(ApiResponse<PagedResult<CourseDto>>.Ok(result));
         }
 

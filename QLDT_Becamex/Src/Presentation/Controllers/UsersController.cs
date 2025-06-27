@@ -42,7 +42,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto request, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new CreateUserCommand(request), cancellationToken);
-            return Ok(ApiResponse.Ok(result)); // Bao kết quả tại đây
+            return Ok(ApiResponse<string>.Ok(result, "Đăng ký thành công")); // Bao kết quả tại đây
         }
 
         /// <summary>

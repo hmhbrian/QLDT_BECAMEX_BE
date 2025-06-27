@@ -42,7 +42,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto request, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new CreateUserCommand(request), cancellationToken);
-            return Ok(ApiResponse<string>.Ok(result, "Đăng ký thành công")); // Bao kết quả tại đây
+            return Ok(ApiResponse.Ok("Tạo người dùng thành công")); // Bao kết quả tại đây
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
             var result = await _mediator.Send(new LoginUserCommand(request));
-            return Ok(ApiResponse<UserDto>.Ok(result)); // Bao kết quả tại đây
+            return Ok(ApiResponse<UserDto>.Ok(result, "Đăng nhập thành công")); // Bao kết quả tại đây
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
             var result = await _mediator.Send(new UpdateUserByUserCommand(rq), cancellationToken);
-            return Ok(ApiResponse.Ok("Cập nhật thành công " + result)); // Bao kết quả tại đây
+            return Ok(ApiResponse.Ok("Cập nhật thành công")); // Bao kết quả tại đây
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
             var result = await _mediator.Send(new UpdateUserByAdminCommand(userId, rq));
-            return Ok(ApiResponse.Ok("Cập nhật thành công " + result)); // Bao kết quả tại đây
+            return Ok(ApiResponse.Ok("Cập nhật thành công")); // Bao kết quả tại đây
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
             var result = await _mediator.Send(new ChangePasswordUserCommand(rq));
-            return Ok(ApiResponse.Ok("Đổi mật khẩu thành công " + result));
+            return Ok(ApiResponse.Ok("Đổi mật khẩu thành công"));
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
             var result = await _mediator.Send(new ResetPasswordByAdminCommand(userId, rq));
-            return Ok(ApiResponse.Ok("Cấp lại mật khẩu thành công " + result));
+            return Ok(ApiResponse.Ok("Cấp lại mật khẩu thành công"));
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace QLDT_Becamex.Src.Controllers
             }
 
             var result = await _mediator.Send(new SoftDeleteUserCommand(userId));
-            return Ok(ApiResponse.Ok("Xóa thành công " + result)); // Bao kết quả tại đây
+            return Ok(ApiResponse.Ok("Xóa thành công")); // Bao kết quả tại đây
         }
 
 
@@ -223,7 +223,7 @@ namespace QLDT_Becamex.Src.Controllers
             }
 
             var result = await _mediator.Send(new ForceDeleteUserCommand(userId));
-            return Ok(ApiResponse.Ok("Xóa thành công " + result)); // Bao kết quả tại đây
+            return Ok(ApiResponse.Ok("Xóa thành công")); // Bao kết quả tại đây
         }
     }
 }

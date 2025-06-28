@@ -78,13 +78,16 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalid)}", 400);
             }
 
+
+
+            _mapper.Map(request, course);
+
             if (request.ThumbUrl != null)
             {
                 var imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
                 course.ThumbUrl = imageUrl;
             }
 
-            _mapper.Map(request, course);
             course.ModifiedAt = DateTime.Now;
             _unitOfWork.CourseRepository.Update(course);
 

@@ -419,7 +419,7 @@ namespace QLDT_Becamex.Src.Services.Implementations
 
                 // Kiểm tra tên phòng ban đã tồn tại chưa (ngoại trừ chính nó)
                 var nameExists = await _unitOfWork.DepartmentRepository
-                    .AnyAsync(d => d.DepartmentName == request.DepartmentName || d.DepartmentCode == request.DepartmentCode && d.DepartmentId != id);
+                    .AnyAsync(d => (d.DepartmentName == request.DepartmentName || d.DepartmentCode == request.DepartmentCode) && d.DepartmentId != id);
                 if (nameExists)
                 {
                     return Result<DepartmentDto>.Failure(

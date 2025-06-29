@@ -1,44 +1,71 @@
-﻿using Moq;
-using QLDT_Becamex.Src.Services.Interfaces;
-using QLDT_Becamex.Src.Controllers;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using QLDT_Becamex.Src.Services.Interfaces;
+using QLDT_Becamex.Src.Services.Implementations;
+using QLDT_Becamex.Src.Controllers;
+using QLDT_Becamex.Src.Dtos.Users;
+using QLDT_Becamex.Src.Dtos.Results;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
+using Microsoft.AspNetCore.Http;
+using QLDT_Becamex.Src.Dtos.Params;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.Win32;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using QLDT_Becamex.Src.Application.Dtos;
 
 namespace xUnitQLDT_Becamex.Tests.Controllers
 {
-    public class UserControllerTest
+    public class UsersControllerTest
     {
-        private readonly Mock<IUserService> _userServiceMock;
+        private readonly Mock<IMediator> _mediatorMock;
         private readonly UsersController _userController;
-        public UserControllerTest()
+
+        public UsersControllerTest()
         {
             // Tạo IConfiguration giả
-            
+            var inMemorySettings = new Dictionary<string, string>
+            {
+                {"Jwt:Key", "your_fake_jwt_key_128bit_long_enough"},
+                {"Jwt:Issuer", "your_fake_issuer"},
+                {"Jwt:Audience", "your_fake_audience"}
+            };
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            var jwtService = new JwtService(configuration);
             _userServiceMock = new Mock<IUserService>();
-            _userController = new UsersController(_userServiceMock.Object);
+            _userController = new UsersController(_userServiceMock.Object, jwtService);
 
             // Thiết lập ControllerContext với ClaimsPrincipal
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
-                new Claim(ClaimTypes.Role, "USER")
+                new Claim(ClaimTypes.Role, "ADMIN")
             };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             var principal = new ClaimsPrincipal(identity);
             var httpContext = new DefaultHttpContext { User = principal };
             _userController.ControllerContext = new ControllerContext { HttpContext = httpContext };
         }
+
         [Fact]
         public async Task CreateUser_ReturnsOk()
         {
             // Arrange
-            var userDtoRq = new UserDtoRq
+            var userDtoRq = new UserCreateDto
             {
                 FullName = "Nguyen Van Test",
                 IdCard = "123456789012",
@@ -56,29 +83,18 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
                 ConfirmPassword = "Password123!"
             };
 
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(userDtoRq);
-            bool isValid = Validator.TryValidateObject(userDtoRq, validationContext, validationResults, true);
+            var randomId = Guid.NewGuid().ToString();
 
-            Assert.True(isValid, "DTO should be valid: " + string.Join(", ", validationResults.Select(r => r.ErrorMessage)));
-
-            var expectedResult = Result.Success(
-                message: "Đăng ký thành công.",
-                code: "REGISTER_SUCCESS",
-                statusCode: 200
-            );
-
-            _userServiceMock
-                .Setup(s => s.CreateUserAsync(It.Is<UserDtoRq>(dto => dto.Email == userDtoRq.Email)))
-                .ReturnsAsync(expectedResult);
+            _mediatorMock
+                .Setup(m => m.Send(It.Is<CreateUserCommand>(c => c.Request == userDtoRq), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(randomId);
 
             // Act
-            var response = await _userController.CreateUser(userDtoRq);
+            var response = await _userController.CreateUser(userDtoRq, CancellationToken.None);
 
             // Assert
             var okResult = Assert.IsType<ObjectResult>(response);
             Assert.Equal(200, okResult.StatusCode);
-
             var responseValue = okResult.Value;
             Assert.NotNull(responseValue);
 
@@ -129,18 +145,19 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var response = await _userController.CreateUser(userDtoRq);
 
             // Assert
-            var objectResult = Assert.IsType<ObjectResult>(response);
-            Assert.Equal(400, objectResult.StatusCode);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
+            Assert.Equal(400, badRequestResult.StatusCode);
 
-            var responseValue = objectResult.Value;
-            var message = responseValue?.GetType().GetProperty("message")?.GetValue(responseValue)?.ToString();
-            var errors = responseValue?.GetType().GetProperty("errors")?.GetValue(responseValue) as IEnumerable<string>;
-            var code = responseValue?.GetType().GetProperty("code")?.GetValue(responseValue)?.ToString();
+            var responseValue = badRequestResult.Value;
+            var message = responseValue.GetType().GetProperty("message")?.GetValue(responseValue)?.ToString();
+            var errors = responseValue.GetType().GetProperty("errors")?.GetValue(responseValue) as IEnumerable<string>;
+            var code = responseValue.GetType().GetProperty("code")?.GetValue(responseValue)?.ToString();
+            var statusCode = responseValue.GetType().GetProperty("statusCode")?.GetValue(responseValue)?.ToString();
 
             Assert.Equal("Email đã tồn tại.", message);
-            Assert.Contains("Email đã được sử dụng.", errors!);
+            Assert.Contains("Email đã được sử dụng.", errors);
             Assert.Equal("EMAIL_EXISTS", code);
-
+            Assert.Equal("400", statusCode);
 
             _userServiceMock.Verify(s => s.CreateUserAsync(It.IsAny<UserDtoRq>()), Times.Once());
         }
@@ -180,10 +197,24 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
                 .ReturnsAsync(expectedResult);
 
             // Act
-            var result = await _userController.Login(request);
+            IActionResult result;
+            try
+            {
+                result = await _userController.Login(request);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Exception: {ex.Message}\n{ex.StackTrace}");
+                return;
+            }
 
             // Assert
             var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+            if (objectResult.StatusCode != 200)
+            {
+                Console.WriteLine($"Response: {JsonConvert.SerializeObject(objectResult.Value)}");
+                Assert.Fail($"Expected StatusCode 200, but got {objectResult.StatusCode}");
+            }
             Assert.Equal(200, objectResult.StatusCode);
 
             var responseValue = objectResult.Value;
@@ -193,20 +224,27 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var statusCode = responseValue.GetType().GetProperty("statusCode")?.GetValue(responseValue)?.ToString();
             var code = responseValue.GetType().GetProperty("code")?.GetValue(responseValue)?.ToString();
             var data = responseValue.GetType().GetProperty("data")?.GetValue(responseValue) as UserDto;
+            var accessToken = responseValue.GetType().GetProperty("accessToken")?.GetValue(responseValue)?.ToString();
 
             Assert.Equal("Đăng nhập thành công.", message);
             Assert.Equal("200", statusCode);
             Assert.Equal("SUCCESS", code);
-
             Assert.NotNull(data);
             Assert.Equal(userDto.Id, data.Id);
             Assert.Equal(userDto.Email, data.Email);
             Assert.Equal(userDto.FullName, data.FullName);
             Assert.Equal(userDto.Role, data.Role);
+            Assert.NotNull(accessToken);
 
-            _userServiceMock.Verify(
-                x => x.LoginAsync(It.Is<UserLoginRq>(r => r.Email == request.Email && r.Password == request.Password)),
-                Times.Once());
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadToken(accessToken) as JwtSecurityToken;
+            Assert.NotNull(jwtToken);
+            var claims = jwtToken.Claims;
+            Assert.Equal("123", claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+            Assert.Equal("user@becamex.com", claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value);
+            Assert.Equal("ADMIN", claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value);
+
+            _userServiceMock.Verify(x => x.LoginAsync(It.Is<UserLoginRq>(r => r.Email == request.Email && r.Password == request.Password)), Times.Once());
         }
         [Fact]
         public async Task GetUserById_ReturnsOk()
@@ -251,7 +289,7 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             }
 
             // Assert
-            var okResult = Assert.IsType<ObjectResult>(response);
+            var okResult = Assert.IsType<OkObjectResult>(response);
             Assert.Equal(200, okResult.StatusCode);
 
             var responseValue = okResult.Value;
@@ -311,7 +349,7 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var result = await _userController.UpdateMyProfile(request);
 
             // Assert
-            var okResult = Assert.IsType<ObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, okResult.StatusCode);
 
             var responseValue = okResult.Value;
@@ -386,7 +424,7 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var result = await _userController.UpdateUserByAdmin(userId, request);
 
             // Assert
-            var okResult = Assert.IsType<ObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, okResult.StatusCode);
 
             var json = JsonConvert.SerializeObject(okResult.Value);
@@ -517,7 +555,7 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var result = await _userController.ChangePassword(request);
 
             // Assert
-            var okResult = Assert.IsType<ObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, okResult.StatusCode);
 
             var json = JsonConvert.SerializeObject(okResult.Value);
@@ -565,7 +603,7 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var result = await _userController.ResetPasswordByAdmin(userId, request);
 
             // Assert
-            var okResult = Assert.IsType<ObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, okResult.StatusCode);
 
             var json = JsonConvert.SerializeObject(okResult.Value);
@@ -624,7 +662,7 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             var result = await _userController.SearchUser(keyword, queryParams);
 
             // Assert
-            var okResult = Assert.IsType<ObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, okResult.StatusCode);
 
             var json = JsonConvert.SerializeObject(okResult.Value);
@@ -659,10 +697,10 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
                 .ReturnsAsync(expectedResult);
 
             // Act
-            var result = await _userController.SoftDeleteUser(targetUserId);
+            var result = await _userController.SoftDeletePasswordByAdmin(targetUserId);
 
             // Assert
-            var okResult = Assert.IsType<ObjectResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, okResult.StatusCode);
 
             var json = JsonConvert.SerializeObject(okResult.Value);

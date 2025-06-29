@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("xUnitQLDT_Becamex.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+34f14496fc72e07f8dcf0a5588c7f66f82df896a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e2a4cf07dada8eacfd17342717867f92976ac6f0")]
 [assembly: System.Reflection.AssemblyProductAttribute("xUnitQLDT_Becamex.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("xUnitQLDT_Becamex.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

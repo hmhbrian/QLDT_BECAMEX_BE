@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
-using QLDT_Becamex.Src.Application.Dtos;
+using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Constant;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Domain.Models;
-using QLDT_Becamex.Src.Services.Interfaces;
 
 
 namespace QLDT_Becamex.Src.Services.Implementations

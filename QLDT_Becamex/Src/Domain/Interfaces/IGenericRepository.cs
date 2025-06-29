@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using QLDT_Becamex.Src.Domain.Entities;
+
+using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Domain.Interfaces
 {
@@ -42,5 +44,8 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
              int? pageSize = null,
              bool asNoTracking = false,
              Func<IQueryable<T>, IQueryable<T>>? includes = null);
+
+        // Lấy một IQueryable để thực hiện các truy vấn phức tạp hơn
+        public IQueryable<T> GetQueryable();
     }
 }

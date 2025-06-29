@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QLDT_Becamex.Src.Application.Common.Mappings;
+using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Domain.Models;
-using QLDT_Becamex.Src.Infrastructure;
-using QLDT_Becamex.Src.Infrastructure.Mappings;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
-using QLDT_Becamex.Src.Services.Implementations;
-using QLDT_Becamex.Src.Services.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services;
+
 
 using System.Text;
 
@@ -99,6 +100,14 @@ builder.Services.AddCors(options =>
     });
 });
 
+// 5. Cấu hình AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+// 5. Cấu hình MediatR
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly);
+});
+
 // 4. Đăng ký Unit of Work, Repositories và Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -106,21 +115,15 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IPositionRepostiory, PositionRepository>();
+builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();
+builder.Services.AddScoped<ICourseCategoryRepository, CourseCategoryRepository>();
 
 // Services
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<IPositionService, PositionService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IUserStatusService, UserStatusService>();
-builder.Services.AddScoped<ICourseStatusService, CourseStatusService>();
+
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IBaseService, BaseService>();
 
-// 5. Cấu hình AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 // 6. Cấu hình Controllers và Swagger/OpenAPI
 builder.Services.AddControllers();
@@ -158,6 +161,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+
 // --- Cấu hình HTTP Request Pipeline (Middleware) ---
 // Thứ tự của các middleware rất quan trọng.
 
@@ -171,7 +175,8 @@ if (app.Environment.IsDevelopment())
 
 // 2. Middleware chuyển hướng HTTPS (Tùy chọn, hiện đang bị comment)
 // app.UseHttpsRedirection();
-
+// --- 🔥 2. Exception Handling Middleware (custom) ---
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // 👈 THÊM Ở ĐÂY
 // 3. Middleware định tuyến
 app.UseRouting(); // Cần thiết nếu bạn muốn các middleware Authorization/Authentication hoạt động trước khi chọn endpoint
 

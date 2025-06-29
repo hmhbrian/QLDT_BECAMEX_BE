@@ -44,7 +44,19 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 if (!statusExists)
                     throw new AppException("Trạng thái khóa học không hợp lệ", 400);
             }
+            if (request.CategoryId.HasValue)
+            {
+                var CategoryExists = await _unitOfWork.CourseCategoryRepository.AnyAsync(s => s.Id == request.CategoryId.Value);
+                if (!CategoryExists)
+                    throw new AppException("Loại khóa học không hợp lệ", 400);
+            }
 
+            if (request.LecturerId.HasValue)
+            {
+                var LecturerExists = await _unitOfWork.LecturerRepository.AnyAsync(s => s.Id == request.LecturerId.Value);
+                if (!LecturerExists)
+                    throw new AppException("Giảng viên khóa học không hợp lệ", 400);
+            }
 
             if (request.DepartmentIds != null && request.DepartmentIds.Any())
             {
@@ -78,16 +90,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalid)}", 400);
             }
 
-
-
-            _mapper.Map(request, course);
-
+            string? imageUrl = null;
             if (request.ThumbUrl != null)
             {
-                var imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
-                course.ThumbUrl = imageUrl;
+                imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
+                
             }
-
+            course.ThumbUrl = imageUrl;
+            _mapper.Map(request, course);
             course.ModifiedAt = DateTime.Now;
             _unitOfWork.CourseRepository.Update(course);
 

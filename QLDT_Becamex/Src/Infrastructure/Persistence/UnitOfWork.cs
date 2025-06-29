@@ -10,13 +10,15 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public IUserRepository UserRepository { get; }
         public IDepartmentRepository DepartmentRepository { get; }
         public IPositionRepostiory PositionRepository { get; }
-        public IUserStatusRepostiory UserStatusRepostiory { get; }
+        public IUserStatusRepostiory UserStatusRepository { get; }
 
         public ICourseDepartmentRepository CourseDepartmentRepository { get; }
         public ICoursePositionRepository CoursePositionRepository { get; }
         public ICourseStatusRepository CourseStatusRepository { get; }
         public ICourseRepository CourseRepository { get; }
         public IUserCourseRepository UserCourseRepository { get; }
+        public ICourseCategoryRepository CourseCategoryRepository { get; }
+        public ILecturerRepository LecturerRepository { get; }
 
 
 
@@ -26,12 +28,14 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             UserRepository = new UserRepository(dbContext);
             DepartmentRepository = new DepartmentRepository(dbContext);
             PositionRepository = new PositionRepository(dbContext);
-            UserStatusRepostiory = new UserStatusRepostiory(dbContext);
+            UserStatusRepository = new UserStatusRepostiory(dbContext);
             CourseDepartmentRepository = new CourseDepartmentRepository(dbContext);
             CoursePositionRepository = new CoursePositionRepository(dbContext);
             CourseStatusRepository = new CourseStatusRepository(dbContext);
             CourseRepository = new CourseRepository(dbContext);
             UserCourseRepository = new UserCourseRepository(dbContext);
+            LecturerRepository = new LecturerRepository(dbContext);
+            CourseCategoryRepository = new CourseCategoryRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

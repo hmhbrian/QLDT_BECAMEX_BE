@@ -38,6 +38,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public DateTime? RegistrationClosingDate { get; set; } = DateTime.Now;
         public string? Location { get; set; }
         public int? StatusId { get; set; }
+        public int? CategoryId { get; set; }
+        public int? LecturerId { get; set; }
         public List<int>? DepartmentIds { get; set; }
         public List<int>? PositionIds { get; set; }
 

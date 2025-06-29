@@ -36,7 +36,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .Where(id => id != -1).ToList();
                 if (statusIds.Any())
                 {
-                    Expression<Func<Course, bool>> statusPredicate = c => statusIds.Contains(c.Status.Id);
+                    Expression<Func<Course, bool>> statusPredicate = c => statusIds.Contains(c.Status!.Id);
                     predicate = predicate == null ? statusPredicate : predicate.And(statusPredicate);
                 }
             }
@@ -64,6 +64,32 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 {
                     Expression<Func<Course, bool>> posPredicate = c => c.CoursePositions != null && c.CoursePositions.Any(cp => posIds.Contains(cp.PositionId));
                     predicate = predicate == null ? posPredicate : predicate.And(posPredicate);
+                }
+            }
+
+            // Filter by CategoryId
+            if (!string.IsNullOrEmpty(queryParam.CategoryIds))
+            {
+                var CategoryId = queryParam.CategoryIds.Split(',')
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
+                    .Where(id => id != -1).ToList();
+                if (CategoryId.Any())
+                {
+                    Expression<Func<Course, bool>> CategoryPredicate = c => CategoryId.Contains(c.Category!.Id);
+                    predicate = predicate == null ? CategoryPredicate : predicate.And(CategoryPredicate);
+                }
+            }
+
+            // Filter by LecturerId
+            if (!string.IsNullOrEmpty(queryParam.LecturerIds))
+            {
+                var LecturerId = queryParam.LecturerIds.Split(',')
+                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
+                    .Where(id => id != -1).ToList();
+                if (LecturerId.Any())
+                {
+                    Expression<Func<Course, bool>> LecturerPredicate = c => LecturerId.Contains(c.Lecturer!.Id);
+                    predicate = predicate == null ? LecturerPredicate : predicate.And(LecturerPredicate);
                 }
             }
 
@@ -96,6 +122,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 .Include(c => c.CoursePositions)!
                     .ThenInclude(cp => cp.Position)
                 .Include(c => c.Status)
+                .Include(c => c.Category)
+                .Include(c => c.Lecturer)
                 .AsNoTracking();
 
             if (predicate != null) query = query.Where(predicate);

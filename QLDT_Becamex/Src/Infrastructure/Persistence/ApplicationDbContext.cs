@@ -20,6 +20,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<CourseDepartment> CourseDepartment { get; set; }
         public DbSet<CoursePosition> CoursePosition { get; set; }
         public DbSet<UserCourse> UserCourse { get; set; }
+        public DbSet<Lecturer> Lecturers { get; set; }
+        public DbSet<CourseCategory> CourseCategories { get; set; }
 
 
 
@@ -41,6 +43,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureCourseDepartment(modelBuilder);
             ConfigureCoursePosition(modelBuilder);
             ConfigureUserCourse(modelBuilder);
+            ConfigureCourseCategory(modelBuilder);
+            ConfigureLecturer(modelBuilder);
 
         }
 
@@ -226,6 +230,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.Property(p => p.StatusId);
 
+                entity.Property(p => p.CategoryId);
+
+                entity.Property(p => p.LecturerId);
+
                 entity.Property(p => p.CreatedAt)
                       .HasColumnType("datetime");
 
@@ -238,6 +246,16 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.HasOne(p => p.Status)
                       .WithMany(s => s.Courses)
                       .HasForeignKey(p => p.StatusId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(p => p.Category)
+                      .WithMany(s => s.Courses)
+                      .HasForeignKey(p => p.CategoryId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(p => p.Lecturer)
+                      .WithMany(s => s.Courses)
+                      .HasForeignKey(p => p.LecturerId)
                       .OnDelete(DeleteBehavior.SetNull);
             });
         }
@@ -286,6 +304,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }
+
         private void ConfigureCoursePosition(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CoursePosition>(entity =>
@@ -335,6 +354,59 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .WithMany(p => p.UserCourse)
                       .HasForeignKey(cp => cp.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        private void ConfigureCourseCategory(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CourseCategory>(entity =>
+            {
+                // Định nghĩa khóa chính
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+
+                entity.Property(p => p.Name)
+                      .IsRequired()  
+                      .HasMaxLength(255);      
+                
+                entity.Property(p => p.Description)
+                      .HasMaxLength(1000);
+
+                entity.HasMany(s => s.Courses)
+                      .WithOne(c => c.Category)
+                      .HasForeignKey(c => c.CategoryId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+        }
+
+        private void ConfigureLecturer(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Lecturer>(entity =>
+            {
+                // Định nghĩa khóa chính
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+
+                entity.Property(p => p.FullName)
+                      .IsRequired()  
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.Email)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.ProfileImageUrl)
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.PhoneNumber)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.HasMany(s => s.Courses)
+                      .WithOne(c => c.Lecturer)
+                      .HasForeignKey(c => c.LecturerId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
             });
         }
     }

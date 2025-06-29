@@ -25,10 +25,12 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
                 predicate: c => c.Id == request.Id,
                 includes: q => q
-                    .Include(c => c.CourseDepartments)
-                    .Include(c => c.CoursePositions)
+                    .Include(c => c.CourseDepartments)!.ThenInclude(cd => cd.Department)
+                    .Include(c => c.CoursePositions)!.ThenInclude(cp => cp.Position)
                     .Include(c => c.UserCourses)
                     .Include(c => c.Status)
+                    .Include(c => c.Category)
+                    .Include(c => c.Lecturer)
             );
 
             if (course == null)

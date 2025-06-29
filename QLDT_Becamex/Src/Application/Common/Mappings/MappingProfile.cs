@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Lecturer, LecturerDto>().ReverseMap();
             CreateMap<LecturerDtoRq, Lecturer>();
 
-            //Lecturer
+            //CourseCategory
             CreateMap<CourseCategory, CourseCategoryDto>().ReverseMap();
             CreateMap<CourseCategoryRqDto, CourseCategory>();
 

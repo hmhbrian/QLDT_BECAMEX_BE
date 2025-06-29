@@ -30,6 +30,10 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
 
         public int? StatusId { get; set; }
         public CourseStatus? Status { get; set; }
+        public int? CategoryId { get; set; }
+        public Domain.Entities.CourseCategory? Category { get; set; }
+        public int? LecturerId { get; set; }
+        public Domain.Entities.Lecturer? Lecturer { get; set; }
         public ICollection<DepartmentDto>? Departments { get; set; } = new List<DepartmentDto>();
         public ICollection<PositionDto>? Positions { get; set; } = new List<PositionDto>();
     }

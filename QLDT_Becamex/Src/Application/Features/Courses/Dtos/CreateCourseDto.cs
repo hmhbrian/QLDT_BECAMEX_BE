@@ -38,66 +38,44 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public DateTime? RegistrationClosingDate { get; set; } = DateTime.Now;
         public string? Location { get; set; }
         public int? StatusId { get; set; }
+        public int? CategoryId { get; set; }
+        public int? LecturerId { get; set; }
         public List<int>? DepartmentIds { get; set; }
         public List<int>? PositionIds { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (RegistrationStartDate == null)
+            if (RegistrationStartDate.HasValue && StartDate.HasValue &&
+                RegistrationStartDate.Value >= StartDate.Value)
             {
                 yield return new ValidationResult(
-                    "Vui lòng nhập ngày bắt đầu đăng ký.",
+                    "Ngày bắt đầu đăng ký phải trước ngày bắt đầu khóa học",
                     new[] { nameof(RegistrationStartDate) });
             }
-            if (RegistrationClosingDate == null)
-            {
-                yield return new ValidationResult(
-                    "Vui lòng nhập hạn đăng ký.",
-                    new[] { nameof(RegistrationStartDate) });
-            }
-            if (StartDate == null)
-            {
-                yield return new ValidationResult(
-                    "Vui lòng nhập ngày bắt đầu học.",
-                    new[] { nameof(RegistrationStartDate) });
-            }
-            if (EndDate == null)
-            {
-                yield return new ValidationResult(
-                    "Vui lòng nhập ngày hoàn thành khóa học.",
-                    new[] { nameof(RegistrationStartDate) });
-            }
-            if (RegistrationStartDate.HasValue && RegistrationClosingDate.HasValue && StartDate.HasValue && EndDate.HasValue)
-            {
-                
-                if (RegistrationStartDate.Value >= StartDate.Value)
-                {
-                    yield return new ValidationResult(
-                        "Ngày bắt đầu đăng ký phải trước ngày bắt đầu khóa học",
-                        new[] { nameof(RegistrationStartDate) });
-                }
 
-                if (RegistrationClosingDate.Value > StartDate.Value)
-                {
-                    yield return new ValidationResult(
-                        "Ngày kết thúc đăng ký phải trước hoặc bằng ngày bắt đầu khóa học",
-                        new[] { nameof(RegistrationClosingDate) });
-                }
+            if (RegistrationClosingDate.HasValue && StartDate.HasValue &&
+                RegistrationClosingDate.Value > StartDate.Value)
+            {
+                yield return new ValidationResult(
+                    "Ngày kết thúc đăng ký phải trước hoặc bằng ngày bắt đầu khóa học",
+                    new[] { nameof(RegistrationClosingDate) });
+            }
 
-                if (RegistrationStartDate.Value >= RegistrationClosingDate.Value)
-                {
-                    yield return new ValidationResult(
-                        "Ngày bắt đầu đăng ký phải trước ngày kết thúc đăng ký",
-                        new[] { nameof(RegistrationStartDate), nameof(RegistrationClosingDate) });
-                }
+            if (RegistrationStartDate.HasValue && RegistrationClosingDate.HasValue &&
+                RegistrationStartDate.Value >= RegistrationClosingDate.Value)
+            {
+                yield return new ValidationResult(
+                    "Ngày bắt đầu đăng ký phải trước ngày kết thúc đăng ký",
+                    new[] { nameof(RegistrationStartDate), nameof(RegistrationClosingDate) });
+            }
 
-                if (StartDate.Value >= EndDate.Value)
-                {
-                    yield return new ValidationResult(
-                        "Ngày bắt đầu khóa học phải trước ngày kết thúc",
-                        new[] { nameof(StartDate), nameof(EndDate) });
-                }
-            }    
+            if (StartDate.HasValue && EndDate.HasValue &&
+                StartDate.Value >= EndDate.Value)
+            {
+                yield return new ValidationResult(
+                    "Ngày bắt đầu khóa học phải trước ngày kết thúc",
+                    new[] { nameof(StartDate), nameof(EndDate) });
+            }
         }
     }
 

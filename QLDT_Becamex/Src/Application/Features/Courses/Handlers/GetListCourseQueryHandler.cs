@@ -51,6 +51,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .Include(c => c.CoursePositions)!
                         .ThenInclude(cp => cp.Position)
                     .Include(c => c.Status)
+                    .Include(c => c.Category)
+                    .Include(c => c.Lecturer)
             );
 
             var pagination = new Pagination

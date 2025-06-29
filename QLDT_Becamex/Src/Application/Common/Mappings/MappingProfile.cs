@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
+using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
@@ -22,6 +24,13 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();
             CreateMap<UserStatusDtoRq, UserStatus>();
 
+            //Lecturer
+            CreateMap<Lecturer, LecturerDto>().ReverseMap();
+            CreateMap<LecturerDtoRq, Lecturer>();
+
+            //Lecturer
+            CreateMap<CourseCategory, CourseCategoryDto>().ReverseMap();
+            CreateMap<CourseCategoryRqDto, CourseCategory>();
 
             //Department
             CreateMap<DepartmentRequestDto, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId));
@@ -48,7 +57,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     PositionId = cp.PositionId,
                     PositionName = cp.Position.PositionName,
                 }).ToList()))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.Lecturer))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category));
 
             CreateMap<CourseDto, Course>();
 

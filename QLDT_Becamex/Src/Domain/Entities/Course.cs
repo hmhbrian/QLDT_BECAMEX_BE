@@ -25,10 +25,13 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime? ModifiedAt { get; set; }
         public int? StatusId { get; set; }
         public CourseStatus? Status { get; set; }
+        public int? CategoryId { get; set; }
+        public CourseCategory? Category { get; set; }
+        public int? LecturerId { get; set; }
+        public Lecturer? Lecturer { get; set; }
         public bool IsDeleted { get; set; } = false;
         public ICollection<CourseDepartment>? CourseDepartments { get; set; } = new List<CourseDepartment>();
         public ICollection<CoursePosition>? CoursePositions { get; set; } = new List<CoursePosition>();
         public ICollection<UserCourse>? UserCourses { get; set; } = new List<UserCourse>();
-
     }
 }

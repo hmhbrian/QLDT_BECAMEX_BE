@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Application.Features.Positions.Handlers
 
         public async Task<string> Handle(CreatePositionCommand request, CancellationToken cancellationToken)
         {
-            var exists = await _unitOfWork.PositionRepository.GetFirstOrDefaultAsync(x => x.PositionName.ToLower() == request.Request.PositionName.ToLower());
+            var exists = await _unitOfWork.PositionRepository.GetFirstOrDefaultAsync(x => x.PositionName!.ToLower() == request.Request.PositionName.ToLower());
             if (exists != null)
                 throw new AppException("Vị trí đã tồn tại", 409);
 
@@ -46,7 +46,7 @@ namespace QLDT_Becamex.Src.Application.Features.Positions.Handlers
             if (entity == null)
                 throw new AppException("Không tìm thấy vị trí", 404);
 
-            var exists = await _unitOfWork.PositionRepository.GetFirstOrDefaultAsync(x => x.PositionName.ToLower() == request.Request.PositionName.ToLower() && x.PositionId != request.Id);
+            var exists = await _unitOfWork.PositionRepository.GetFirstOrDefaultAsync(x => x.PositionName!.ToLower() == request.Request.PositionName.ToLower() && x.PositionId != request.Id);
             if (exists != null)
                 throw new AppException("Tên vị trí đã tồn tại", 409);
 
@@ -66,7 +66,7 @@ namespace QLDT_Becamex.Src.Application.Features.Positions.Handlers
 
             _unitOfWork.PositionRepository.Remove(entity);
             await _unitOfWork.CompleteAsync();
-            return entity.PositionId.ToString();
+            return entity.PositionId.ToString()!;
         }
 
         public async Task<IEnumerable<PositionDto>> Handle(GetAllPositionsQuery request, CancellationToken cancellationToken)

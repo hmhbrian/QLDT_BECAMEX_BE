@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> CreateCourse([FromForm] CreateCourseDto request)
         {
             var result = await _mediator.Send(new CreateCourseCommand(request));
-            return Ok(ApiResponse.Ok(result));
+            return Ok(ApiResponse.Ok("Tạo khóa học thành công"));
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> UpdateCourse(string id, [FromForm] CreateCourseDto request)
         {
             var result = await _mediator.Send(new UpdateCourseCommand(id, request));
-            return Ok(ApiResponse.Ok(result));
+            return Ok(ApiResponse.Ok("Cập nhật khóa học thành công"));
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> DeleteCourse([FromQuery] string id)
         {
             var result = await _mediator.Send(new DeleteCourseCommand(id));
-            return Ok(ApiResponse.Ok(result));
+            return Ok(ApiResponse.Ok("Xóa khóa học thành công"));
         }
     }
 }

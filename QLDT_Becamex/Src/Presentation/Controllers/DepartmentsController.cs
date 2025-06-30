@@ -26,7 +26,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> CreateDepartment([FromBody] DepartmentRequestDto request)
         {
             var result = await _mediator.Send(new CreateDepartmentCommand(request));
-            return Ok(ApiResponse<string>.Ok(result));
+            return Ok(ApiResponse<string>.Ok("Tạo phòng ban thành công"));
 
         }
 
@@ -51,7 +51,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentRequestDto request)
         {
             var result = await _mediator.Send(new UpdateDepartmentCommand(id, request));
-            return Ok(ApiResponse<DepartmentDto>.Ok(result));
+            return Ok(ApiResponse.Ok("Cập nhật phòng ban thành công"));
         }
 
         [HttpDelete("{id}")]
@@ -59,7 +59,7 @@ namespace QLDT_Becamex.Src.Controllers
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             var result = await _mediator.Send(new DeleteDepartmentCommand(id));
-            return Ok(ApiResponse<bool>.Ok(result));
+            return Ok(ApiResponse.Ok("Xóa phòng ban thành công"));
         }
     }
 }

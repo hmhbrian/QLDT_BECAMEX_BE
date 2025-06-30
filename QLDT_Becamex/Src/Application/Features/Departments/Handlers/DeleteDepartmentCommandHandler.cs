@@ -115,7 +115,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
             {
                 child.ParentId = newParentId;
                 child.Level = newLevel;
-                child.Status = "inactive";
+                child.Status = 1; //inactive
                 child.UpdatedAt = DateTime.Now;
 
                 departmentDict[child.DepartmentId] = child;

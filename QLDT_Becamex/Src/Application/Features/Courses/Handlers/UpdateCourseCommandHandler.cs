@@ -72,6 +72,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                         var children = await _baseService.GetAllChildDepartmentIds(deptId);
                         foreach (var child in children) allIds.Add(child);
                     }
+                
                 }
                 if (invalid.Any())
                     throw new AppException($"Phòng ban không hợp lệ: {string.Join(", ", invalid)}", 400);
@@ -89,7 +90,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 if (invalid.Any())
                     throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalid)}", 400);
             }
-
+            _mapper.Map(request, course);
             string? imageUrl = null;
             if (request.ThumbUrl != null)
             {
@@ -97,7 +98,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 
             }
             course.ThumbUrl = imageUrl;
-            _mapper.Map(request, course);
+            
             course.ModifiedAt = DateTime.Now;
             _unitOfWork.CourseRepository.Update(course);
 

@@ -22,7 +22,7 @@ public class ChangePasswordUserCommandHandler : IRequestHandler<ChangePasswordUs
 
         var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
 
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId!);
         if (user == null)
             throw new AppException("Không tìm thấy người dùng", 404);
 

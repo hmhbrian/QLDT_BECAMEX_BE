@@ -14,7 +14,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string? ManagerId { get; set; }
         public ApplicationUser? Manager { get; set; }
         public string? Description { get; set; }
-        public string? Status { get; set; }
+        public int? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

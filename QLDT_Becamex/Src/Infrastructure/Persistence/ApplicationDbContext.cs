@@ -137,8 +137,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(d => d.Description)
                       .HasMaxLength(1000); // Giới hạn độ dài cho Description
 
-                entity.Property(d => d.Status)
-                      .HasMaxLength(1000);
+                entity.Property(d => d.Status);
                 entity.Property(d => d.CreatedAt);
                 entity.Property(d => d.UpdatedAt);
             });

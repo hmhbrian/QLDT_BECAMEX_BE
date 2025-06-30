@@ -65,7 +65,7 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
             if (!createResult.Succeeded)
                 throw new AppException("Tạo user thất bại", 500);
 
-            await _userManager.AddToRoleAsync(user, role.Name);
+            await _userManager.AddToRoleAsync(user, role.Name!);
 
             return user.Id;
         }

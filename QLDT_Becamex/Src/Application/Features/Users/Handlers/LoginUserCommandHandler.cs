@@ -55,7 +55,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 var roles = await _userManager.GetRolesAsync(user);
                 userDto.Role = roles.FirstOrDefault();
                 userDto.Position = _mapper.Map<PositionDto>(user.Position);
-                userDto.AccessToken = _jwtService.GenerateJwtToken(user.Id, user.Email, userDto.Role);
+                userDto.AccessToken = _jwtService.GenerateJwtToken(user.Id, user.Email!, userDto.Role!);
 
                 return userDto;
             }

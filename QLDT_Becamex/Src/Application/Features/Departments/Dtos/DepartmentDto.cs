@@ -10,7 +10,7 @@
         public string? ParentName { get; set; }
         public string? ManagerId { get; set; }
         public string? ManagerName { get; set; }
-        public string? Status { get; set; }
+        public int? Status { get; set; }
         public int Level { get; set; }
         public List<string>? Path { get; set; }
         public DateTime CreatedAt { get; set; }

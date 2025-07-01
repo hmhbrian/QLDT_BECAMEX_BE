@@ -37,7 +37,7 @@ namespace QLDT_Becamex.Src.Application.Features.Positions.Handlers
             await _unitOfWork.CompleteAsync();
 
             _mapper.Map<PositionDto>(entity);
-            return exists.PositionId.ToString();
+            return entity.PositionId.ToString();
         }
 
         public async Task<string> Handle(UpdatePositionCommand request, CancellationToken cancellationToken)
@@ -55,7 +55,7 @@ namespace QLDT_Becamex.Src.Application.Features.Positions.Handlers
             await _unitOfWork.CompleteAsync();
 
             _mapper.Map<PositionDto>(entity);
-            return exists.PositionId.ToString();
+            return entity.PositionId.ToString();
         }
 
         public async Task<string> Handle(DeletePositionCommand request, CancellationToken cancellationToken)

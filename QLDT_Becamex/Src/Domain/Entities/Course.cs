@@ -33,5 +33,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public ICollection<CourseDepartment>? CourseDepartments { get; set; } = new List<CourseDepartment>();
         public ICollection<CoursePosition>? CoursePositions { get; set; } = new List<CoursePosition>();
         public ICollection<UserCourse>? UserCourses { get; set; } = new List<UserCourse>();
+        public ICollection<Lesson>? Lessons { get; set; } = new List<Lesson>();
+        public ICollection<Test>? Tests { get; set; } = new List<Test>();
     }
 }

@@ -6,7 +6,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class Position
     {
-        public int? PositionId { get; set; } // Khóa chính
+        public int PositionId { get; set; } // Khóa chính
         public string? PositionName { get; set; }
 
 

@@ -92,12 +92,13 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
             _mapper.Map(request, course);
             string? imageUrl = null;
-            if (request.ThumbUrl != null)
+            if (request.ThumbUrl != null )
             {
                 imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
-                
+                course.ThumbUrl = imageUrl;
+
             }
-            course.ThumbUrl = imageUrl;
+           
             
             course.ModifiedAt = DateTime.Now;
             _unitOfWork.CourseRepository.Update(course);

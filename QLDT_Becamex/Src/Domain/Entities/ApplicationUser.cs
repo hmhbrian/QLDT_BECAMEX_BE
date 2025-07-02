@@ -1,6 +1,5 @@
 ﻿// Ví dụ: Src/Models/ApplicationUser.cs
 using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp với nơi bạn định nghĩa ApplicationUser
 {

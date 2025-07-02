@@ -13,6 +13,8 @@
         public IUserCourseRepository UserCourseRepository { get; }
         public ICourseCategoryRepository CourseCategoryRepository { get; }
         public ILecturerRepository LecturerRepository { get; }
+        public ICourseAttachedFileRepository CourseAttachedFileRepository { get; }
+
 
 
 

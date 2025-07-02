@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
@@ -70,6 +71,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             //CourseStatus
             CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
             CreateMap<CreateCourseStatusDto, CourseStatus>().ReverseMap();
+
+            //CourseAttachedFile
+            CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();
+
 
         }
     }

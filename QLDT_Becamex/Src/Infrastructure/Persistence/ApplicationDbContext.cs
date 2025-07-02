@@ -19,6 +19,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<CourseStatus> CourseStatus { get; set; }
         public DbSet<CourseDepartment> CourseDepartment { get; set; }
         public DbSet<CoursePosition> CoursePosition { get; set; }
+        public DbSet<CourseAttachedFile> CourseAttachedFile { get; set; }
+
         public DbSet<UserCourse> UserCourse { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<CourseCategory> CourseCategories { get; set; }
@@ -42,6 +44,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureCourseStatus(modelBuilder);
             ConfigureCourseDepartment(modelBuilder);
             ConfigureCoursePosition(modelBuilder);
+            ConfigureCourseAttachedFile(modelBuilder);
             ConfigureUserCourse(modelBuilder);
             ConfigureCourseCategory(modelBuilder);
             ConfigureLecturer(modelBuilder);
@@ -256,6 +259,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .WithMany(s => s.Courses)
                       .HasForeignKey(p => p.LecturerId)
                       .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasMany(x => x.AttachedFiles)
+                      .WithOne(x => x.Course)
+                      .HasForeignKey(x => x.CourseId);
             });
         }
 
@@ -280,6 +287,51 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .OnDelete(DeleteBehavior.SetNull);
             });
         }
+
+        private void ConfigureCourseAttachedFile(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CourseAttachedFile>(entity =>
+            {
+                entity.ToTable("CourseAttachedFile");
+
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.CourseId)
+                      .IsRequired();
+
+                entity.Property(x => x.Title)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.Type)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.Property(x => x.Link)
+                      .HasMaxLength(500)
+                      .IsRequired();
+
+                entity.Property(x => x.UserId)
+                      .IsRequired();
+
+                entity.Property(x => x.CreatedAt)
+                    .IsRequired();
+
+                entity.Property(x => x.ModifiedTime)
+                    .IsRequired();
+
+                entity.HasOne(f => f.Course)
+                      .WithMany(c => c.AttachedFiles)
+                      .HasForeignKey(f => f.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(f => f.UserCreated)
+                      .WithMany()
+                      .HasForeignKey(f => f.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
 
         private void ConfigureCourseDepartment(ModelBuilder modelBuilder)
         {
@@ -365,9 +417,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(p => p.Id).ValueGeneratedOnAdd();
 
                 entity.Property(p => p.Name)
-                      .IsRequired()  
-                      .HasMaxLength(255);      
-                
+                      .IsRequired()
+                      .HasMaxLength(255);
+
                 entity.Property(p => p.Description)
                       .HasMaxLength(1000);
 
@@ -387,7 +439,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(p => p.Id).ValueGeneratedOnAdd();
 
                 entity.Property(p => p.FullName)
-                      .IsRequired()  
+                      .IsRequired()
                       .HasMaxLength(255);
 
                 entity.Property(p => p.Email)

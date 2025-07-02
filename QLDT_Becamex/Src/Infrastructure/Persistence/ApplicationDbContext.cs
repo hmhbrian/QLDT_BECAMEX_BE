@@ -24,7 +24,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<UserCourse> UserCourse { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<CourseCategory> CourseCategories { get; set; }
-        public DbSet<Lesson> Lessons { get; set; } 
+        public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<Question> Questions { get; set; }
 
@@ -476,79 +476,109 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.HasKey(e => e.Id);
 
                 entity.Property(s => s.Id)
-                   .IsRequired().ValueGeneratedOnAdd();
-
-                entity.HasOne(cp => cp.Course)
-                      .WithMany(c => c.Lessons)
-                      .HasForeignKey(cp => cp.Course_id)
-                      .OnDelete(DeleteBehavior.NoAction);
-
-                entity.Property(p => p.Title)
                       .IsRequired()
-                      .HasMaxLength(255);
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id"); ;
 
-                entity.Property(p => p.Content_pdf)
+                entity.Property(e => e.Title)
                       .IsRequired()
-                      .HasMaxLength(255);
+                      .HasMaxLength(255)
+                      .HasColumnName("title");
 
-                entity.Property(p => p.Order).IsRequired();
+                entity.Property(e => e.UrlPdf) // sửa từ Content_pdf
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("url_pdf"); // nếu DB xài snake_case
 
-                entity.HasOne(cp => cp.UserCreated)
-                      .WithMany(p => p.CreatedLesson)
-                      .HasForeignKey(cp => cp.UserId_created)
-                      .IsRequired(false)
+                entity.Property(e => e.Order)
+                      .IsRequired()
+                      .HasColumnName("order");
+
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+                entity.HasOne(e => e.Course)
+                 .WithMany(c => c.Lessons)
+                 .HasForeignKey(e => e.CourseId)
+                 .HasConstraintName("FK_Lessons_Courses")
+                 .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.UserCreated)
+                     .WithMany(u => u.CreatedLesson)
+                     .HasForeignKey(e => e.UserIdCreated)
+                     .HasConstraintName("FK_Lessons_UserCreated")
+                     .OnDelete(DeleteBehavior.NoAction);
+
+
+                entity.HasOne(e => e.UserEdited)
+                      .WithMany(u => u.UpdatedLesson)
+                      .HasForeignKey(e => e.UserIdEdited)
+                      .HasConstraintName("FK_Lessons_UserEdited")
                       .OnDelete(DeleteBehavior.NoAction);
 
-                entity.HasOne(cp => cp.UserEdited)
-                      .WithMany(p => p.UpdatedLesson)
-                      .HasForeignKey(cp => cp.UserId_edited)
-                      .OnDelete(DeleteBehavior.NoAction);
-
-                entity.Property(d => d.CreatedAt);
-
-                entity.Property(d => d.UpdatedAt);
             });
         }
+
 
         private void ConfigureTest(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Test>(entity =>
             {
-                entity.ToTable("Tests");
+                entity.ToTable("tests"); // table name snake_case
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(s => s.Id)
-                   .IsRequired().ValueGeneratedOnAdd();
-
-                entity.HasOne(cp => cp.Course)
-                      .WithMany(c => c.Tests)
-                      .HasForeignKey(cp => cp.Course_id)
-                      .OnDelete(DeleteBehavior.NoAction);
-
-                entity.Property(p => p.Title)
+                entity.Property(e => e.Id)
                       .IsRequired()
-                      .HasMaxLength(255);
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id");
 
-                entity.Property(p => p.Pass_threshold);
+                entity.Property(e => e.Title)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("title");
 
-                entity.Property(p => p.Time_test);
+                entity.Property(e => e.PassThreshold)
+                      .HasColumnName("pass_threshold");
 
-                entity.HasOne(cp => cp.UserCreated)
-                      .WithMany(p => p.CreatedTest)
-                      .HasForeignKey(cp => cp.UserId_created)
-                      .OnDelete(DeleteBehavior.NoAction);
+                entity.Property(e => e.TimeTest)
+                      .HasColumnName("time_test");
 
-                entity.HasOne(cp => cp.UserEdited)
-                      .WithMany(p => p.UpdatedTest)
-                      .HasForeignKey(cp => cp.UserId_edited)
-                      .OnDelete(DeleteBehavior.NoAction);
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnName("created_at");
 
-                entity.Property(d => d.CreatedAt);
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnName("updated_at");
 
-                entity.Property(d => d.UpdatedAt);
+                entity.Property(e => e.CourseId)
+                      .HasColumnName("course_id");
+
+                entity.Property(e => e.UserIdCreated)
+                      .HasColumnName("user_id_created");
+
+                entity.Property(e => e.UserIdEdited)
+                      .HasColumnName("user_id_edited");
+
+                entity.HasOne(e => e.Course)
+                      .WithMany(c => c.Tests)
+                      .HasForeignKey(e => e.CourseId)
+                      .OnDelete(DeleteBehavior.NoAction)
+                      .HasConstraintName("fk_tests_courses");
+
+                entity.HasOne(e => e.UserCreated)
+                      .WithMany(u => u.CreatedTest)
+                      .HasForeignKey(e => e.UserIdCreated)
+                      .OnDelete(DeleteBehavior.NoAction)
+                      .HasConstraintName("fk_tests_user_created");
+
+                entity.HasOne(e => e.UserEdited)
+                      .WithMany(u => u.UpdatedTest)
+                      .HasForeignKey(e => e.UserIdEdited)
+                      .OnDelete(DeleteBehavior.NoAction)
+                      .HasConstraintName("fk_tests_user_edited");
             });
         }
+
 
         private void ConfigureQuestion(ModelBuilder modelBuilder)
         {

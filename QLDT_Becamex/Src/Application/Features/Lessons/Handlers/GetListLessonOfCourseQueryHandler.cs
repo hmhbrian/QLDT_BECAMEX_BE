@@ -24,7 +24,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 throw new AppException("Khóa học không tồn tại", 404);
             }
             var lessons = await _unitOfWork.LessonRepository.GetFlexibleAsync(
-                predicate: l => l.Course_id == request.CourseId,
+                predicate: l => l.CourseId == request.CourseId,
                 orderBy: q => q.OrderBy(l => l.Order)
             );
             if (lessons == null)

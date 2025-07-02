@@ -428,14 +428,14 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.HasOne(cp => cp.Course)
                       .WithMany(c => c.Lessons)
-                      .HasForeignKey(cp => cp.course_id)
+                      .HasForeignKey(cp => cp.Course_id)
                       .OnDelete(DeleteBehavior.NoAction);
 
-                entity.Property(p => p.title)
+                entity.Property(p => p.Title)
                       .IsRequired()
                       .HasMaxLength(255);
 
-                entity.Property(p => p.content_pdf)
+                entity.Property(p => p.Content_pdf)
                       .IsRequired()
                       .HasMaxLength(255);
 
@@ -443,13 +443,13 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.HasOne(cp => cp.UserCreated)
                       .WithMany(p => p.CreatedLesson)
-                      .HasForeignKey(cp => cp.userId_created)
+                      .HasForeignKey(cp => cp.UserId_created)
                       .IsRequired(false)
                       .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(cp => cp.UserEdited)
                       .WithMany(p => p.UpdatedLesson)
-                      .HasForeignKey(cp => cp.userId_edited)
+                      .HasForeignKey(cp => cp.UserId_edited)
                       .OnDelete(DeleteBehavior.NoAction);
 
                 entity.Property(d => d.CreatedAt);
@@ -471,25 +471,25 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.HasOne(cp => cp.Course)
                       .WithMany(c => c.Tests)
-                      .HasForeignKey(cp => cp.course_id)
+                      .HasForeignKey(cp => cp.Course_id)
                       .OnDelete(DeleteBehavior.NoAction);
 
-                entity.Property(p => p.title)
+                entity.Property(p => p.Title)
                       .IsRequired()
                       .HasMaxLength(255);
 
-                entity.Property(p => p.pass_threshold);
+                entity.Property(p => p.Pass_threshold);
 
-                entity.Property(p => p.time_test);
+                entity.Property(p => p.Time_test);
 
                 entity.HasOne(cp => cp.UserCreated)
                       .WithMany(p => p.CreatedTest)
-                      .HasForeignKey(cp => cp.userId_created)
+                      .HasForeignKey(cp => cp.UserId_created)
                       .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(cp => cp.UserEdited)
                       .WithMany(p => p.UpdatedTest)
-                      .HasForeignKey(cp => cp.userId_edited)
+                      .HasForeignKey(cp => cp.UserId_edited)
                       .OnDelete(DeleteBehavior.NoAction);
 
                 entity.Property(d => d.CreatedAt);
@@ -511,16 +511,16 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.HasOne(cp => cp.Test)
                       .WithMany(c => c.Tests)
-                      .HasForeignKey(cp => cp.test_id)
+                      .HasForeignKey(cp => cp.Test_id)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.Property(p => p.question_text)
+                entity.Property(p => p.Question_text)
                       .IsRequired()
                       .HasMaxLength(255);
 
-                entity.Property(p => p.question_type);
+                entity.Property(p => p.Question_type);
 
-                entity.Property(p => p.explanation)
+                entity.Property(p => p.Explanation)
                       .IsRequired()
                       .HasMaxLength(255);
 

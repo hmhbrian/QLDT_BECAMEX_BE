@@ -5,6 +5,7 @@ using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
+using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
@@ -71,6 +72,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
             CreateMap<CreateCourseStatusDto, CourseStatus>().ReverseMap();
 
+            //Lesson
+            CreateMap<Lesson, AllLessonDto>().ReverseMap();
+            CreateMap<Lesson, DetailLessonDto>()
+                .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.UserId_created))
+                .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserId_edited));
         }
     }
 }

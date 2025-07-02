@@ -12,6 +12,7 @@ using System.Linq;
 using System.Collections.Generic; // Cần thiết cho List
 
 using DomainEntities = QLDT_Becamex.Src.Domain.Entities;
+using Azure.Core;
 
 namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
 {
@@ -40,12 +41,21 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                 throw new AppException("Không tìm thấy thông tin người dùng được xác thực.", 401);
             }
 
+            var existingCourse = await _unitOfWork.CourseRepository.GetByIdAsync(courseId);
+
+            if (existingCourse == null)
+            {
+                throw new AppException($"Course with ID: {courseId} not found.", 404);
+            }
+
             var createdFilesDto = new List<CourseAttachedFileDto>(); // Danh sách để lưu các DTO kết quả
+
 
             foreach (var request in requests)
             {
                 string? fileOrLinkUrl = null;
                 string fileType = "";
+                string? filePublicId = null; // Biến để lưu PublicId
 
                 // Kiểm tra xem có Title không
                 if (string.IsNullOrEmpty(request.Title))
@@ -90,7 +100,9 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                     try
                     {
                         // Gọi hàm UploadPdfAsync từ CloudinaryService của bạn
-                        fileOrLinkUrl = await _cloudinaryService.UploadPdfAsync(request.File);
+                        var uploadResult = await _cloudinaryService.UploadPdfAsync(request.File, "Course_pdfs");
+                        fileOrLinkUrl = uploadResult?.url; // Lấy URL từ kết quả upload
+                        filePublicId = uploadResult?.publicId; // Lấy PublicId từ kết quả upload
                         if (fileOrLinkUrl == null)
                         {
                             throw new AppException($"Không thể tải file '{request.File.FileName}' lên dịch vụ lưu trữ.", 500);
@@ -115,6 +127,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                     Title = request.Title!,
                     Type = fileType,
                     Link = fileOrLinkUrl!,
+                    PublicIdUrlPdf = filePublicId,
                     UserId = userId!,
                     CreatedAt = DateTime.Now,
                     ModifiedTime = DateTime.Now
@@ -131,6 +144,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                     Title = newAttachedFile.Title,
                     Type = newAttachedFile.Type,
                     Link = newAttachedFile.Link,
+                    PublicIdUrlPdf = newAttachedFile.PublicIdUrlPdf,
                     CreatedAt = newAttachedFile.CreatedAt
                 });
             }

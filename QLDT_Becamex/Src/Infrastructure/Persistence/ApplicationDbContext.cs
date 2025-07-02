@@ -314,17 +314,19 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasMaxLength(100);
 
                 entity.Property(x => x.Link)
-                      .HasMaxLength(500)
-                      .IsRequired();
+                      .HasMaxLength(200);
+
+                entity.Property(x => x.PublicIdUrlPdf)
+                      .HasMaxLength(200);
+
+
 
                 entity.Property(x => x.UserId)
                       .IsRequired();
 
-                entity.Property(x => x.CreatedAt)
-                    .IsRequired();
+                entity.Property(x => x.CreatedAt);
 
-                entity.Property(x => x.ModifiedTime)
-                    .IsRequired();
+                entity.Property(x => x.ModifiedTime);
 
                 entity.HasOne(f => f.Course)
                       .WithMany(c => c.AttachedFiles)
@@ -489,6 +491,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("url_pdf");
+
+                entity.Property(e => e.PublicIdUrlPdf)
+                     .IsRequired()
+                     .HasMaxLength(255)
+                     .HasColumnName("public_id_url_pdf");
 
                 entity.Property(e => e.Position)
                       .IsRequired()

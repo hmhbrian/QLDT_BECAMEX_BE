@@ -12,7 +12,7 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250702034502_RefactorRenameFieldToQuestion")]
+    [Migration("20250702040022_RefactorRenameFieldToQuestion")]
     partial class RefactorRenameFieldToQuestion
     {
         /// <inheritdoc />
@@ -596,15 +596,16 @@ namespace QLDT_Becamex.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("course_id");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("Order")
+                    b.Property<int>("Position")
                         .HasColumnType("int")
-                        .HasColumnName("order");
+                        .HasColumnName("position");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -623,10 +624,12 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnName("url_pdf");
 
                     b.Property<string>("UserIdCreated")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id_created");
 
                     b.Property<string>("UserIdEdited")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id_edited");
 
                     b.HasKey("Id");
 
@@ -667,44 +670,40 @@ namespace QLDT_Becamex.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("A")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("a");
 
                     b.Property<string>("B")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("b");
 
                     b.Property<string>("C")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("c");
 
                     b.Property<string>("CorrectOption")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("correct_option");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<string>("D")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("d");
 
                     b.Property<string>("Explanation")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("explanation");
 
                     b.Property<string>("QuestionText")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("question_text");
@@ -713,7 +712,7 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("int")
                         .HasColumnName("question_type");
 
-                    b.Property<int?>("TestId")
+                    b.Property<int>("TestId")
                         .HasColumnType("int")
                         .HasColumnName("test_id");
 
@@ -725,7 +724,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("TestId");
 
-                    b.ToTable("questions", (string)null);
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Test", b =>
@@ -779,7 +778,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("UserIdEdited");
 
-                    b.ToTable("tests", (string)null);
+                    b.ToTable("Tests", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
@@ -1021,19 +1020,19 @@ namespace QLDT_Becamex.Migrations
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
-                        .HasConstraintName("FK_Lessons_Courses");
+                        .HasConstraintName("fk_lessons_courses");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
                         .WithMany("CreatedLesson")
                         .HasForeignKey("UserIdCreated")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .HasConstraintName("FK_Lessons_UserCreated");
+                        .HasConstraintName("fk_lessons_user_created");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserEdited")
                         .WithMany("UpdatedLesson")
                         .HasForeignKey("UserIdEdited")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .HasConstraintName("FK_Lessons_UserEdited");
+                        .HasConstraintName("fk_lessons_user_edited");
 
                     b.Navigation("Course");
 
@@ -1048,6 +1047,7 @@ namespace QLDT_Becamex.Migrations
                         .WithMany("Questions")
                         .HasForeignKey("TestId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_questions_tests");
 
                     b.Navigation("Test");

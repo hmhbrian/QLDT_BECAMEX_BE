@@ -471,60 +471,71 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             modelBuilder.Entity<Lesson>(entity =>
             {
-                entity.ToTable("Lessons");
+                entity.ToTable("Lessons"); // ✅ table snake_case
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(s => s.Id)
+                entity.Property(e => e.Id)
                       .IsRequired()
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id"); ;
+                      .HasColumnName("id");
 
                 entity.Property(e => e.Title)
                       .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("title");
 
-                entity.Property(e => e.UrlPdf) // sửa từ Content_pdf
+                entity.Property(e => e.UrlPdf)
                       .IsRequired()
                       .HasMaxLength(255)
-                      .HasColumnName("url_pdf"); // nếu DB xài snake_case
+                      .HasColumnName("url_pdf");
 
-                entity.Property(e => e.Order)
+                entity.Property(e => e.Position)
                       .IsRequired()
-                      .HasColumnName("order");
+                      .HasColumnName("position");
 
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+                entity.Property(e => e.CourseId)
+                      .HasColumnName("course_id");
+
+                entity.Property(e => e.UserIdCreated)
+                      .HasColumnName("user_id_created");
+
+                entity.Property(e => e.UserIdEdited)
+                      .HasColumnName("user_id_edited");
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnName("created_at");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnName("updated_at");
 
                 entity.HasOne(e => e.Course)
-                 .WithMany(c => c.Lessons)
-                 .HasForeignKey(e => e.CourseId)
-                 .HasConstraintName("FK_Lessons_Courses")
-                 .OnDelete(DeleteBehavior.NoAction);
+                      .WithMany(c => c.Lessons)
+                      .HasForeignKey(e => e.CourseId)
+                      .HasConstraintName("fk_lessons_courses") // ✅ snake_case constraint
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(e => e.UserCreated)
-                     .WithMany(u => u.CreatedLesson)
-                     .HasForeignKey(e => e.UserIdCreated)
-                     .HasConstraintName("FK_Lessons_UserCreated")
-                     .OnDelete(DeleteBehavior.NoAction);
-
+                      .WithMany(u => u.CreatedLesson)
+                      .HasForeignKey(e => e.UserIdCreated)
+                      .HasConstraintName("fk_lessons_user_created") // ✅ snake_case constraint
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(e => e.UserEdited)
                       .WithMany(u => u.UpdatedLesson)
                       .HasForeignKey(e => e.UserIdEdited)
-                      .HasConstraintName("FK_Lessons_UserEdited")
+                      .HasConstraintName("fk_lessons_user_edited") // ✅ snake_case constraint
                       .OnDelete(DeleteBehavior.NoAction);
-
             });
         }
+
 
 
         private void ConfigureTest(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Test>(entity =>
             {
-                entity.ToTable("tests"); // table name snake_case
+                entity.ToTable("Tests"); // table name snake_case
 
                 entity.HasKey(e => e.Id);
 
@@ -584,48 +595,46 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             modelBuilder.Entity<Question>(entity =>
             {
-                entity.ToTable("questions"); // snake_case
+                entity.ToTable("Questions"); // snake_case
 
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id)
-                      .IsRequired()
                       .ValueGeneratedOnAdd()
                       .HasColumnName("id");
 
                 entity.Property(e => e.TestId)
+                      .IsRequired()
                       .HasColumnName("test_id");
 
                 entity.Property(e => e.QuestionText)
-                      .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("question_text");
+
+                entity.Property(e => e.CorrectOption)
+                  .HasMaxLength(255)
+                  .HasColumnName("correct_option");
 
                 entity.Property(e => e.QuestionType)
                       .HasColumnName("question_type");
 
                 entity.Property(e => e.Explanation)
-                      .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("explanation");
 
                 entity.Property(e => e.A)
-                      .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("a");
 
                 entity.Property(e => e.B)
-                      .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("b");
 
                 entity.Property(e => e.C)
-                      .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("c");
 
                 entity.Property(e => e.D)
-                      .IsRequired()
                       .HasMaxLength(255)
                       .HasColumnName("d");
 

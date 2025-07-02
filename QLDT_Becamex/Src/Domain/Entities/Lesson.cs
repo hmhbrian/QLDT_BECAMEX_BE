@@ -9,7 +9,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public Course Course { get; set; } = null!;
         public string Title { get; set; } = null!;
         public string UrlPdf { get; set; } = null!;
-        public int? Order { get; set; }
+        public int? Position { get; set; }
         public string? UserIdCreated { get; set; }
         public ApplicationUser? UserCreated { get; set; }
         public string? UserIdEdited { get; set; }

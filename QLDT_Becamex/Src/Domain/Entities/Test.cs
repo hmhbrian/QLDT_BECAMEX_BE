@@ -14,6 +14,6 @@
         public ApplicationUser? UserEdited { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public ICollection<Question>? Tests { get; set; } = new List<Question>();
+        public ICollection<Question>? Questions { get; set; } = new List<Question>();
     }
 }

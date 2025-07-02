@@ -3,11 +3,11 @@
     public class Question
     {
         public int Id { get; set; }
-        public int? Test_id { get; set; }
+        public int? TestId { get; set; }
         public Test? Test { get; set; }
-        public string? Question_text { get; set; }
-        public string? Correct_option { get; set; }
-        public int Question_type { get; set; }
+        public string? QuestionText { get; set; }
+        public string? CorrectOption { get; set; }
+        public int? QuestionType { get; set; }
         public string? Explanation { get; set; }
         public string? A { get; set; }
         public string? B { get; set; }

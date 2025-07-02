@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             }
             var lessons = await _unitOfWork.LessonRepository.GetFlexibleAsync(
                 predicate: l => l.CourseId == request.CourseId,
-                orderBy: q => q.OrderBy(l => l.Order)
+                orderBy: q => q.OrderBy(l => l.Position)
             );
             if (lessons == null)
                 throw new AppException("Không tìm thấy bài học nào cho khóa học này", 404);

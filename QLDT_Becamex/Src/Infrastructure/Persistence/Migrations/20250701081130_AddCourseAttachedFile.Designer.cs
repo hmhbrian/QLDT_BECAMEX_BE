@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250701081130_AddCourseAttachedFile")]
+    partial class AddCourseAttachedFile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -582,53 +585,6 @@ namespace QLDT_Becamex.Migrations
                     b.ToTable("Lecturers");
                 });
 
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lesson", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content_pdf")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Course_id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId_created")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId_edited")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Course_id");
-
-                    b.HasIndex("UserId_created");
-
-                    b.HasIndex("UserId_edited");
-
-                    b.ToTable("Lessons", (string)null);
-                });
-
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Position", b =>
                 {
                     b.Property<int>("PositionId")
@@ -645,111 +601,6 @@ namespace QLDT_Becamex.Migrations
                     b.HasKey("PositionId");
 
                     b.ToTable("Positions");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Question", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("A")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("B")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("C")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Correct_option")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("D")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Explanation")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Question_text")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("Question_type")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Test_id")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Test_id");
-
-                    b.ToTable("Questions", (string)null);
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Test", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Course_id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<float>("Pass_threshold")
-                        .HasColumnType("real");
-
-                    b.Property<int>("Time_test")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId_created")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId_edited")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Course_id");
-
-                    b.HasIndex("UserId_created");
-
-                    b.HasIndex("UserId_edited");
-
-                    b.ToTable("Tests", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
@@ -984,64 +835,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lesson", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
-                        .WithMany("Lessons")
-                        .HasForeignKey("Course_id")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
-                        .WithMany("CreatedLesson")
-                        .HasForeignKey("UserId_created")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserEdited")
-                        .WithMany("UpdatedLesson")
-                        .HasForeignKey("UserId_edited")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Course");
-
-                    b.Navigation("UserCreated");
-
-                    b.Navigation("UserEdited");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Question", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Test", "Test")
-                        .WithMany("Tests")
-                        .HasForeignKey("Test_id")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Test");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Test", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
-                        .WithMany("Tests")
-                        .HasForeignKey("Course_id")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
-                        .WithMany("CreatedTest")
-                        .HasForeignKey("UserId_created")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserEdited")
-                        .WithMany("UpdatedTest")
-                        .HasForeignKey("UserId_edited")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Course");
-
-                    b.Navigation("UserCreated");
-
-                    b.Navigation("UserEdited");
-                });
-
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
@@ -1065,14 +858,6 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.Navigation("Children");
 
-                    b.Navigation("CreatedLesson");
-
-                    b.Navigation("CreatedTest");
-
-                    b.Navigation("UpdatedLesson");
-
-                    b.Navigation("UpdatedTest");
-
                     b.Navigation("UserCourse");
                 });
 
@@ -1083,10 +868,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("CourseDepartments");
 
                     b.Navigation("CoursePositions");
-
-                    b.Navigation("Lessons");
-
-                    b.Navigation("Tests");
 
                     b.Navigation("UserCourses");
                 });
@@ -1120,11 +901,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("CoursePositions");
 
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Test", b =>
-                {
-                    b.Navigation("Tests");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,7 +6,7 @@ namespace QLDT_Becamex.Src.Application.Common.Dtos
     {
         [Range(1, int.MaxValue, ErrorMessage = "Page must be a positive integer.")]
         public int Page { get; set; } = 1;
-        [Range(1, 24, ErrorMessage = "Limit must be between 1 and 24.")]
+        [Range(1, 50, ErrorMessage = "Limit must be between 1 and 50.")]
         public int Limit { get; set; } = 24;
         public string SortField { get; set; } = "created.at";
 

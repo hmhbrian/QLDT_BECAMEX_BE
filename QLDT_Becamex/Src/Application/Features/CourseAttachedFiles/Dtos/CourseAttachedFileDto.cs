@@ -11,6 +11,8 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos
         public string? Type { get; set; } = null;
 
         public string? Link { get; set; } = null;
+        public string? PublicIdUrlPdf { get; set; }
+
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }

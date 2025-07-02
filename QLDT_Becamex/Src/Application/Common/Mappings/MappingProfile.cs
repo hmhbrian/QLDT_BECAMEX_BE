@@ -12,6 +12,7 @@ using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
+using static QLDT_Becamex.Src.Application.Features.Tests.Dtos.TestReponseDTO;
 
 namespace QLDT_Becamex.Src.Application.Common.Mappings
 {
@@ -83,6 +84,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserIdEdited))
                 .ForMember(dest => dest.UserNameCreated, opt => opt.MapFrom(src => src.UserCreated != null ? src.UserCreated.FullName : null))
                 .ForMember(dest => dest.UserNameEdited, opt => opt.MapFrom(src => src.UserEdited != null ? src.UserEdited.FullName : null));
+
+            //Test
+            CreateMap<Test, AllTestDto>()
+                .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0));
         }
     }
 }

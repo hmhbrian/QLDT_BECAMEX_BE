@@ -75,6 +75,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             await _mediator.Send(new DeleteLessonCommand(courseId, lessonIds));
             return Ok(ApiResponse.Ok("Xoá bài học thành công."));
+        }
             
         /// <summary>
         /// Lấy chi tiết bài học của khóa học. HOCVIEN, HR, ADMIN có quyền truy cập.

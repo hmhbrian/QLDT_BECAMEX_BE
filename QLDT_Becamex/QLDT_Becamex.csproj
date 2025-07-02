@@ -35,6 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Src\Application\Features\Lessons\Commands\" />
+    <Folder Include="Src\Application\Features\Tests\Commands\" />
     <Folder Include="Src\Infrastructure\Persistence\Migrations\" />
   </ItemGroup>
 

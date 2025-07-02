@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250701085557_AddLessonAndTest")]
+    partial class AddLessonAndTest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -364,52 +367,6 @@ namespace QLDT_Becamex.Migrations
                     b.ToTable("Course", (string)null);
                 });
 
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseAttachedFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("ModifiedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CourseAttachedFile", (string)null);
-                });
-
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -593,9 +550,6 @@ namespace QLDT_Becamex.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -606,6 +560,9 @@ namespace QLDT_Becamex.Migrations
 
                     b.Property<string>("course_id")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("order")
+                        .HasColumnType("int");
 
                     b.Property<string>("title")
                         .IsRequired()
@@ -910,25 +867,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseAttachedFile", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
-                        .WithMany("AttachedFiles")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("UserCreated");
-                });
-
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseDepartment", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
@@ -1078,8 +1016,6 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
                 {
-                    b.Navigation("AttachedFiles");
-
                     b.Navigation("CourseDepartments");
 
                     b.Navigation("CoursePositions");

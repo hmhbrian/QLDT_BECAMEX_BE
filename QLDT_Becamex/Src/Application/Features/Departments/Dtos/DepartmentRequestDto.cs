@@ -16,7 +16,6 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Dtos
         public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Status is required")]
-        [MaxLength(20, ErrorMessage = "Status cannot exceed 20 characters")]
         public int Status { get; set; } = 2; //ative
         public string ManagerId { get; set; } = string.Empty;
         public int? ParentId { get; set; }

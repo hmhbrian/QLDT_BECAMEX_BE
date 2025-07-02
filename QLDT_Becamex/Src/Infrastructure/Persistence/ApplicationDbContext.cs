@@ -24,6 +24,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<UserCourse> UserCourse { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<CourseCategory> CourseCategories { get; set; }
+        public DbSet<Lesson> Lessons { get; set; } 
+        public DbSet<Test> Tests { get; set; }
+        public DbSet<Question> Questions { get; set; }
 
 
 
@@ -48,6 +51,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureUserCourse(modelBuilder);
             ConfigureCourseCategory(modelBuilder);
             ConfigureLecturer(modelBuilder);
+            ConfigureLesson(modelBuilder);
+            ConfigureTest(modelBuilder);
+            ConfigureQuestion(modelBuilder);
 
         }
 
@@ -458,6 +464,137 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasForeignKey(c => c.LecturerId)
                       .OnDelete(DeleteBehavior.SetNull);
 
+            });
+        }
+
+        private void ConfigureLesson(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Lesson>(entity =>
+            {
+                entity.ToTable("Lessons");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
+                entity.HasOne(cp => cp.Course)
+                      .WithMany(c => c.Lessons)
+                      .HasForeignKey(cp => cp.course_id)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.Property(p => p.title)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.content_pdf)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.Order).IsRequired();
+
+                entity.HasOne(cp => cp.UserCreated)
+                      .WithMany(p => p.CreatedLesson)
+                      .HasForeignKey(cp => cp.userId_created)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(cp => cp.UserEdited)
+                      .WithMany(p => p.UpdatedLesson)
+                      .HasForeignKey(cp => cp.userId_edited)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.Property(d => d.CreatedAt);
+
+                entity.Property(d => d.UpdatedAt);
+            });
+        }
+
+        private void ConfigureTest(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Test>(entity =>
+            {
+                entity.ToTable("Tests");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
+                entity.HasOne(cp => cp.Course)
+                      .WithMany(c => c.Tests)
+                      .HasForeignKey(cp => cp.course_id)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.Property(p => p.title)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.pass_threshold);
+
+                entity.Property(p => p.time_test);
+
+                entity.HasOne(cp => cp.UserCreated)
+                      .WithMany(p => p.CreatedTest)
+                      .HasForeignKey(cp => cp.userId_created)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(cp => cp.UserEdited)
+                      .WithMany(p => p.UpdatedTest)
+                      .HasForeignKey(cp => cp.userId_edited)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.Property(d => d.CreatedAt);
+
+                entity.Property(d => d.UpdatedAt);
+            });
+        }
+
+        private void ConfigureQuestion(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Question>(entity =>
+            {
+                entity.ToTable("Questions");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(s => s.Id)
+                   .IsRequired().ValueGeneratedOnAdd();
+
+                entity.HasOne(cp => cp.Test)
+                      .WithMany(c => c.Tests)
+                      .HasForeignKey(cp => cp.test_id)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(p => p.question_text)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.question_type);
+
+                entity.Property(p => p.explanation)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.A)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.B)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.C)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(p => p.D)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(d => d.CreatedAt);
+
+                entity.Property(d => d.UpdatedAt);
             });
         }
     }

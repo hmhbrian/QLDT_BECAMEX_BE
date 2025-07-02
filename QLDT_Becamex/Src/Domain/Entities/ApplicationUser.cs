@@ -31,6 +31,10 @@ namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp
         public ICollection<ApplicationUser>? Children { get; set; }
 
         public ICollection<UserCourse>? UserCourse { get; set; }
+        public ICollection<Lesson>? CreatedLesson { get; set; } = new List<Lesson>();
+        public ICollection<Lesson>? UpdatedLesson { get; set; } = new List<Lesson>();
+        public ICollection<Test>? CreatedTest { get; set; } = new List<Test>();
+        public ICollection<Test>? UpdatedTest { get; set; } = new List<Test>();
 
 
     }

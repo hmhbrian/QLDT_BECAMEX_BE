@@ -72,15 +72,15 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             //CourseStatus
             CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
             CreateMap<CreateCourseStatusDto, CourseStatus>().ReverseMap();
-            
+
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();
 
             //Lesson
             CreateMap<Lesson, AllLessonDto>().ReverseMap();
             CreateMap<Lesson, DetailLessonDto>()
-                .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.UserId_created))
-                .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserId_edited));
+                .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.UserIdCreated))
+                .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserIdEdited));
 
         }
     }

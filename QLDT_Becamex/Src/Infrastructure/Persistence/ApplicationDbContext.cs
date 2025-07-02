@@ -584,48 +584,64 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             modelBuilder.Entity<Question>(entity =>
             {
-                entity.ToTable("Questions");
+                entity.ToTable("questions"); // snake_case
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(s => s.Id)
-                   .IsRequired().ValueGeneratedOnAdd();
+                entity.Property(e => e.Id)
+                      .IsRequired()
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id");
 
-                entity.HasOne(cp => cp.Test)
-                      .WithMany(c => c.Tests)
-                      .HasForeignKey(cp => cp.Test_id)
+                entity.Property(e => e.TestId)
+                      .HasColumnName("test_id");
+
+                entity.Property(e => e.QuestionText)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("question_text");
+
+                entity.Property(e => e.QuestionType)
+                      .HasColumnName("question_type");
+
+                entity.Property(e => e.Explanation)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("explanation");
+
+                entity.Property(e => e.A)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("a");
+
+                entity.Property(e => e.B)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("b");
+
+                entity.Property(e => e.C)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("c");
+
+                entity.Property(e => e.D)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("d");
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnName("created_at");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnName("updated_at");
+
+                entity.HasOne(e => e.Test)
+                      .WithMany(t => t.Questions) // sửa lại navigation property nếu đang sai
+                      .HasForeignKey(e => e.TestId)
+                      .HasConstraintName("fk_questions_tests")
                       .OnDelete(DeleteBehavior.Cascade);
-
-                entity.Property(p => p.Question_text)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.Question_type);
-
-                entity.Property(p => p.Explanation)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.A)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.B)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.C)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.D)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(d => d.CreatedAt);
-
-                entity.Property(d => d.UpdatedAt);
             });
         }
+
     }
 }

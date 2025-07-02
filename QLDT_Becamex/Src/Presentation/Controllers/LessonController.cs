@@ -1,14 +1,16 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
-using static QLDT_Becamex.Src.Application.Features.Lessons.Dtos.LessonResponseDTO;
+using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
+using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lessons.Queries;
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/courses/{courseId}/lessons")]
     [ApiController]
+    [Authorize]
     public class LessonController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -20,15 +22,61 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <summary>
         /// Lấy danh sách bài học của khóa học.HOCVIEN, HR, ADMIN có quyền truy cập
         /// </summary>
-        /// <param name="courseId">ID của khóa học cần lấy danh sách bài học.</param>
-        /// <returns>ActionResult chứa danh sách bài học hoặc lỗi nếu không tìm thấy.</returns>
-        [HttpGet("OfCourse")]
-        public async Task<IActionResult> GetListLessonOfCourse([FromQuery] string courseId)
+        [HttpGet]
+        public async Task<IActionResult> GetListLessonOfCourse([FromRoute] string courseId)
         {
             var result = await _mediator.Send(new GetListLessonOfCourseQuery(courseId));
             return Ok(ApiResponse<List<AllLessonDto>>.Ok(result));
         }
 
+
+        /// <summary>
+        /// Lấy danh sách bài học của khóa học.
+        /// </summary>
+        [HttpPost]
+
+        [Consumes("multipart/form-data")] // Chỉ định rằng API mong đợi form-data (cho IFormFile)
+        public async Task<IActionResult> CreateLessonOfCourse([FromRoute] string courseId, [FromForm] CreateLessonDto request)
+        {
+            await _mediator.Send(new CreateLessonCommand(courseId, request));
+            return Ok(ApiResponse.Ok("Create lesson success"));
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin chi tiết của một bài học.
+        /// </summary>
+        /// <remarks>
+        [HttpPut("{lessonId}")] // PUT api/Lesson/{id}
+        // Yêu cầu xác thực người dùng
+        [Consumes("multipart/form-data")] // Chỉ định rằng API mong đợi form-data (cho IFormFile)
+        public async Task<IActionResult> UpdateLesson([FromRoute] string courseId, [FromRoute] int lessonId, [FromForm] UpdateLessonDto request)
+        {
+            // Gửi lệnh cập nhật đến MediatR.
+            // Command sẽ chứa ID của bài học (từ route) và dữ liệu cập nhật (từ form).
+            await _mediator.Send(new UpdateLessonCommand(courseId, lessonId, request));
+
+            // Trả về phản hồi thành công
+            return Ok(ApiResponse.Ok("Lesson updated successfully."));
+        }
+
+
+        /// <summary>
+        /// Xoá nhiều bài học theo khoá học.
+        /// </summary>
+        /// <param name="courseId">ID của khoá học</param>
+        /// <param name="lessonIds">Danh sách ID bài học cần xoá</param>
+        [HttpDelete]
+        public async Task<IActionResult> DeleteLessons(
+            [FromRoute] string courseId,
+            [FromBody] List<int> lessonIds)
+        {
+            if (lessonIds == null || !lessonIds.Any())
+                return BadRequest(ApiResponse.Fail("Danh sách bài học không được để trống."));
+
+            await _mediator.Send(new DeleteLessonCommand(courseId, lessonIds));
+            return Ok(ApiResponse.Ok("Xoá bài học thành công."));
+        }
+            
         /// <summary>
         /// Lấy chi tiết bài học của khóa học. HOCVIEN, HR, ADMIN có quyền truy cập.
         /// </summary>

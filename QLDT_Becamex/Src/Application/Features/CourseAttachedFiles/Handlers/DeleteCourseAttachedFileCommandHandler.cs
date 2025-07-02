@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using System.Threading;
@@ -29,24 +31,24 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Commands
                 throw new AppException("Không tìm thấy file đính kèm hoặc ID khóa học không khớp.", 404);
             }
 
+            var existingCourse = await _unitOfWork.CourseRepository.GetByIdAsync(request.CourseId);
+
+            if (existingCourse == null)
+            {
+                throw new AppException($"Course with ID: {request.CourseId} not found.", 404);
+            }
+
             // Nếu đây là một file được tải lên (không phải link) và có URL
             if (attachedFile.Type != "Link" && !string.IsNullOrEmpty(attachedFile.Link))
             {
-                // Bạn cần trích xuất Public ID từ URL.
-                // Đây là một ví dụ đơn giản, bạn có thể cần một hàm helper phức tạp hơn
-                // tùy thuộc vào cấu trúc URL Cloudinary của bạn.
-                // Public ID thường nằm sau phần /v.../ và trước phần mở rộng file.
-                // Ví dụ URL: https://res.cloudinary.com/your_cloud_name/raw/upload/v12345/documents/my_document.pdf
-                // Public ID sẽ là: documents/my_document
-                var publicId = _cloudinaryService.GetPublicIdFromCloudinaryUrl(attachedFile.Link);
-
-                if (!string.IsNullOrEmpty(publicId))
+                
+                if (!string.IsNullOrEmpty(attachedFile.PublicIdUrlPdf))
                 {
-                    var deleteSuccess = await _cloudinaryService.DeleteFileAsync(publicId);
+                    var deleteSuccess = await _cloudinaryService.DeleteFileAsync(attachedFile.PublicIdUrlPdf);
                     if (!deleteSuccess)
                     {
                         // Xử lý lỗi nếu không thể xóa file trên Cloudinary
-                        Console.WriteLine($"[HANDLER ERROR] Không thể xóa file Cloudinary với Public ID: {publicId}");
+                        Console.WriteLine($"[HANDLER ERROR] Không thể xóa file Cloudinary với Public ID: {attachedFile.PublicIdUrlPdf}");
                         // Tùy chọn: bạn có thể ném lỗi hoặc chỉ ghi log và tiếp tục xóa trong DB
                     }
                 }

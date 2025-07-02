@@ -1,5 +1,6 @@
 ﻿using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
+using QLDT_Becamex.Src.Application.Common.Dtos;
 
 namespace QLDT_Becamex.Src.Infrastructure.Services
 {
@@ -25,51 +26,50 @@ namespace QLDT_Becamex.Src.Infrastructure.Services
         /// </summary>
         /// <param name="file">Tệp PDF cần tải lên (IFormFile).</param>
         /// <returns>URL an toàn của tệp PDF đã tải lên hoặc null nếu tải lên thất bại hoặc tệp không phải PDF.</returns>
-        public async Task<string?> UploadPdfAsync(IFormFile file)
+        public async Task<(string url, string publicId)?> UploadPdfAsync(IFormFile file, string folderName)
         {
-            // Bước 1: Kiểm tra xem tệp có phải là PDF hay không
             if (file == null || file.Length == 0)
             {
-                Console.WriteLine("[Cloudinary WARNING] Tệp không có hoặc rỗng.");
-                return null;
+                // Ném AppException nếu file trống
+                throw new AppException("No file provided or file is empty.", 400); // 400 Bad Request
             }
 
-            // Kiểm tra kiểu MIME của tệp. Chỉ chấp nhận PDF.
             if (file.ContentType != "application/pdf")
             {
-                Console.WriteLine($"[Cloudinary WARNING] Tệp không phải PDF. Kiểu tệp: {file.ContentType}");
-                return null;
+                // Ném AppException nếu không phải file PDF
+                throw new AppException($"Invalid file type. Expected 'application/pdf', but received '{file.ContentType}'.", 400); // 400 Bad Request
             }
 
             try
             {
-                // Bước 2: Mở luồng tệp
                 using var stream = file.OpenReadStream();
+                var publicId = $"{folderName}/{Path.GetFileNameWithoutExtension(file.FileName)}_{Guid.NewGuid().ToString("N")}";
 
-                // Bước 3: Thiết lập tham số tải lên cho tệp RAW (PDF không phải là hình ảnh)
                 var uploadParams = new RawUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
-                    Folder = "documents", // Bạn có thể thay đổi thư mục lưu trữ PDF tùy ý
-                    PublicId = Path.GetFileNameWithoutExtension(file.FileName) // Đặt PublicId theo tên file (không có phần mở rộng)
+                    Folder = folderName,
+                    PublicId = publicId
                 };
 
-                // Bước 4: Tải lên Cloudinary
                 var result = await _cloudinary.UploadAsync(uploadParams);
 
-                // Bước 5: Trả về URL an toàn
                 if (result.Error != null)
                 {
-                    Console.WriteLine($"[Cloudinary ERROR] Lỗi tải lên PDF: {result.Error.Message}");
-                    return null;
+                    // Ghi log lỗi Cloudinary chi tiết hơn nếu cần
+                    Console.WriteLine($"Cloudinary upload error for {file.FileName}: {result.Error.Message}");
+                    // Ném AppException nếu có lỗi từ Cloudinary
+                    throw new AppException($"Failed to upload PDF file to Cloudinary: {result.Error.Message}", 500); // 500 Internal Server Error
                 }
 
-                return result.SecureUrl?.ToString();
+                return (result.SecureUrl?.ToString() ?? string.Empty, result.PublicId);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Cloudinary ERROR] Lỗi trong quá trình tải lên PDF: {ex.Message}");
-                return null;
+                // Ghi log ngoại lệ không mong muốn
+                Console.WriteLine($"Unexpected error during Cloudinary PDF upload: {ex.Message}");
+                // Ném AppException cho các lỗi không xác định khác
+                throw new AppException($"An unexpected error occurred during PDF upload: {ex.Message}", 500); // 500 Internal Server Error
             }
         }
 
@@ -135,39 +135,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Services
                 // hoặc đơn giản hơn nếu không có logger
                 Console.WriteLine($"[Cloudinary ERROR] {ex.Message}");
 
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Trích xuất Public ID từ một URL Cloudinary.
-        /// Public ID bao gồm folder và tên tệp (không có phần mở rộng và không có phần version).
-        /// Ví dụ: "https://res.cloudinary.com/cloudname/raw/upload/v12345/documents/my_doc.pdf" -> "documents/my_doc"
-        /// </summary>
-        /// <param name="url">URL của tệp trên Cloudinary.</param>
-        /// <returns>Public ID của tệp hoặc null nếu không thể trích xuất.</returns>
-        public string? GetPublicIdFromCloudinaryUrl(string url)
-        {
-            try
-            {
-                var uri = new Uri(url);
-                var uploadIndex = url.IndexOf("/upload/");
-                if (uploadIndex == -1)
-                    return null;
-
-                var pathAfterUpload = url.Substring(uploadIndex + "/upload/".Length); // ví dụ: v123456/documents/sasas.pdf
-
-                // Cắt bỏ phần version (v123456/)
-                var parts = pathAfterUpload.Split('/', 2);
-                if (parts.Length < 2)
-                    return null;
-
-                var fullPath = parts[1]; // documents/sasas.pdf
-
-                return fullPath; // KHÔNG bỏ đuôi
-            }
-            catch
-            {
                 return null;
             }
         }

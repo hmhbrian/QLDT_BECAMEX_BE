@@ -6,7 +6,7 @@ using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
-using static QLDT_Becamex.Src.Application.Features.Lessons.Dtos.LessonResponseDTO;
+using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;

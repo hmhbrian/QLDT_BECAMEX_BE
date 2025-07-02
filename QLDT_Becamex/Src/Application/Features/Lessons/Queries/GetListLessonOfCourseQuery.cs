@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using static QLDT_Becamex.Src.Application.Features.Lessons.Dtos.LessonResponseDTO;
+using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Queries
 {

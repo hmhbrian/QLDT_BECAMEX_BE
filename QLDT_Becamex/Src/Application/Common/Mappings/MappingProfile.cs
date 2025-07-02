@@ -80,8 +80,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Lesson, AllLessonDto>().ReverseMap();
             CreateMap<Lesson, DetailLessonDto>()
                 .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.UserIdCreated))
-                .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserIdEdited));
-
+                .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserIdEdited))
+                .ForMember(dest => dest.UserNameCreated, opt => opt.MapFrom(src => src.UserCreated != null ? src.UserCreated.FullName : null))
+                .ForMember(dest => dest.UserNameEdited, opt => opt.MapFrom(src => src.UserEdited != null ? src.UserEdited.FullName : null));
         }
     }
 }

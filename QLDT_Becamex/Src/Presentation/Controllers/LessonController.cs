@@ -20,7 +20,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách bài học của khóa học.
+        /// Lấy danh sách bài học của khóa học.HOCVIEN, HR, ADMIN có quyền truy cập
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetListLessonOfCourse([FromRoute] string courseId)
@@ -66,7 +66,6 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <param name="courseId">ID của khoá học</param>
         /// <param name="lessonIds">Danh sách ID bài học cần xoá</param>
         [HttpDelete]
-
         public async Task<IActionResult> DeleteLessons(
             [FromRoute] string courseId,
             [FromBody] List<int> lessonIds)
@@ -76,6 +75,17 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             await _mediator.Send(new DeleteLessonCommand(courseId, lessonIds));
             return Ok(ApiResponse.Ok("Xoá bài học thành công."));
+            
+        /// <summary>
+        /// Lấy chi tiết bài học của khóa học. HOCVIEN, HR, ADMIN có quyền truy cập.
+        /// </summary>
+        /// <param name="LessonId">ID của bài học cần lấy thông tin.</param>
+        /// <returns>ActionResult chứa thông tin chi tiết bài học hoặc lỗi nếu không tìm thấy.</returns>
+        [HttpGet("OfCourse/{id}")]
+        public async Task<IActionResult> GetLessonById(int id)
+        {
+            var result = await _mediator.Send(new GetLessonByIdQuery(id));
+            return Ok(ApiResponse<DetailLessonDto>.Ok(result));
         }
     }
 }

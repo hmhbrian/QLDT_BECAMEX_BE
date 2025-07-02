@@ -19,7 +19,8 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
         public async Task<List<AllLessonDto>> Handle(GetListLessonOfCourseQuery request, CancellationToken cancellationToken)
         {
             // Validate CourseId
-            if (string.IsNullOrEmpty(request.CourseId))
+            var course = await _unitOfWork.CourseRepository.GetByIdAsync(request.CourseId);
+            if (course == null)
             {
                 throw new AppException("Khóa học không tồn tại", 404);
             }
@@ -27,7 +28,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 predicate: l => l.CourseId == request.CourseId,
                 orderBy: q => q.OrderBy(l => l.Position)
             );
-            if (lessons == null)
+            if (lessons == null || !lessons.Any())
                 throw new AppException("Không tìm thấy bài học nào cho khóa học này", 404);
 
             var dto = _mapper.Map<List<AllLessonDto>>(lessons);

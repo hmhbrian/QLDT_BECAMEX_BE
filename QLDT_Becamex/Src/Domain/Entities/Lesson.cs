@@ -26,7 +26,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;
             Position = request.Position;
-            UserIdEdited = userIdCreated;
+            UserIdCreated = userIdCreated;
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
         }

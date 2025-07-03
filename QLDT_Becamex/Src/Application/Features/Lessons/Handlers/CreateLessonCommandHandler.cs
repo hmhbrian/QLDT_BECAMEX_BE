@@ -42,15 +42,15 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             }
 
             // --- 1. Tải file PDF lên Cloudinary ---
-            string pdfUrl = null;
-            string filePublicId = null;
+            string pdfUrl = null!;
+            string filePublicId = null!;
 
             if (request.Request.FilePdf != null && request.Request.FilePdf.Length > 0)
             {
 
                 var uploadResult = await _cloudinaryService.UploadPdfAsync(request.Request.FilePdf, "Lesson_pdfs");
-                pdfUrl = uploadResult?.url; // Lấy URL từ kết quả upload
-                filePublicId = uploadResult?.publicId; // Lấy PublicId từ kết quả upload
+                pdfUrl = uploadResult?.url!; // Lấy URL từ kết quả upload
+                filePublicId = uploadResult?.publicId!; // Lấy PublicId từ kết quả upload
 
                 if (string.IsNullOrEmpty(pdfUrl))
                 {

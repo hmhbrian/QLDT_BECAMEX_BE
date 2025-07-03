@@ -24,10 +24,14 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             {
                 throw new AppException("Khóa học không tồn tại", 404);
             }
+
+            // Lấy danh sách bài học của khóa học theo CourseId
             var lessons = await _unitOfWork.LessonRepository.GetFlexibleAsync(
                 predicate: l => l.CourseId == request.CourseId,
                 orderBy: q => q.OrderBy(l => l.Position)
             );
+
+            // Kiểm tra nếu không có bài học nào
             if (lessons == null || !lessons.Any())
                 throw new AppException("Không tìm thấy bài học nào cho khóa học này", 404);
 

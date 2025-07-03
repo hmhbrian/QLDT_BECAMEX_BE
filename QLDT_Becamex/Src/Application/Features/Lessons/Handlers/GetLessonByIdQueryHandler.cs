@@ -3,7 +3,7 @@ using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lessons.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using static QLDT_Becamex.Src.Application.Features.Lessons.Dtos.LessonResponseDTO;
+using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 {

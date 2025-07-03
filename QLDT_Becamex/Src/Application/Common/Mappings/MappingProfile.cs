@@ -53,7 +53,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<CreateRoleDto, IdentityRole>();
 
             //Course
-            CreateMap<CreateCourseDto, Course>();
+            CreateMap<CreateCourseDto, Course>()
+                .ForMember(dest => dest.ThumbUrl, opt => opt.Condition(src => src.ThumbUrl != null))
+                .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null));
             CreateMap<Course, CourseDto>()
                 .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentDto
                 {

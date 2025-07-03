@@ -10,12 +10,12 @@ using QLDT_Becamex.Src.Domain.Interfaces;
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {
     [ApiController]
-    [Route("api/test")]
-    public class TestController : ControllerBase
+    [Route("api/tests")]
+    public class TestsController : ControllerBase
     {
         private readonly ITestRepository _testRepository;
         public readonly IMediator _mediator;
-        public TestController(ITestRepository testRepository, IMediator mediator)
+        public TestsController(ITestRepository testRepository, IMediator mediator)
         {
             _testRepository = testRepository;
             _mediator = mediator;

@@ -13,7 +13,7 @@
         public IUserCourseRepository UserCourseRepository { get; }
         public ICourseCategoryRepository CourseCategoryRepository { get; }
         public ILecturerRepository LecturerRepository { get; }
-
+        public ITestRepository TestRepository { get; }
 
 
         public Task<int> CompleteAsync();

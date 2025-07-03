@@ -474,3 +474,8 @@ C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\obj\Debug\net8.0
 C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\obj\Debug\net8.0\xUnitQLDT_Becamex.Tests.pdb
 C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\obj\Debug\net8.0\xUnitQLDT_Becamex.Tests.genruntimeconfig.cache
 C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\obj\Debug\net8.0\ref\xUnitQLDT_Becamex.Tests.dll
+C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\bin\Debug\net8.0\FluentAssertions.dll
+C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\bin\Debug\net8.0\FluentResults.dll
+C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\bin\Debug\net8.0\MediatR.dll
+C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\bin\Debug\net8.0\MediatR.Contracts.dll
+C:\Data\BECAMEX Project\QLDT_BECAMEX_BE\xUnitQLDT_Becamex.Tests\bin\Debug\net8.0\MediatR.Extensions.Microsoft.DependencyInjection.dll

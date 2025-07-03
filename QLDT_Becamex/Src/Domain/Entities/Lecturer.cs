@@ -12,6 +12,5 @@ namespace QLDT_Becamex.Src.Domain.Entities
         [JsonIgnore]
         // Khóa học giảng dạy
         public ICollection<Course>? Courses { get; set; } = new List<Course>();
-
     }
 }

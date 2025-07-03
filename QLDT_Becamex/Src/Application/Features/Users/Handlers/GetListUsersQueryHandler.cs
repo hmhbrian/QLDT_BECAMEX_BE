@@ -83,7 +83,6 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                     TotalPages = (int)Math.Ceiling((double)totalItems / queryParams.Limit)
                 }
             };
-
             return result;
         }
     }

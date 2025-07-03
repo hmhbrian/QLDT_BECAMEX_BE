@@ -6,8 +6,10 @@ using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
+using QLDT_Becamex.Src.Application.Features.Questions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
+using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 
@@ -17,6 +19,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
     {
         public MappingProfile()
         {
+            // Define ignoreNavigation as a no-op action for AfterMap
+            Action<object, object, ResolutionContext> ignoreNavigation = (src, dest, context) => { };
+
             //User
             CreateMap<ApplicationUser, UserDto>();
 
@@ -66,11 +71,40 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             CreateMap<CourseDto, Course>();
 
-
             //CourseStatus
             CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
             CreateMap<CreateCourseStatusDto, CourseStatus>().ReverseMap();
 
+            // Question
+            CreateMap<QuestionDto, Question>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.test_id, opt => opt.Ignore())
+                .ForMember(dest => dest.Test, opt => opt.Ignore());
+
+            // Test
+            CreateMap<TestCreateDto, Test>()
+                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
+                .AfterMap(ignoreNavigation);
+
+            CreateMap<Test, TestDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Tests != null ? src.Tests.ToList() : new List<Question>()))
+                .AfterMap((src, dest) =>
+                {
+                    if (dest.Tests != null)
+                    {
+                        foreach (var q in dest.Tests)
+                        {
+                            q.Test = null;
+                        }
+                    }
+                });
+            CreateMap<TestUpdateDto, Test>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.course_id, opt => opt.Ignore())
+                .ForMember(dest => dest.userId_created, opt => opt.Ignore())
+                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
+                .AfterMap(ignoreNavigation);
         }
     }
 }

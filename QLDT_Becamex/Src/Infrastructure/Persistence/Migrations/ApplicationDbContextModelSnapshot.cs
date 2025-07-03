@@ -364,6 +364,55 @@ namespace QLDT_Becamex.Migrations
                     b.ToTable("Course", (string)null);
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseAttachedFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Link")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("ModifiedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PublicIdUrlPdf")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CourseAttachedFile", (string)null);
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -540,45 +589,61 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("course_id");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Position")
+                        .HasColumnType("int")
+                        .HasColumnName("position");
 
-                    b.Property<string>("content_pdf")
+                    b.Property<string>("PublicIdUrlPdf")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("public_id_url_pdf");
 
-                    b.Property<string>("course_id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("title")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("title");
 
-                    b.Property<string>("userId_created")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
 
-                    b.Property<string>("userId_edited")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("UrlPdf")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("url_pdf");
+
+                    b.Property<string>("UserIdCreated")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id_created");
+
+                    b.Property<string>("UserIdEdited")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id_edited");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("course_id");
+                    b.HasIndex("CourseId");
 
-                    b.HasIndex("userId_created");
+                    b.HasIndex("UserIdCreated");
 
-                    b.HasIndex("userId_edited");
+                    b.HasIndex("UserIdEdited");
 
                     b.ToTable("Lessons", (string)null);
                 });
@@ -605,58 +670,65 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("A")
-                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("a");
 
                     b.Property<string>("B")
-                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("b");
 
                     b.Property<string>("C")
-                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("c");
+
+                    b.Property<string>("CorrectOption")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("correct_option");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("D")
-                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("d");
+
+                    b.Property<string>("Explanation")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("explanation");
+
+                    b.Property<string>("QuestionText")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("question_text");
+
+                    b.Property<int?>("QuestionType")
+                        .HasColumnType("int")
+                        .HasColumnName("question_type");
+
+                    b.Property<int>("TestId")
+                        .HasColumnType("int")
+                        .HasColumnName("test_id");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("correct_option")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("explanation")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("question_text")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("question_type")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("test_id")
-                        .HasColumnType("int");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("test_id");
+                    b.HasIndex("TestId");
 
                     b.ToTable("Questions", (string)null);
                 });
@@ -665,43 +737,52 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("course_id");
+
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<float>("PassThreshold")
+                        .HasColumnType("real")
+                        .HasColumnName("pass_threshold");
 
-                    b.Property<string>("course_id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("TimeTest")
+                        .HasColumnType("int")
+                        .HasColumnName("time_test");
 
-                    b.Property<float>("pass_threshold")
-                        .HasColumnType("real");
-
-                    b.Property<int>("time_test")
-                        .HasColumnType("int");
-
-                    b.Property<string>("title")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("title");
 
-                    b.Property<string>("userId_created")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
 
-                    b.Property<string>("userId_edited")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("UserIdCreated")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id_created");
+
+                    b.Property<string>("UserIdEdited")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id_edited");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("course_id");
+                    b.HasIndex("CourseId");
 
-                    b.HasIndex("userId_created");
+                    b.HasIndex("UserIdCreated");
 
-                    b.HasIndex("userId_edited");
+                    b.HasIndex("UserIdEdited");
 
                     b.ToTable("Tests", (string)null);
                 });
@@ -864,6 +945,25 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Status");
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseAttachedFile", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
+                        .WithMany("AttachedFiles")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("UserCreated");
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseDepartment", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
@@ -923,18 +1023,22 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
                         .WithMany("Lessons")
-                        .HasForeignKey("course_id")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("fk_lessons_courses");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
                         .WithMany("CreatedLesson")
-                        .HasForeignKey("userId_created")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("UserIdCreated")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_lessons_user_created");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserEdited")
                         .WithMany("UpdatedLesson")
-                        .HasForeignKey("userId_edited")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("UserIdEdited")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_lessons_user_edited");
 
                     b.Navigation("Course");
 
@@ -946,9 +1050,11 @@ namespace QLDT_Becamex.Migrations
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Question", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Test", "Test")
-                        .WithMany("Tests")
-                        .HasForeignKey("test_id")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany("Questions")
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_questions_tests");
 
                     b.Navigation("Test");
                 });
@@ -957,18 +1063,21 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
                         .WithMany("Tests")
-                        .HasForeignKey("course_id")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_tests_courses");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
                         .WithMany("CreatedTest")
-                        .HasForeignKey("userId_created")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("UserIdCreated")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_tests_user_created");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserEdited")
                         .WithMany("UpdatedTest")
-                        .HasForeignKey("userId_edited")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("UserIdEdited")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_tests_user_edited");
 
                     b.Navigation("Course");
 
@@ -1013,6 +1122,8 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
                 {
+                    b.Navigation("AttachedFiles");
+
                     b.Navigation("CourseDepartments");
 
                     b.Navigation("CoursePositions");
@@ -1057,7 +1168,7 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Test", b =>
                 {
-                    b.Navigation("Tests");
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

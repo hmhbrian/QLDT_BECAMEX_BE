@@ -14,6 +14,9 @@
         public ICourseCategoryRepository CourseCategoryRepository { get; }
         public ILecturerRepository LecturerRepository { get; }
         public ITestRepository TestRepository { get; }
+        public ICourseAttachedFileRepository CourseAttachedFileRepository { get; }
+        public ILessonRepository LessonRepository { get; }
+        public IQuestionRepository QuestionRepository { get; }
 
 
         public Task<int> CompleteAsync();

@@ -29,7 +29,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                     page: null,
                     pageSize: null,
                     asNoTracking: true,
-                    includes: t => t.Include(t => t.Tests)
+                    includes: t => t.Include(t => t.Questions)
                 );
 
                 var testDtos = _mapper.Map<List<TestDto>>(tests);

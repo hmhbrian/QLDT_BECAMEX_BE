@@ -36,15 +36,15 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             var test = _mapper.Map<Test>(request);
 
             // Set navigation properties
-            test.course_id = request.course_id;
-            test.userId_created = request.userId_created;
-            test.userId_edited = request.userId_created;
+            test.CourseId = request.course_id;
+            test.UserIdCreated = request.userId_created;
+            test.UserIdEdited = request.userId_created;
             // Set test_id for each Question in Tests
-            if (test.Tests != null)
+            if (test.Questions != null)
             {
-                foreach (var question in test.Tests)
+                foreach (var question in test.Questions)
                 {
-                    question.test_id = 0; // Will be updated after saving
+                    question.TestId = 0; // Will be updated after saving
                     question.CreatedAt = DateTime.UtcNow;
                     question.UpdatedAt = DateTime.UtcNow;
                 }
@@ -57,11 +57,11 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             await _unitOfWork.CompleteAsync();
 
             // Update test_id for Questions after Test.Id is generated
-            if (test.Tests != null)
+            if (test.Questions != null)
             {
-                foreach (var question in test.Tests)
+                foreach (var question in test.Questions)
                 {
-                    question.test_id = test.Id;
+                    question.TestId = test.Id;
                 }
                 await _unitOfWork.CompleteAsync();
             }

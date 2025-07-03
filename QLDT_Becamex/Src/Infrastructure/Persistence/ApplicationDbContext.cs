@@ -19,10 +19,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<CourseStatus> CourseStatus { get; set; }
         public DbSet<CourseDepartment> CourseDepartment { get; set; }
         public DbSet<CoursePosition> CoursePosition { get; set; }
+        public DbSet<CourseAttachedFile> CourseAttachedFile { get; set; }
+
         public DbSet<UserCourse> UserCourse { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<CourseCategory> CourseCategories { get; set; }
-        public DbSet<Lesson> Lessons { get; set; } 
+        public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<Question> Questions { get; set; }
 
@@ -45,6 +47,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureCourseStatus(modelBuilder);
             ConfigureCourseDepartment(modelBuilder);
             ConfigureCoursePosition(modelBuilder);
+            ConfigureCourseAttachedFile(modelBuilder);
             ConfigureUserCourse(modelBuilder);
             ConfigureCourseCategory(modelBuilder);
             ConfigureLecturer(modelBuilder);
@@ -262,6 +265,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .WithMany(s => s.Courses)
                       .HasForeignKey(p => p.LecturerId)
                       .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasMany(x => x.AttachedFiles)
+                      .WithOne(x => x.Course)
+                      .HasForeignKey(x => x.CourseId);
             });
         }
 
@@ -286,6 +293,53 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .OnDelete(DeleteBehavior.SetNull);
             });
         }
+
+        private void ConfigureCourseAttachedFile(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CourseAttachedFile>(entity =>
+            {
+                entity.ToTable("CourseAttachedFile");
+
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.CourseId)
+                      .IsRequired();
+
+                entity.Property(x => x.Title)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.Type)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.Property(x => x.Link)
+                      .HasMaxLength(200);
+
+                entity.Property(x => x.PublicIdUrlPdf)
+                      .HasMaxLength(200);
+
+
+
+                entity.Property(x => x.UserId)
+                      .IsRequired();
+
+                entity.Property(x => x.CreatedAt);
+
+                entity.Property(x => x.ModifiedTime);
+
+                entity.HasOne(f => f.Course)
+                      .WithMany(c => c.AttachedFiles)
+                      .HasForeignKey(f => f.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(f => f.UserCreated)
+                      .WithMany()
+                      .HasForeignKey(f => f.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
 
         private void ConfigureCourseDepartment(ModelBuilder modelBuilder)
         {
@@ -371,9 +425,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(p => p.Id).ValueGeneratedOnAdd();
 
                 entity.Property(p => p.Name)
-                      .IsRequired()  
-                      .HasMaxLength(255);      
-                
+                      .IsRequired()
+                      .HasMaxLength(255);
+
                 entity.Property(p => p.Description)
                       .HasMaxLength(1000);
 
@@ -393,7 +447,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(p => p.Id).ValueGeneratedOnAdd();
 
                 entity.Property(p => p.FullName)
-                      .IsRequired()  
+                      .IsRequired()
                       .HasMaxLength(255);
 
                 entity.Property(p => p.Email)
@@ -419,131 +473,191 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             modelBuilder.Entity<Lesson>(entity =>
             {
-                entity.ToTable("Lessons");
+                entity.ToTable("Lessons"); // ✅ table snake_case
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(s => s.Id)
-                   .IsRequired().ValueGeneratedOnAdd();
+                entity.Property(e => e.Id)
+                      .IsRequired()
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id");
 
-                entity.HasOne(cp => cp.Course)
+                entity.Property(e => e.Title)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("title");
+
+                entity.Property(e => e.UrlPdf)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("url_pdf");
+
+                entity.Property(e => e.PublicIdUrlPdf)
+                     .IsRequired()
+                     .HasMaxLength(255)
+                     .HasColumnName("public_id_url_pdf");
+
+                entity.Property(e => e.Position)
+                      .IsRequired()
+                      .HasColumnName("position");
+
+                entity.Property(e => e.CourseId)
+                      .HasColumnName("course_id");
+
+                entity.Property(e => e.UserIdCreated)
+                      .HasColumnName("user_id_created");
+
+                entity.Property(e => e.UserIdEdited)
+                      .HasColumnName("user_id_edited");
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnName("created_at");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnName("updated_at");
+
+                entity.HasOne(e => e.Course)
                       .WithMany(c => c.Lessons)
-                      .HasForeignKey(cp => cp.course_id)
+                      .HasForeignKey(e => e.CourseId)
+                      .HasConstraintName("fk_lessons_courses") // ✅ snake_case constraint
                       .OnDelete(DeleteBehavior.NoAction);
 
-                entity.Property(p => p.title)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.content_pdf)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.Order).IsRequired();
-
-                entity.HasOne(cp => cp.UserCreated)
-                      .WithMany(p => p.CreatedLesson)
-                      .HasForeignKey(cp => cp.userId_created)
-                      .IsRequired(false)
+                entity.HasOne(e => e.UserCreated)
+                      .WithMany(u => u.CreatedLesson)
+                      .HasForeignKey(e => e.UserIdCreated)
+                      .HasConstraintName("fk_lessons_user_created") // ✅ snake_case constraint
                       .OnDelete(DeleteBehavior.NoAction);
 
-                entity.HasOne(cp => cp.UserEdited)
-                      .WithMany(p => p.UpdatedLesson)
-                      .HasForeignKey(cp => cp.userId_edited)
+                entity.HasOne(e => e.UserEdited)
+                      .WithMany(u => u.UpdatedLesson)
+                      .HasForeignKey(e => e.UserIdEdited)
+                      .HasConstraintName("fk_lessons_user_edited") // ✅ snake_case constraint
                       .OnDelete(DeleteBehavior.NoAction);
-
-                entity.Property(d => d.CreatedAt);
-
-                entity.Property(d => d.UpdatedAt);
             });
         }
+
+
 
         private void ConfigureTest(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Test>(entity =>
             {
-                entity.ToTable("Tests");
+                entity.ToTable("Tests"); // table name snake_case
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(s => s.Id)
-                   .IsRequired().ValueGeneratedOnAdd();
-
-                entity.HasOne(cp => cp.Course)
-                      .WithMany(c => c.Tests)
-                      .HasForeignKey(cp => cp.course_id)
-                      .OnDelete(DeleteBehavior.NoAction);
-
-                entity.Property(p => p.title)
+                entity.Property(e => e.Id)
                       .IsRequired()
-                      .HasMaxLength(255);
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id");
 
-                entity.Property(p => p.pass_threshold);
+                entity.Property(e => e.Title)
+                      .IsRequired()
+                      .HasMaxLength(255)
+                      .HasColumnName("title");
 
-                entity.Property(p => p.time_test);
+                entity.Property(e => e.PassThreshold)
+                      .HasColumnName("pass_threshold");
 
-                entity.HasOne(cp => cp.UserCreated)
-                      .WithMany(p => p.CreatedTest)
-                      .HasForeignKey(cp => cp.userId_created)
-                      .OnDelete(DeleteBehavior.NoAction);
+                entity.Property(e => e.TimeTest)
+                      .HasColumnName("time_test");
 
-                entity.HasOne(cp => cp.UserEdited)
-                      .WithMany(p => p.UpdatedTest)
-                      .HasForeignKey(cp => cp.userId_edited)
-                      .OnDelete(DeleteBehavior.NoAction);
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnName("created_at");
 
-                entity.Property(d => d.CreatedAt);
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnName("updated_at");
 
-                entity.Property(d => d.UpdatedAt);
+                entity.Property(e => e.CourseId)
+                      .HasColumnName("course_id");
+
+                entity.Property(e => e.UserIdCreated)
+                      .HasColumnName("user_id_created");
+
+                entity.Property(e => e.UserIdEdited)
+                      .HasColumnName("user_id_edited");
+
+                entity.HasOne(e => e.Course)
+                      .WithMany(c => c.Tests)
+                      .HasForeignKey(e => e.CourseId)
+                      .OnDelete(DeleteBehavior.NoAction)
+                      .HasConstraintName("fk_tests_courses");
+
+                entity.HasOne(e => e.UserCreated)
+                      .WithMany(u => u.CreatedTest)
+                      .HasForeignKey(e => e.UserIdCreated)
+                      .OnDelete(DeleteBehavior.NoAction)
+                      .HasConstraintName("fk_tests_user_created");
+
+                entity.HasOne(e => e.UserEdited)
+                      .WithMany(u => u.UpdatedTest)
+                      .HasForeignKey(e => e.UserIdEdited)
+                      .OnDelete(DeleteBehavior.NoAction)
+                      .HasConstraintName("fk_tests_user_edited");
             });
         }
+
 
         private void ConfigureQuestion(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Question>(entity =>
             {
-                entity.ToTable("Questions");
+                entity.ToTable("Questions"); // snake_case
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(s => s.Id)
-                   .IsRequired().ValueGeneratedOnAdd();
+                entity.Property(e => e.Id)
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id");
 
-                entity.HasOne(cp => cp.Test)
-                      .WithMany(c => c.Tests)
-                      .HasForeignKey(cp => cp.test_id)
+                entity.Property(e => e.TestId)
+                      .IsRequired()
+                      .HasColumnName("test_id");
+
+                entity.Property(e => e.QuestionText)
+                      .HasMaxLength(255)
+                      .HasColumnName("question_text");
+
+                entity.Property(e => e.CorrectOption)
+                  .HasMaxLength(255)
+                  .HasColumnName("correct_option");
+
+                entity.Property(e => e.QuestionType)
+                      .HasColumnName("question_type");
+
+                entity.Property(e => e.Explanation)
+                      .HasMaxLength(255)
+                      .HasColumnName("explanation");
+
+                entity.Property(e => e.A)
+                      .HasMaxLength(255)
+                      .HasColumnName("a");
+
+                entity.Property(e => e.B)
+                      .HasMaxLength(255)
+                      .HasColumnName("b");
+
+                entity.Property(e => e.C)
+                      .HasMaxLength(255)
+                      .HasColumnName("c");
+
+                entity.Property(e => e.D)
+                      .HasMaxLength(255)
+                      .HasColumnName("d");
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnName("created_at");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnName("updated_at");
+
+                entity.HasOne(e => e.Test)
+                      .WithMany(t => t.Questions) // sửa lại navigation property nếu đang sai
+                      .HasForeignKey(e => e.TestId)
+                      .HasConstraintName("fk_questions_tests")
                       .OnDelete(DeleteBehavior.Cascade);
-
-                entity.Property(p => p.question_text)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.question_type);
-
-                entity.Property(p => p.explanation)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.A)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.B)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.C)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(p => p.D)
-                      .IsRequired()
-                      .HasMaxLength(255);
-
-                entity.Property(d => d.CreatedAt);
-
-                entity.Property(d => d.UpdatedAt);
             });
         }
+
     }
 }

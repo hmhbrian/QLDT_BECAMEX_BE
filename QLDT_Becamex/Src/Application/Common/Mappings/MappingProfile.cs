@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
+using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Questions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
@@ -12,6 +14,7 @@ using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
+using static QLDT_Becamex.Src.Application.Features.Tests.Dtos.TestReponseDTO;
 
 namespace QLDT_Becamex.Src.Application.Common.Mappings
 {
@@ -78,17 +81,17 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             // Question
             CreateMap<QuestionDto, Question>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.test_id, opt => opt.Ignore())
+                .ForMember(dest => dest.TestId, opt => opt.Ignore())
                 .ForMember(dest => dest.Test, opt => opt.Ignore());
 
             // Test
             CreateMap<TestCreateDto, Test>()
-                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
 
             CreateMap<Test, TestDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
-                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Tests != null ? src.Tests.ToList() : new List<Question>()))
+                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.ToList() : new List<Question>()))
                 .AfterMap((src, dest) =>
                 {
                     if (dest.Tests != null)
@@ -101,10 +104,25 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 });
             CreateMap<TestUpdateDto, Test>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.course_id, opt => opt.Ignore())
-                .ForMember(dest => dest.userId_created, opt => opt.Ignore())
-                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
+                .ForMember(dest => dest.CourseId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserIdCreated, opt => opt.Ignore())
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
+            //CourseAttachedFile
+            CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();
+
+            //Lesson
+            CreateMap<Lesson, AllLessonDto>().ReverseMap();
+            CreateMap<Lesson, DetailLessonDto>()
+                .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.UserIdCreated))
+                .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserIdEdited))
+                .ForMember(dest => dest.UserNameCreated, opt => opt.MapFrom(src => src.UserCreated != null ? src.UserCreated.FullName : null))
+                .ForMember(dest => dest.UserNameEdited, opt => opt.MapFrom(src => src.UserEdited != null ? src.UserEdited.FullName : null));
+
+            //Test
+            CreateMap<Test, AllTestDto>()
+                .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0));
+
         }
     }
 }

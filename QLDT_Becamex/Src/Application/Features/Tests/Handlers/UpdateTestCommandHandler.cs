@@ -41,14 +41,14 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             _mapper.Map(request, test);
 
             // Set foreign key properties
-            test.userId_edited = request.userId_edited;
+            test.UserIdEdited = request.userId_edited;
             test.UpdatedAt = DateTime.UtcNow;
 
             // Handle Questions
             if (request.Tests != null)
             {
                 // Load existing questions
-                var existingQuestions = test.Tests?.ToList() ?? new List<Question>();
+                var existingQuestions = test.Questions?.ToList() ?? new List<Question>();
 
                 // Map new questions from request
                 var newQuestions = _mapper.Map<List<Question>>(request.Tests);
@@ -56,18 +56,18 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 // Update test_id and UpdatedAt for new questions
                 foreach (var question in newQuestions)
                 {
-                    question.test_id = test.Id;
+                    question.TestId = test.Id;
                     question.CreatedAt = question.CreatedAt == default ? DateTime.UtcNow : question.CreatedAt;
                     question.UpdatedAt = DateTime.UtcNow;
                 }
 
                 // Replace existing questions with new ones
-                test.Tests = newQuestions;
+                test.Questions = newQuestions;
             }
             else
             {
                 // If Tests is null, keep existing questions
-                test.Tests = test.Tests ?? new List<Question>();
+                test.Questions = test.Questions ?? new List<Question>();
             }
 
             // Update Test in repository

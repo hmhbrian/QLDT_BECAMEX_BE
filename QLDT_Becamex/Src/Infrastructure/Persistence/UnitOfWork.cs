@@ -20,6 +20,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public ICourseCategoryRepository CourseCategoryRepository { get; }
         public ILecturerRepository LecturerRepository { get; }
         public ITestRepository TestRepository { get; }
+        public ICourseAttachedFileRepository CourseAttachedFileRepository { get; }
+        public ILessonRepository LessonRepository { get; }
+        public IQuestionRepository QuestionRepository { get; }
 
 
         public UnitOfWork(ApplicationDbContext dbContext)
@@ -37,6 +40,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             LecturerRepository = new LecturerRepository(dbContext);
             CourseCategoryRepository = new CourseCategoryRepository(dbContext);
             TestRepository = new TestRepository(dbContext);
+            CourseAttachedFileRepository = new CourseAttachedFileRepository(dbContext);
+            LessonRepository = new LessonRepository(dbContext);
+            QuestionRepository = new QuestionRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

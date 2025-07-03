@@ -31,7 +31,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
 
         /// <summary>
-        /// Lấy danh sách bài học của khóa học.
+        /// Thêm bài học cho khóa học.
         /// </summary>
         [HttpPost]
 
@@ -82,7 +82,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// </summary>
         /// <param name="LessonId">ID của bài học cần lấy thông tin.</param>
         /// <returns>ActionResult chứa thông tin chi tiết bài học hoặc lỗi nếu không tìm thấy.</returns>
-        [HttpGet("OfCourse/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetLessonById(int id)
         {
             var result = await _mediator.Send(new GetLessonByIdQuery(id));

@@ -4,11 +4,11 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
 {
     public class TestCreateDto
     {
-        public string course_id { get; set; } = null!; // Bắt buộc
-        public string title { get; set; } = null!; // Bắt buộc
-        public float pass_threshold { get; set; }
-        public int time_test { get; set; }
-        public string userId_created { get; set; } = null!; // Bắt buộc
-        public ICollection<QuestionDto> Tests { get; set; } = new List<QuestionDto>();
+        public string CourseId { get; set; } = null!; // Bắt buộc
+        public string Title { get; set; } = null!; // Bắt buộc
+        public float PassThreshold { get; set; }
+        public int TimeTest { get; set; }
+        public string UserIdCreated { get; set; } = null!; // Bắt buộc
+        public ICollection<QuestionDto> Questions { get; set; } = new List<QuestionDto>();
     }
 }

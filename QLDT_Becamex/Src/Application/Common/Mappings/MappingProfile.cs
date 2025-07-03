@@ -14,7 +14,6 @@ using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
-using static QLDT_Becamex.Src.Application.Features.Tests.Dtos.TestReponseDTO;
 
 namespace QLDT_Becamex.Src.Application.Common.Mappings
 {
@@ -85,28 +84,30 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             // Test
             CreateMap<TestCreateDto, Test>()
-                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
 
-            CreateMap<Test, TestDto>()
+            CreateMap<Test, DetailTestDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
-                .ForMember(dest => dest.Tests, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.ToList() : new List<Question>()))
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.ToList() : new List<Question>()))
                 .AfterMap((src, dest) =>
                 {
-                    if (dest.Tests != null)
+                    if (dest.Questions != null)
                     {
-                        foreach (var q in dest.Tests)
+                        foreach (var q in dest.Questions)
                         {
                             q.Test = null;
                         }
                     }
                 });
+
             CreateMap<TestUpdateDto, Test>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore())
                 .ForMember(dest => dest.UserIdCreated, opt => opt.Ignore())
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
+
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();
 

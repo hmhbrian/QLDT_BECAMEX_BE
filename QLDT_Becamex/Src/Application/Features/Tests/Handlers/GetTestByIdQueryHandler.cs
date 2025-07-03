@@ -8,7 +8,7 @@ using QLDT_Becamex.Src.Application.Features.Tests.Queries;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
-    public class GetTestByIdQueryHandler : IRequestHandler<GetTestByIdQuery, TestDto>
+    public class GetTestByIdQueryHandler : IRequestHandler<GetTestByIdQuery, DetailTestDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             _mapper = mapper;
         }
 
-        public async Task<TestDto> Handle(GetTestByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DetailTestDto> Handle(GetTestByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                     throw new AppException("Bài kiểm tra không tồn tại", 404);
                 }
 
-                var testDto = _mapper.Map<TestDto>(testEntity);
+                var testDto = _mapper.Map<DetailTestDto>(testEntity);
                 return testDto;
             }
             catch (Exception ex)

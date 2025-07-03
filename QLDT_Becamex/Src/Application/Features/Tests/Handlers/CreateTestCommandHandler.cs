@@ -22,12 +22,12 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             var request = command.Request;
 
             // Check course existence
-            var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == request.course_id);
+            var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == request.CourseId);
             if (!courseExists)
             {
                 throw new AppException("Khóa học không tồn tại", 404);
             }
-            var userCreatedExists = await _unitOfWork.UserRepository.AnyAsync(c => c.Id == request.userId_created);
+            var userCreatedExists = await _unitOfWork.UserRepository.AnyAsync(c => c.Id == request.UserIdCreated);
             if (!userCreatedExists)
             {
                 throw new AppException("User tạo bài không tồn tại", 404);
@@ -36,9 +36,9 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             var test = _mapper.Map<Test>(request);
 
             // Set navigation properties
-            test.CourseId = request.course_id;
-            test.UserIdCreated = request.userId_created;
-            test.UserIdEdited = request.userId_created;
+            test.CourseId = request.CourseId;
+            test.UserIdCreated = request.UserIdCreated;
+            test.UserIdEdited = request.UserIdCreated;
             // Set test_id for each Question in Tests
             if (test.Questions != null)
             {

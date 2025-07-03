@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using static QLDT_Becamex.Src.Application.Features.Tests.Dtos.TestReponseDTO;
+using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Queries
 {

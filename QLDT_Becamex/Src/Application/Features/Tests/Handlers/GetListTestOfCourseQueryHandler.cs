@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using static QLDT_Becamex.Src.Application.Features.Tests.Dtos.TestReponseDTO;
+using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {

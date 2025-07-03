@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -74,5 +74,6 @@ namespace xUnitQLDT_Becamex.Tests.Controllers
             Assert.True(Guid.TryParse(apiResponse.Data, out _)); // Kiểm tra định dạng GUID
             _mediatorMock.Verify(m => m.Send(It.IsAny<CreateUserCommand>(), It.IsAny<CancellationToken>()), Times.Once());
         }
+        
     }
 }

@@ -120,7 +120,6 @@ builder.Services.AddScoped<ICourseCategoryRepository, CourseCategoryRepository>(
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ITestRepository, TestRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
-
 // Services
 
 builder.Services.AddScoped<IJwtService, JwtService>();

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xUnitQLDT_Becamex.Tests.Handlers.User
+namespace xUnitQLDT_Becamex.Tests.Handlers.UserChangePasswordCommand
 {
     public class ForceDeleteUserCommandHandlerTests
     {

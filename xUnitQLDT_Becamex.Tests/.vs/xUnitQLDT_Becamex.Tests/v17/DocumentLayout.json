@@ -1,0 +1,106 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|c:\\data\\becamex project\\qldt_becamex_be\\xunitqldt_becamex.tests\\handlers\\user\\getuserbyidqueryhandlertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|solutionrelative:handlers\\user\\getuserbyidqueryhandlertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|c:\\data\\becamex project\\qldt_becamex_be\\xunitqldt_becamex.tests\\handlers\\user\\getlistusersqueryhandlertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|solutionrelative:handlers\\user\\getlistusersqueryhandlertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|c:\\data\\becamex project\\qldt_becamex_be\\xunitqldt_becamex.tests\\xunitqldt_becamex.tests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|solutionrelative:xunitqldt_becamex.tests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|c:\\data\\becamex project\\qldt_becamex_be\\xunitqldt_becamex.tests\\handlers\\user\\changepasswordusercommandhandlertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C96677-EB42-4BDF-90C0-6B0B8AE479B7}|xUnitQLDT_Becamex.Tests.csproj|solutionrelative:handlers\\user\\changepasswordusercommandhandlertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "xUnitQLDT_Becamex.Tests",
+              "DocumentMoniker": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\xUnitQLDT_Becamex.Tests.csproj",
+              "RelativeDocumentMoniker": "xUnitQLDT_Becamex.Tests.csproj",
+              "ToolTip": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\xUnitQLDT_Becamex.Tests.csproj",
+              "RelativeToolTip": "xUnitQLDT_Becamex.Tests.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-07-01T09:09:43.12Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GetListUsersQueryHandlerTest.cs",
+              "DocumentMoniker": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Handlers\\User\\GetListUsersQueryHandlerTest.cs",
+              "RelativeDocumentMoniker": "Handlers\\User\\GetListUsersQueryHandlerTest.cs",
+              "ToolTip": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Handlers\\User\\GetListUsersQueryHandlerTest.cs",
+              "RelativeToolTip": "Handlers\\User\\GetListUsersQueryHandlerTest.cs",
+              "ViewState": "AQIAAGoAAAAAAAAAAAAhwIQAAAAZAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T09:06:40.751Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GetUserByIdQueryHandlerTest.cs",
+              "DocumentMoniker": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Handlers\\User\\GetUserByIdQueryHandlerTest.cs",
+              "RelativeDocumentMoniker": "Handlers\\User\\GetUserByIdQueryHandlerTest.cs",
+              "ToolTip": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Handlers\\User\\GetUserByIdQueryHandlerTest.cs",
+              "RelativeToolTip": "Handlers\\User\\GetUserByIdQueryHandlerTest.cs",
+              "ViewState": "AQIAACkAAAAAAAAAAAAQwDMAAAA1AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T08:56:39.005Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ChangePasswordUserCommandHandlerTest.cs",
+              "DocumentMoniker": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Handlers\\User\\ChangePasswordUserCommandHandlerTest.cs",
+              "RelativeDocumentMoniker": "Handlers\\User\\ChangePasswordUserCommandHandlerTest.cs",
+              "ToolTip": "C:\\Data\\BECAMEX Project\\QLDT_BECAMEX_BE\\xUnitQLDT_Becamex.Tests\\Handlers\\User\\ChangePasswordUserCommandHandlerTest.cs",
+              "RelativeToolTip": "Handlers\\User\\ChangePasswordUserCommandHandlerTest.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAAQwBwAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T08:03:53.413Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1038,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

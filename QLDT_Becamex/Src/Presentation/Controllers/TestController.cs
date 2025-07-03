@@ -26,6 +26,6 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetListTestOfCourseQuery(courseId));
             return Ok(ApiResponse<List<AllTestDto>>.Ok(result));
-        }
+        } 
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace QLDT_Becamex.Src.Domain.Entities
+namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class Test
     {

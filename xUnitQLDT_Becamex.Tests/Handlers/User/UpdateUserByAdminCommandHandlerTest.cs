@@ -9,7 +9,7 @@ using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Handlers;
 using QLDT_Becamex.Src.Domain.Entities;
 
-namespace xUnitQLDT_Becamex.Tests.Handlers.User
+namespace xUnitQLDT_Becamex.Tests.Handlers.UserChangePasswordCommand
 {
     public class UpdateUserByAdminCommandHandlerTests
     {

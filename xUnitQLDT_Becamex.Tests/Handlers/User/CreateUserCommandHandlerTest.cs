@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xUnitQLDT_Becamex.Tests.Handlers.User
+namespace xUnitQLDT_Becamex.Tests.Handlers.UserChangePasswordCommand
 {
     public class CreateUserCommandHandlerTest
     {
@@ -60,7 +60,8 @@ namespace xUnitQLDT_Becamex.Tests.Handlers.User
 
             var role = new IdentityRole { Name = "HOCVIEN" };
             _roleManager.Setup(r => r.FindByNameAsync("HOCVIEN")).ReturnsAsync(role);
-            _userManager.Setup(u => u.FindByEmailAsync(userDtoRq.Email)).ReturnsAsync(new ApplicationUser { Email = userDtoRq.Email});
+            //_userManager.Setup(u => u.FindByEmailAsync(userDtoRq.Email)).ReturnsAsync(new ApplicationUser { Email = userDtoRq.Email});
+            _userManager.Setup(u => u.FindByEmailAsync(userDtoRq.Email)).ReturnsAsync((ApplicationUser)null);
             _userManager.Setup(u => u.CreateAsync(It.IsAny<ApplicationUser>(), userDtoRq.Password)).ReturnsAsync(IdentityResult.Success);
             _userManager.Setup(u => u.AddToRoleAsync(It.IsAny<ApplicationUser>(), role.Name)).ReturnsAsync(IdentityResult.Success);
 

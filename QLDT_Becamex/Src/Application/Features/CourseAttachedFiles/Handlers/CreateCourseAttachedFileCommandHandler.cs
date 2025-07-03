@@ -40,6 +40,10 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
             {
                 throw new AppException("Không tìm thấy thông tin người dùng được xác thực.", 401);
             }
+            if (requests.Count == 0 || requests == null )
+            {
+                throw new AppException("Danh sách request không được để trống.", 400);
+            }
 
             var existingCourse = await _unitOfWork.CourseRepository.GetByIdAsync(courseId);
 
@@ -49,7 +53,6 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
             }
 
             var createdFilesDto = new List<CourseAttachedFileDto>(); // Danh sách để lưu các DTO kết quả
-
 
             foreach (var request in requests)
             {
@@ -64,7 +67,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                 }
 
                 // 1. Kiểm tra ưu tiên: nếu có Link thì lưu Link
-                if (!string.IsNullOrEmpty(request.Link))
+                if (request.Link != null && request.File == null)
                 {
                     fileOrLinkUrl = request.Link;
                     fileType = "Link";
@@ -122,16 +125,16 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
 
                 // --- Lưu thông tin vào Database ---
                 var newAttachedFile = new DomainEntities.CourseAttachedFile()
-                {
-                    CourseId = courseId!, // Sử dụng CourseId từ command
-                    Title = request.Title!,
-                    Type = fileType,
-                    Link = fileOrLinkUrl!,
-                    PublicIdUrlPdf = filePublicId,
-                    UserId = userId!,
-                    CreatedAt = DateTime.Now,
-                    ModifiedTime = DateTime.Now
-                };
+                    {
+                        CourseId = courseId!, // Sử dụng CourseId từ command
+                        Title = request.Title!,
+                        Type = fileType,
+                        Link = fileOrLinkUrl,
+                        PublicIdUrlPdf = filePublicId,
+                        UserId = userId!,
+                        CreatedAt = DateTime.Now,
+                        ModifiedTime = DateTime.Now
+                    };
 
                 await _unitOfWork.CourseAttachedFileRepository.AddAsync(newAttachedFile);
 
@@ -151,6 +154,11 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
 
             // Gọi CompleteAsync một lần duy nhất sau khi đã thêm tất cả các file
             await _unitOfWork.CompleteAsync();
+            //if (result <= 0)
+            //{
+            //    Console.WriteLine("[HANDLER ERROR] Không có bản ghi nào được lưu vào database.");
+            //    throw new AppException("Không thể lưu dữ liệu vào database.", 500);
+            //}
 
             return createdFilesDto; // Trả về danh sách DTO của các file đã tạo
         }

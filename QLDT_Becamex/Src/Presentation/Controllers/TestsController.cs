@@ -5,28 +5,30 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
-using QLDT_Becamex.Src.Domain.Interfaces;
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {
     [ApiController]
-    [Route("api/tests")]
+    [Route("api/courses/{courseId}/tests")]
     public class TestsController : ControllerBase
     {
-        private readonly ITestRepository _testRepository;
         public readonly IMediator _mediator;
-        public TestsController(ITestRepository testRepository, IMediator mediator)
+        public TestsController(IMediator mediator)
         {
-            _testRepository = testRepository;
             _mediator = mediator;
         }
+
+        /// <summary>
+        /// Lấy danh sách bài kiểm tra của khóa học.HOCVIEN, HR, ADMIN có quyền truy cập
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "ADMIN, HR")]
-        public async Task<IActionResult> GetAllTest()
+        public async Task<IActionResult> GetListTestOfCourse([FromRoute] string courseId)
         {
-            var result = await _mediator.Send(new GetAllTestQuery());
-            return Ok(ApiResponse<List<TestDto>>.Ok(result));
+            var result = await _mediator.Send(new GetListTestOfCourseQuery(courseId));
+            return Ok(ApiResponse<List<AllTestDto>>.Ok(result));
         }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetTestById(int id)
@@ -36,8 +38,9 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             {
                 return NotFound(ApiResponse.Fail("Bài kiểm tra không tồn tại"));
             }
-            return Ok(ApiResponse<TestDto>.Ok(result));
+            return Ok(ApiResponse<DetailTestDto>.Ok(result));
         }
+
         [HttpPost("create")]
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> CreateTest([FromBody] TestCreateDto request, CancellationToken cancellationToken)
@@ -45,6 +48,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             var result = await _mediator.Send(new CreateTestCommand(request), cancellationToken);
             return Ok(ApiResponse<string>.Ok(result, "Thêm bài kiểm tra thành công"));
         }
+
         [HttpPut("update/{id}")]
         [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> UpdateDepartment(int id, [FromBody] TestUpdateDto request, CancellationToken cancellationToken)

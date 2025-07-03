@@ -3,5 +3,5 @@ using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Queries
 {
-    public record GetTestByIdQuery(int Id) : IRequest<TestDto>;
+    public record GetTestByIdQuery(int Id) : IRequest<DetailTestDto>;
 }

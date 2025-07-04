@@ -31,6 +31,15 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             {
                 throw new AppException("Khóa học không tồn tại", 404);
             }
+            // get max test position in course
+            var testsInCourse = await _unitOfWork.TestRepository.GetFlexibleAsync(
+                predicate: t => t.CourseId == courseId,
+                asNoTracking: true
+            );
+            int maxPosition = testsInCourse.Any()
+                ? testsInCourse.Max(t => t.Position)
+                : 0;
+            // Check if user exists
             var userCreatedExists = await _unitOfWork.UserRepository.AnyAsync(c => c.Id == userId);
             if (!userCreatedExists)
             {
@@ -41,17 +50,20 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 
             // Set navigation properties
             test.CourseId = courseId;
-            test.UserIdCreated = userId; // Use userId from authentication info
+            test.UserIdCreated = userId;
             test.UserIdEdited = userId;
             test.CreatedAt = DateTime.UtcNow;
             test.UpdatedAt = DateTime.UtcNow;
+            test.Position = maxPosition + 1;
             // Set test_id for each Question in Tests
             if (test.Questions != null)
             {
+                int index = 1;
                 foreach (var question in test.Questions)
                 {
                     question.CreatedAt = DateTime.UtcNow;
                     question.UpdatedAt = DateTime.UtcNow;
+                    question.Position = index++;
                 }
             }
 

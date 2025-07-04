@@ -24,11 +24,23 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             {
                 throw new AppException("Bài kiểm tra không tồn tại", 404);
             }
-
+            string courseId = test.CourseId;
             // Remove Test from repository
             _unitOfWork.TestRepository.Remove(test);
 
             // Save changes to database
+            await _unitOfWork.CompleteAsync();
+            var allTest = await _unitOfWork.TestRepository.GetAllAsync();
+            var remainingTests = allTest.Where(t => t.CourseId == courseId).ToList();
+
+            int position = 1;
+            foreach (var t in remainingTests.OrderBy(t => t.Position))
+            {
+                t.Position = position++;
+                t.UpdatedAt = DateTime.UtcNow;
+                _unitOfWork.TestRepository.Update(t);
+            }
+
             await _unitOfWork.CompleteAsync();
 
             // Return Test Id as string

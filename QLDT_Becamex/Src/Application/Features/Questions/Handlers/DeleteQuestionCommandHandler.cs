@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Questions.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces;
@@ -6,42 +6,49 @@ using QLDT_Becamex.Src.Domain.Interfaces;
 
 namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
 {
-    public class DeleteQuestionsCommandHandler : IRequestHandler<DeleteQuestionsCommand, string>
+    public class DeleteQuestionCommandHandler : IRequestHandler<DeleteQuestionCommand, string>
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteQuestionsCommandHandler(IUnitOfWork unitOfWork)
+        public DeleteQuestionCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<string> Handle(DeleteQuestionsCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(DeleteQuestionCommand request, CancellationToken cancellationToken)
         {
-            var questionIds = request.QuestionIds;
+            var questionId = request.QuestionId;
 
             var existTest = await _unitOfWork.TestRepository.GetByIdAsync(request.TestId);
             if (existTest == null)
             {
-                throw new AppException("Bài kiểm tra không tồn tại", 404);  // Ném ngoại lệ nếu bài kiểm tra không tồn tại
+                throw new AppException("Bài kiểm tra không tồn tại", 404);
             }
-            // Kiểm tra xem danh sách ID câu hỏi có hợp lệ không
-            if (questionIds == null || !questionIds.Any())
-            {
-                throw new AppException("Danh sách câu hỏi cần xóa không hợp lệ", 400);
-            }
-            // Lấy danh sách entity tương ứng với các ID
-            var questions = await _unitOfWork.QuestionRepository.FindAsync(q => questionIds.Contains(q.Id) && q.TestId == request.TestId);
 
-            if (!questions.Any())
+            var question = await _unitOfWork.QuestionRepository.FindAsync(q => q.Id == questionId && q.TestId == request.TestId);
+            if (!question.Any())
             {
-                throw new AppException("Không tìm thấy câu hỏi nào phù hợp để xóa", 404);
+                throw new AppException("Câu hỏi cần xóa không tồn tại trong bài kiểm tra này", 404);
             }
-            // Xóa câu hỏi khỏi cơ sở dữ liệu
-            _unitOfWork.QuestionRepository.RemoveRange(questions);
+
+            _unitOfWork.QuestionRepository.Remove(question.First());
             await _unitOfWork.CompleteAsync();
 
-            // Trả về thông báo thành công
-            return $"Đã xóa {questionIds.Count} câu hỏi thành công.";
+            var allQuestions = await _unitOfWork.QuestionRepository.GetAllAsync();
+            var remainingQuestions = allQuestions.Where(q => q.TestId == request.TestId).ToList();
+
+            int position = 1;
+            foreach (var q in remainingQuestions.OrderBy(q => q.Position))
+            {
+                q.Position = position++;
+                q.UpdatedAt = DateTime.UtcNow;
+                _unitOfWork.QuestionRepository.Update(q);
+            }
+
+            await _unitOfWork.CompleteAsync();
+
+            return $"Đã xóa câu hỏi thành công.";
         }
+
     }
 }

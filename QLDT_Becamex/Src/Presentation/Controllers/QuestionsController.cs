@@ -60,5 +60,12 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             var result = await _mediator.Send(command);
             return Ok(ApiResponse<string>.Ok(result));
         }
+        [HttpDelete("{questionId}")]
+        public async Task<IActionResult> DeleteById([FromRoute] int testId, [FromRoute] int questionId)
+        {
+            var command = new DeleteQuestionCommand(testId, questionId);
+            var result = await _mediator.Send(command);
+            return Ok(ApiResponse<string>.Ok(result));
+        }
     }
 }

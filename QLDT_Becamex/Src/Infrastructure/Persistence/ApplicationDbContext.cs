@@ -487,10 +487,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasMaxLength(255)
                       .HasColumnName("title");
 
-                entity.Property(e => e.Slug)
+                entity.Property(e => e.Position)
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnName("slug");
+                        .HasColumnName("position");
 
                 entity.Property(e => e.UrlPdf)
                       .IsRequired()
@@ -551,6 +550,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .IsRequired()
                       .ValueGeneratedOnAdd()
                       .HasColumnName("id");
+
+                entity.Property(e => e.Position)
+                        .IsRequired()
+                        .HasColumnName("position");
 
                 entity.Property(e => e.Title)
                       .IsRequired()
@@ -614,6 +617,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(e => e.TestId)
                       .IsRequired()
                       .HasColumnName("test_id");
+
+                entity.Property(e => e.Position)
+                        .IsRequired()
+                        .HasColumnName("position");
 
                 entity.Property(e => e.QuestionText)
                       .HasMaxLength(255)

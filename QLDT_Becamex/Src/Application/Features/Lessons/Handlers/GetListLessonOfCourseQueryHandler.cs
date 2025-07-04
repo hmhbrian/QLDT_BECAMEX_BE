@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             // Lấy danh sách bài học của khóa học theo CourseId
             var lessons = await _unitOfWork.LessonRepository.GetFlexibleAsync(
                 predicate: l => l.CourseId == request.CourseId,
-                orderBy: q => q.OrderBy(l => l.Slug)
+                orderBy: q => q.OrderBy(l => l.Position)
 
             );
 

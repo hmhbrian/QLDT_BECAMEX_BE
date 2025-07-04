@@ -22,9 +22,7 @@ public class ChangePasswordUserCommandHandler : IRequestHandler<ChangePasswordUs
 
         var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
 
-#pragma warning disable CS8604 // Possible null reference argument.
         var user = await _userManager.FindByIdAsync(userId);
-#pragma warning restore CS8604 // Possible null reference argument.
         if (user == null)
             throw new AppException("Không tìm thấy người dùng", 404);
 

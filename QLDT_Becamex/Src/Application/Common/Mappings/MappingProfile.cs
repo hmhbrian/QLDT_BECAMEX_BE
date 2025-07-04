@@ -81,7 +81,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TestId, opt => opt.Ignore())
                 .ForMember(dest => dest.Test, opt => opt.Ignore());
-
+            CreateMap<Question, QuestionDto>();
             // Test
             CreateMap<TestCreateDto, Test>()
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions ?? new List<QuestionDto>()))
@@ -89,17 +89,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             CreateMap<Test, DetailTestDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
-                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.ToList() : new List<Question>()))
-                .AfterMap((src, dest) =>
-                {
-                    if (dest.Questions != null)
-                    {
-                        foreach (var q in dest.Questions)
-                        {
-                            q.Test = null;
-                        }
-                    }
-                });
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()));
 
             CreateMap<TestUpdateDto, Test>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -107,6 +97,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.UserIdCreated, opt => opt.Ignore())
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
+            CreateMap<Test, AllTestDto>()
+                .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0));
 
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();

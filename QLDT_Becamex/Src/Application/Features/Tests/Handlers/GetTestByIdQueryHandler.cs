@@ -23,8 +23,13 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
         {
             try
             {
+                var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == request.CourseId);
+                if (!courseExists)
+                {
+                    throw new AppException("Khóa học không tồn tại", 404);
+                }
                 var test = await _unitOfWork.TestRepository.GetFlexibleAsync(
-                    predicate: t => t.Id == request.Id,
+                    predicate: t => t.Id == request.Id && t.CourseId == request.CourseId,
                     orderBy: null,
                     page: null,
                     pageSize: 1, // Giới hạn 1 bản ghi

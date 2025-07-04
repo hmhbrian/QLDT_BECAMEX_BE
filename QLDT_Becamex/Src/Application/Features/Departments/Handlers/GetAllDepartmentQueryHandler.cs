@@ -6,6 +6,7 @@ using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Application.Features.Departments.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 
 namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 {
@@ -13,13 +14,13 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IBaseService _baseService;
+        private readonly IDepartmentService _departmentService;
 
-        public GetAllDepartmentQueryHandler(IMapper mapper, IUnitOfWork unitOfWork, IBaseService baseService)
+        public GetAllDepartmentQueryHandler(IMapper mapper, IUnitOfWork unitOfWork, IDepartmentService departmentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _baseService = baseService;
+            _departmentService = departmentService;
         }
 
         public async Task<List<DepartmentDto>> Handle(GetAllDepartmentQuery request, CancellationToken cancellationToken)
@@ -57,7 +58,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 
                 // Ánh xạ danh sách Department sang DepartmentDto
                 var departmentDtos = await Task.WhenAll(allDepartments.Select(
-                    dept => _baseService.MapToDtoAsync(dept, departmentDict, userDict, pathCache, _mapper)));
+                    dept => _departmentService.MapToDtoAsync(dept, departmentDict, userDict, pathCache, _mapper)));
 
                 return departmentDtos.ToList();
             }

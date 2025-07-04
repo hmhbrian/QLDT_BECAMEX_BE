@@ -5,7 +5,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
     public class Question
     {
         public int Id { get; set; }
-        public int? TestId { get; set; }
+        public int TestId { get; set; }
         public Test? Test { get; set; }
         public string? QuestionText { get; set; }
         public string? CorrectOption { get; set; }
@@ -18,9 +18,9 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public void Create(CreateQuestionDto request)
+        public void Create(int testId, CreateQuestionDto request)
         {
-            // Gán các giá trị từ DTO vào entity Question
+            TestId = testId;
             QuestionText = request.QuestionText;
             CorrectOption = request.CorrectOption;
             QuestionType = request.QuestionType;

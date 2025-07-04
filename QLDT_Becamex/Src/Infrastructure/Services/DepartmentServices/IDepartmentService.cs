@@ -2,12 +2,12 @@
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 
-namespace QLDT_Becamex.Src.Infrastructure.Services
+namespace QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices
 {
-    public interface IBaseService
+    public interface IDepartmentService
     {
-        public (string? UserId, string? Role) GetCurrentUserAuthenticationInfo();
         public Task<List<int>> GetAllChildDepartmentIds(int parentDepartmentId);
+        public List<string> GetPath(int departmentId, Dictionary<int, Department> departmentDict, Dictionary<int, List<string>> pathCache);
         public Task ValidateManagerIdDeparmentAsync(string? managerId, bool isRequired, string? currentManagerId, int? departmentId);
         public Task<DepartmentDto> MapToDtoAsync(
             Department dept,

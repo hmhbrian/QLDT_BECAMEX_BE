@@ -4,26 +4,27 @@ using QLDT_Becamex.Src.Application.Common.Dtos; // AppException
 using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 {
     public class UpdateLessonCommandHandler : IRequestHandler<UpdateLessonCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IBaseService _baseService;
+        private readonly IUserService _userService;
         private readonly ICloudinaryService _cloudinaryService;
 
-        public UpdateLessonCommandHandler(IUnitOfWork unitOfWork, IBaseService baseService, ICloudinaryService cloudinaryService)
+        public UpdateLessonCommandHandler(IUnitOfWork unitOfWork, IUserService userService, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
-            _baseService = baseService;
+            _userService = userService;
             _cloudinaryService = cloudinaryService;
         }
 
         public async Task Handle(UpdateLessonCommand request, CancellationToken cancellationToken)
         {
             // 1. Lấy User ID từ BaseService
-            var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
             if (string.IsNullOrEmpty(userId))
             {
                 throw new AppException("User ID not found. User must be authenticated.", 401);

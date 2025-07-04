@@ -4,6 +4,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
@@ -11,27 +12,35 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public UpdateTestCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IUserService _userService;
+        public UpdateTestCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userService = userService;
         }
 
         public async Task<string> Handle(UpdateTestCommand command, CancellationToken cancellationToken)
         {
             var id = command.Id;
             var request = command.Request;
-
+            var courseId = command.CourseId;
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
+            // Kiểm tra Course existence
+            var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == courseId);
+            if (!courseExists) 
+            {
+                throw new AppException("Khóa học không tồn tại", 404);
+            }
             // Kiểm tra Test existence
             var test = await _unitOfWork.TestRepository.GetByIdAsync(id);
-            if (test == null)
+            if (test == null || test.CourseId != courseId)
             {
                 throw new AppException("Bài kiểm tra không tồn tại", 404);
             }
 
             // Kiểm tra UserEdited existence
-            var userEditedExists = await _unitOfWork.UserRepository.AnyAsync(c => c.Id == request.userId_edited);
+            var userEditedExists = await _unitOfWork.UserRepository.AnyAsync(c => c.Id == userId);
             if (!userEditedExists)
             {
                 throw new AppException("User chỉnh sửa bài không tồn tại", 404);
@@ -41,7 +50,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             _mapper.Map(request, test);
 
             // Set foreign key properties
-            test.UserIdEdited = request.userId_edited;
+            test.UserIdEdited = userId; // Use userId from authentication info
             test.UpdatedAt = DateTime.UtcNow;
 
             // Handle Questions

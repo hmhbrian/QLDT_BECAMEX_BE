@@ -487,6 +487,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasMaxLength(255)
                       .HasColumnName("title");
 
+                entity.Property(e => e.Slug)
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnName("slug");
+
                 entity.Property(e => e.UrlPdf)
                       .IsRequired()
                       .HasMaxLength(255)

@@ -30,7 +30,7 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
 
             // Tạo đối tượng Question từ DTO
             var newQuestion = new Question();
-            newQuestion.Create(createQuestionDto);
+            newQuestion.Create(request.TestId, createQuestionDto);
 
             // Lưu câu hỏi vào cơ sở dữ liệu
             await _unitOfWork.QuestionRepository.AddAsync(newQuestion);

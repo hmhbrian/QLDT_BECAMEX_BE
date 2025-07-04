@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 
 namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
 {
@@ -21,21 +22,21 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICloudinaryService _cloudinaryService;
-        private readonly IBaseService _baseService;
+        private readonly IUserService _userService;
 
         public UpdateUserByUserCommandHandler(
-            UserManager<ApplicationUser> userManager, ICloudinaryService cloudinaryService, IBaseService baseService)
+            UserManager<ApplicationUser> userManager, ICloudinaryService cloudinaryService, IUserService userService)
         {
             _userManager = userManager;
             _cloudinaryService = cloudinaryService;
-            _baseService = baseService;
+            _userService = userService;
         }
 
         public async Task<string> Handle(UpdateUserByUserCommand command, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var request = command.Request;
-            var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
             // 1. Tìm người dùng cần cập nhật
             var userToUpdate = await _userManager.FindByIdAsync(userId!);
 

@@ -14,6 +14,10 @@ using QLDT_Becamex.Src.Infrastructure.Services;
 
 
 using System.Text;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
+using QLDT_Becamex.Src.Infrastructure.Services.UserServices;
+using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
+using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,10 +125,11 @@ builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ITestRepository, TestRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 // Services
-
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-builder.Services.AddScoped<IBaseService, BaseService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
 
 
 // 6. Cấu hình Controllers và Swagger/OpenAPI

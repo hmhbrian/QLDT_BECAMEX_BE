@@ -2,6 +2,7 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Dtos
 {
     public class QuestionDto
     {
+        public int? Id { get; set; }
         public string? QuestionText { get; set; }
         public string? CorrectOption { get; set; }
         public int QuestionType { get; set; }

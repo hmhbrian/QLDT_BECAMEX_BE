@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace QLDT_Becamex.Src.Application.Features.Questions.Dtos
 {
     public class UpdateQuestionDto

@@ -32,9 +32,9 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Create new question under a test
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromRoute] int testId, [FromBody] CreateQuestionCommand command)
+        public async Task<IActionResult> Create([FromRoute] int testId, [FromBody] CreateQuestionDto request)
         {
-            command = command with { TestId = testId };
+            var command = new CreateQuestionCommand(testId, request);
             var result = await _mediator.Send(command);
             return Ok(ApiResponse<string>.Ok(result));
         }
@@ -43,12 +43,9 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Update existing question under a test
         /// </summary>
         [HttpPut("{questionId}")]
-        public async Task<IActionResult> Update([FromRoute] int testId, [FromRoute] int questionId, [FromBody] UpdateQuestionCommand command)
+        public async Task<IActionResult> Update([FromRoute] int testId, [FromRoute] int questionId, [FromBody] UpdateQuestionDto request)
         {
-            if (questionId != command.QuestionId)
-                return BadRequest(ApiResponse<string>.Fail("ID trong route và body không khớp", 400));
-
-            command = command with { TestId = testId };
+            var command = new UpdateQuestionCommand(questionId, testId, request);
             var result = await _mediator.Send(command);
             return Ok(ApiResponse<string>.Ok(result));
         }
@@ -57,9 +54,9 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Delete questions under a test
         /// </summary>
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromRoute] int testId, [FromBody] DeleteQuestionsCommand command)
+        public async Task<IActionResult> Delete([FromRoute] int testId, [FromBody] List<int> questionIds)
         {
-            command = command with { TestId = testId };
+            var command = new DeleteQuestionsCommand(testId, questionIds);
             var result = await _mediator.Send(command);
             return Ok(ApiResponse<string>.Ok(result));
         }

@@ -6,9 +6,9 @@ using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using AutoMapper;
 using QLDT_Becamex.Src.Application.Common.Dtos;
-using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
+using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
 
 namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 {

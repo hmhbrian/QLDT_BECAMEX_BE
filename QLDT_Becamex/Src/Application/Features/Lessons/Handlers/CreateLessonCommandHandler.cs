@@ -5,7 +5,8 @@ using QLDT_Becamex.Src.Infrastructure.Persistence; // Namespace cho IUnitOfWork
 using QLDT_Becamex.Src.Infrastructure.Services; // Namespace cho CloudinaryService (nếu dùng trực tiếp hoặc service cụ thể)
 using QLDT_Becamex.Src.Domain.Interfaces; // Namespace cho IBaseService và ICloudinaryService
 using QLDT_Becamex.Src.Application.Common.Dtos; // Namespace cho AppException (nếu có)
-using QLDT_Becamex.Src.Application.Features.Lessons.Dtos; // Để đảm bảo dùng đúng CreateLessonDto
+using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices; // Để đảm bảo dùng đúng CreateLessonDto
 // using Microsoft.AspNetCore.Http; // Không cần thiết nếu BaseService xử lý HttpContextAccessor
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
@@ -13,20 +14,20 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
     public class CreateLessonCommandHandler : IRequestHandler<CreateLessonCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IBaseService _baseService;
+        private readonly IUserService _userService;
         private readonly ICloudinaryService _cloudinaryService;
 
-        public CreateLessonCommandHandler(IUnitOfWork unitOfWork, IBaseService baseService, ICloudinaryService cloudinaryService)
+        public CreateLessonCommandHandler(IUnitOfWork unitOfWork, IUserService userService, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
-            _baseService = baseService;
+            _userService = userService;
             _cloudinaryService = cloudinaryService;
         }
 
         public async Task Handle(CreateLessonCommand request, CancellationToken cancellationToken)
         {
             // Lấy User ID từ BaseService
-            var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
 
             if (string.IsNullOrEmpty(userId))
             {

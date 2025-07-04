@@ -6,6 +6,8 @@ using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
+using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 using QLDT_Becamex.Src.Shared.Helpers;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
@@ -15,13 +17,13 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
-        private readonly IBaseService _baseService;
-        public UpdateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IBaseService baseService)
+        private readonly IDepartmentService _departmentService;
+        public UpdateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
-            _baseService = baseService;
+            _departmentService = departmentService;
         }
 
         public async Task<string> Handle(UpdateCourseCommand command, CancellationToken cancellationToken)
@@ -69,10 +71,10 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     else
                     {
                         allIds.Add(deptId);
-                        var children = await _baseService.GetAllChildDepartmentIds(deptId);
+                        var children = await _departmentService.GetAllChildDepartmentIds(deptId);
                         foreach (var child in children) allIds.Add(child);
                     }
-                
+
                 }
                 if (invalid.Any())
                     throw new AppException($"Phòng ban không hợp lệ: {string.Join(", ", invalid)}", 400);
@@ -90,14 +92,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 if (invalid.Any())
                     throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalid)}", 400);
             }
-            
+
             _mapper.Map(request, course);
             string? imageUrl = null;
             if (request.ThumbUrl != null)
             {
                 imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
                 course.ThumbUrl = imageUrl;
-                
+
             }
             course.ModifiedAt = DateTime.Now;
             _unitOfWork.CourseRepository.Update(course);

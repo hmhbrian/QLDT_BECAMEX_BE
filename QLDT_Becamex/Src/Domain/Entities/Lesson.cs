@@ -1,5 +1,6 @@
 
 using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
+using QLDT_Becamex.Src.Shared.Helpers;
 namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class Lesson
@@ -10,7 +11,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string Title { get; set; } = null!;
         public string UrlPdf { get; set; } = null!;
         public string PublicIdUrlPdf { get; set; } = null!;
-
+        public string Slug { get; set; } = null!;
         public string? UserIdCreated { get; set; }
         public ApplicationUser? UserCreated { get; set; }
         public string? UserIdEdited { get; set; }
@@ -24,6 +25,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
             UrlPdf = urlPdf;
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;
+            Slug = StringHelper.RemoveDiacritics(request.Title);
             UserIdCreated = userIdCreated;
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
@@ -31,9 +33,11 @@ namespace QLDT_Becamex.Src.Domain.Entities
 
         public void Update(string courseId, string userIdEdited, UpdateLessonDto request, string urlPdf, string newFilePublicId)
         {
-            if (!string.IsNullOrWhiteSpace(request.Title) && request.Title.ToLower().Trim() != Title)
-                Title = request.Title.ToLower().Trim();
-
+            if (!string.IsNullOrWhiteSpace(request.Title) && request.Title != Title)
+            {
+                Title = request.Title;
+                Slug = StringHelper.RemoveDiacritics(request.Title);
+            }
             if (!string.IsNullOrWhiteSpace(urlPdf) && urlPdf != UrlPdf)
                 UrlPdf = urlPdf;
 

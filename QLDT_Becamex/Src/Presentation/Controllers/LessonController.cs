@@ -38,6 +38,10 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         [Consumes("multipart/form-data")] // Chỉ định rằng API mong đợi form-data (cho IFormFile)
         public async Task<IActionResult> CreateLessonOfCourse([FromRoute] string courseId, [FromForm] CreateLessonDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Trả về lỗi nếu validation thất bại
+            }
             await _mediator.Send(new CreateLessonCommand(courseId, request));
             return Ok(ApiResponse.Ok("Create lesson success"));
         }

@@ -5,14 +5,12 @@
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? UrlPdf { get; set; }
-        public int Position { get; set; }
     }
     public class DetailLessonDto
     {
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? UrlPdf { get; set; }
-        public int Position { get; set; }
         public string? UserIdCreated { get; set; }
         public string? UserNameCreated { get; set; }
         public string? UserIdEdited { get; set; }

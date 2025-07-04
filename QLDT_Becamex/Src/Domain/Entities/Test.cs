@@ -8,6 +8,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string? Title { get; set; }
         public float PassThreshold { get; set; }
         public int TimeTest { get; set; }
+        public int Position { get; set; }
         public string? UserIdCreated { get; set; }
         public ApplicationUser? UserCreated { get; set; }
         public string? UserIdEdited { get; set; }

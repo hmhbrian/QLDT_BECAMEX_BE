@@ -8,8 +8,6 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Dtos
         public string Title { get; set; } = null!;
         [Required]
         public IFormFile FilePdf { get; set; } = null!;
-        [Required]
-        public int? Position { get; set; }
     }
 
     public class UpdateLessonDto
@@ -19,6 +17,5 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Dtos
 
         public IFormFile? FilePdf { get; set; }
 
-        public int? Position { get; set; }
     }
 }

@@ -45,39 +45,21 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             {
                 throw new AppException("User chỉnh sửa bài không tồn tại", 404);
             }
-
+            var testsInCourse = await _unitOfWork.TestRepository.GetFlexibleAsync(
+                predicate: t => t.CourseId == courseId,
+                asNoTracking: true
+            );
+            // Kiểm tra trùng position trong cùng khóa học
+            if (testsInCourse.Any(t => t.Position == test.Position && t.Id != test.Id))
+            {
+                throw new AppException($"Position {test.Position} đã được sử dụng bởi một bài kiểm tra khác trong khóa học này", 400);
+            }
             // Map TestUpdateDto to existing Test
             _mapper.Map(request, test);
 
             // Set foreign key properties
             test.UserIdEdited = userId; // Use userId from authentication info
             test.UpdatedAt = DateTime.UtcNow;
-
-            // Handle Questions
-            if (request.Tests != null)
-            {
-                // Load existing questions
-                var existingQuestions = test.Questions?.ToList() ?? new List<Question>();
-
-                // Map new questions from request
-                var newQuestions = _mapper.Map<List<Question>>(request.Tests);
-
-                // Update test_id and UpdatedAt for new questions
-                foreach (var question in newQuestions)
-                {
-                    question.TestId = test.Id;
-                    question.CreatedAt = question.CreatedAt == default ? DateTime.UtcNow : question.CreatedAt;
-                    question.UpdatedAt = DateTime.UtcNow;
-                }
-
-                // Replace existing questions with new ones
-                test.Questions = newQuestions;
-            }
-            else
-            {
-                // If Tests is null, keep existing questions
-                test.Questions = test.Questions ?? new List<Question>();
-            }
 
             // Update Test in repository
             _unitOfWork.TestRepository.Update(test);

@@ -7,6 +7,6 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
         public string Title { get; set; } = null!; // Bắt buộc
         public float PassThreshold { get; set; }
         public int TimeTest { get; set; }
-        public ICollection<QuestionDto> Questions { get; set; } = new List<QuestionDto>();
+        public ICollection<CreateQuestionDto> Questions { get; set; } = new List<CreateQuestionDto>();
     }
 }

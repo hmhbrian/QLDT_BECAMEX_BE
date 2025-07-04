@@ -84,7 +84,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Question, QuestionDto>();
             // Test
             CreateMap<TestCreateDto, Test>()
-                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions ?? new List<QuestionDto>()))
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions ?? new List<CreateQuestionDto>()))
                 .AfterMap(ignoreNavigation);
 
             CreateMap<Test, DetailTestDto>()
@@ -95,11 +95,13 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore())
                 .ForMember(dest => dest.UserIdCreated, opt => opt.Ignore())
-                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
             CreateMap<Test, AllTestDto>()
                 .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0));
-
+            CreateMap<CreateQuestionDto, Question>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.TestId, opt => opt.Ignore())
+                .ForMember(dest => dest.Test, opt => opt.Ignore());
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();
 

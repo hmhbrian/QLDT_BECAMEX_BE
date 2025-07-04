@@ -21,24 +21,32 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
         {
             var createQuestionDto = request.Request;
 
-            // Kiểm tra sự tồn tại của bài kiểm tra (Test)
+            // Kiểm tra bài kiểm tra tồn tại
             var existTest = await _unitOfWork.TestRepository.GetByIdAsync(request.TestId);
             if (existTest == null)
             {
-                throw new AppException("Bài kiểm tra không tồn tại", 404);  // Ném ngoại lệ nếu bài kiểm tra không tồn tại
+                throw new AppException("Bài kiểm tra không tồn tại", 404);
             }
 
-            // Tạo đối tượng Question từ DTO
+            var allQuestions = await _unitOfWork.QuestionRepository.GetAllAsync();
+            var existingQuestions = allQuestions.Where(q => q.TestId == request.TestId).ToList();
+
+            int maxPosition = existingQuestions.Any()
+                ? existingQuestions.Max(q => q.Position)
+                : 0;
+
+            // Tạo câu hỏi và gán Position
             var newQuestion = new Question();
             newQuestion.Create(request.TestId, createQuestionDto);
+            newQuestion.Position = maxPosition + 1;
+            newQuestion.CreatedAt = DateTime.UtcNow;
+            newQuestion.UpdatedAt = DateTime.UtcNow;
 
-            // Lưu câu hỏi vào cơ sở dữ liệu
+            // Lưu vào DB
             await _unitOfWork.QuestionRepository.AddAsync(newQuestion);
             await _unitOfWork.CompleteAsync();
 
-            // Trả về ID của câu hỏi mới tạo hoặc một thông báo thành công
             return $"Tạo câu hỏi thành công. ID của câu hỏi mới là: {newQuestion.Id}";
         }
-
     }
 }

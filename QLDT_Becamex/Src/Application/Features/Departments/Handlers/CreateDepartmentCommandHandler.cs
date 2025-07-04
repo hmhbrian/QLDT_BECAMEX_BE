@@ -6,6 +6,7 @@ using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 
 
 
@@ -15,13 +16,13 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IBaseService _baseService;
+        private readonly IDepartmentService _departmentService;
 
-        public CreateDepartmentCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IBaseService baseService)
+        public CreateDepartmentCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IDepartmentService departmentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _baseService = baseService;
+            _departmentService = departmentService;
 
         }
         public async Task<string> Handle(CreateDepartmentCommand command, CancellationToken cancellationToken)
@@ -44,7 +45,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
             }
 
             // Kiểm tra ManagerId
-            await _baseService.ValidateManagerIdDeparmentAsync(request.ManagerId, true, null, null);
+            await _departmentService.ValidateManagerIdDeparmentAsync(request.ManagerId, true, null, null);
 
 
             var department = _mapper.Map<Department>(request);

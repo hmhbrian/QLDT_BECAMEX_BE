@@ -55,23 +55,25 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .Include(c => c.Lecturer)
             );
 
-            var pagination = new Pagination
-            {
-                TotalItems = totalItems,
-                ItemsPerPage = queryParam.Limit,
-                CurrentPage = queryParam.Page,
-                TotalPages = (int)Math.Ceiling((double)totalItems / queryParam.Limit)
-            };
-
+            // 1. Map dữ liệu
             var courseDtos = _mapper.Map<List<CourseDto>>(courseEntities);
 
-            var pagedResult = new PagedResult<CourseDto>
-            {
-                Items = courseDtos,
-                Pagination = pagination
-            };
+            // 2. Tạo đối tượng phân trang
+            var pagination = new Pagination(
+                currentPage: queryParam.Page,
+                itemsPerPage: queryParam.Limit,
+                totalItems: totalItems
+            );
 
+            // 3. Tạo kết quả phân trang
+            var pagedResult = new PagedResult<CourseDto>(
+                items: courseDtos,
+                pagination: pagination
+            );
+
+            // 4. Trả về
             return pagedResult;
+
         }
     }
 }

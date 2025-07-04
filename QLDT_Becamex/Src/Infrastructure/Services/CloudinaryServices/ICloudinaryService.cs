@@ -1,4 +1,4 @@
-﻿namespace QLDT_Becamex.Src.Infrastructure.Services
+﻿namespace QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices
 {
     public interface ICloudinaryService
     {

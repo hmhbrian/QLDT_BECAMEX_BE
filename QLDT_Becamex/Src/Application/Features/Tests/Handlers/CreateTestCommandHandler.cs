@@ -11,18 +11,18 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IBaseService _baseService;
+        private readonly IUserService _userService;
 
-        public CreateTestCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IBaseService baseService)
+        public CreateTestCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _baseService = baseService;
+            _userService = userService;
         }
 
         public async Task<string> Handle(CreateTestCommand command, CancellationToken cancellationToken)
         {
-            var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
             var request = command.Request;
             var courseId = command.CourseId;
             // Check course existence

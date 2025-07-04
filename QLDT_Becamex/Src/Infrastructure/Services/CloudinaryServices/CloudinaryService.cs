@@ -2,7 +2,7 @@
 using CloudinaryDotNet;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 
-namespace QLDT_Becamex.Src.Infrastructure.Services
+namespace QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices
 {
     public class CloudinaryService : ICloudinaryService
     {

@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 using System.Threading;
 using System.Threading.Tasks;
 // Thêm các namespace cần thiết khác như repository, service, etc.

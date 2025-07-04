@@ -6,6 +6,7 @@ using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Application.Features.Departments.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 
 namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 {
@@ -13,13 +14,13 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IBaseService _baseService;
+        private readonly IDepartmentService _departmentService;
 
-        public GetDepartmentByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IBaseService baseService)
+        public GetDepartmentByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IDepartmentService departmentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _baseService = baseService;
+            _departmentService = departmentService;
         }
 
         public async Task<DepartmentDto> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
@@ -72,7 +73,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                 var pathCache = new Dictionary<int, List<string>>();
 
                 // ánh xạ Department sang DepartmentDto
-                var departmentDto = await _baseService.MapToDtoAsync(dept, departmentDict, userDict, pathCache, _mapper);
+                var departmentDto = await _departmentService.MapToDtoAsync(dept, departmentDict, userDict, pathCache, _mapper);
 
                 return departmentDto;
             }

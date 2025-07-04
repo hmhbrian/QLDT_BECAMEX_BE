@@ -13,6 +13,7 @@ using System.Collections.Generic; // Cần thiết cho List
 
 using DomainEntities = QLDT_Becamex.Src.Domain.Entities;
 using Azure.Core;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 
 namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
 {
@@ -21,20 +22,20 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
     {
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IBaseService _baseService;
+        private readonly IUserService _userService;
 
-        public CreateCourseAttachedFileCommandHandler(ICloudinaryService cloudinaryService, IUnitOfWork unitOfWork, IBaseService baseService)
+        public CreateCourseAttachedFileCommandHandler(ICloudinaryService cloudinaryService, IUnitOfWork unitOfWork, IUserService userService)
         {
             _cloudinaryService = cloudinaryService;
             _unitOfWork = unitOfWork;
-            _baseService = baseService;
+            _userService = userService;
         }
 
         public async Task<List<CourseAttachedFileDto>> Handle(CreateCourseAttachedFileCommand command, CancellationToken cancellationToken)
         {
             var courseId = command.CourseId; // Lấy CourseId từ command
             var requests = command.Request;  // Lấy danh sách DTO từ command
-            var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
 
             if (string.IsNullOrEmpty(userId))
             {

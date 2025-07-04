@@ -144,18 +144,11 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             int limit = queryParam.Limit > 0 ? queryParam.Limit : 10;
             var paged = courses.Skip((page - 1) * limit).Take(limit).ToList();
 
-            var result = new PagedResult<CourseDto>
-            {
-                Items = _mapper.Map<List<CourseDto>>(paged),
-                Pagination = new Pagination
-                {
-                    TotalItems = totalItems,
-                    ItemsPerPage = limit,
-                    CurrentPage = page,
-                    TotalPages = (int)Math.Ceiling((double)totalItems / limit)
-                }
-            };
+            var items = _mapper.Map<List<CourseDto>>(courses);
+            var pagination = new Pagination(page, limit, totalItems);
+            var result = new PagedResult<CourseDto>(items, pagination);
             return result;
+
         }
     }
 }

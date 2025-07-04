@@ -8,19 +8,19 @@ using QLDT_Becamex.Src.Infrastructure.Services;
 public class ChangePasswordUserCommandHandler : IRequestHandler<ChangePasswordUserCommand, string>
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IBaseService _baseService;
+    private readonly IUserService _userService;
 
-    public ChangePasswordUserCommandHandler(UserManager<ApplicationUser> userManager, IBaseService baseService)
+    public ChangePasswordUserCommandHandler(UserManager<ApplicationUser> userManager, IUserService userService)
     {
         _userManager = userManager;
-        _baseService = baseService;
+        _userService = userService;
     }
 
     public async Task<string> Handle(ChangePasswordUserCommand command, CancellationToken cancellationToken)
     {
         var rq = command.Request;
 
-        var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
+        var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)

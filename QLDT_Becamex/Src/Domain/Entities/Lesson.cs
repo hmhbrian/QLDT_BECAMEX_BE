@@ -21,7 +21,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
 
         public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId)
         {
-            Title = request.Title;
+            Title = request.Title.ToLower().Trim();
             UrlPdf = urlPdf;
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;

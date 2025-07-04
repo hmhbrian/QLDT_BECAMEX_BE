@@ -20,6 +20,22 @@ namespace QLDT_Becamex.Src.Application.Common.Dtos
         public int? ItemsPerPage { get; set; }
         public int? CurrentPage { get; set; }
         public int? TotalPages { get; set; }
+        public Pagination(int? currentPage, int? itemsPerPage, int? totalItems)
+        {
+            TotalItems = totalItems;
+            ItemsPerPage = itemsPerPage;
+            CurrentPage = currentPage;
+
+            if (totalItems.HasValue && itemsPerPage.HasValue && itemsPerPage > 0)
+            {
+                TotalPages = (int)Math.Ceiling((double)totalItems.Value / itemsPerPage.Value);
+            }
+            else
+            {
+                TotalPages = 0;
+            }
+        }
+
     }
 
     public class BaseQueryParamFilter : BaseQueryParam

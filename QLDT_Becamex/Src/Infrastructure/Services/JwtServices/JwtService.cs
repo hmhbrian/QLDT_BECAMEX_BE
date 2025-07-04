@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace QLDT_Becamex.Src.Infrastructure.Services
+namespace QLDT_Becamex.Src.Infrastructure.Services.JwtServices
 {
     /// <summary>
     /// Dịch vụ để tạo và quản lý JSON Web Tokens (JWT).

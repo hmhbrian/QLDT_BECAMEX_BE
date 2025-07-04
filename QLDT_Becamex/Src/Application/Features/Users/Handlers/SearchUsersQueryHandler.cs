@@ -71,17 +71,10 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 }
             }
 
-            return new PagedResult<UserDto>
-            {
-                Items = userDtos,
-                Pagination = new Pagination
-                {
-                    TotalItems = total,
-                    ItemsPerPage = queryParams.Limit,
-                    CurrentPage = queryParams.Page,
-                    TotalPages = (int)Math.Ceiling((double)total / queryParams.Limit)
-                }
-            };
+            var pagination = new Pagination(queryParams.Page, queryParams.Limit, total);
+            var pagedResult = new PagedResult<UserDto>(userDtos, pagination);
+            return pagedResult;
+
         }
     }
 }

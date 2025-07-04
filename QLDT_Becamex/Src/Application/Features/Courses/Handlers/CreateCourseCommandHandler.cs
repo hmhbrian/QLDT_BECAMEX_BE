@@ -7,6 +7,8 @@ using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
+using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
@@ -16,15 +18,15 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
-        private readonly IBaseService _baseService;
+        private readonly IDepartmentService _departmentService;
 
 
-        public CreateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IBaseService baseService)
+        public CreateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
-            _baseService = baseService;
+            _departmentService = departmentService;
         }
 
         public async Task<string> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
@@ -72,7 +74,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     else
                     {
                         allDepartmentIds.Add(deptId);
-                        var children = await _baseService.GetAllChildDepartmentIds(deptId);
+                        var children = await _departmentService.GetAllChildDepartmentIds(deptId);
                         foreach (var child in children)
                             allDepartmentIds.Add(child);
                     }

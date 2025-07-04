@@ -1,35 +1,20 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using System.Security.Claims;
 
-namespace QLDT_Becamex.Src.Infrastructure.Services
+namespace QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices
 {
-    public class BaseService : IBaseService
+    public class DepartmentService : IDepartmentService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUnitOfWork _unitOfWork;
-        public BaseService(IHttpContextAccessor httpContextAccessor, IUnitOfWork unitOfWork)
+        public DepartmentService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _httpContextAccessor = httpContextAccessor;
         }
-        public (string? UserId, string? Role) GetCurrentUserAuthenticationInfo()
-        {
-            var currentUser = _httpContextAccessor.HttpContext?.User;
-
-            var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var role = currentUser?.FindFirst(ClaimTypes.Role)?.Value;
-
-
-            return (userId, role);
-        }
-
         public async Task<List<int>> GetAllChildDepartmentIds(int parentDepartmentId)
         {
             try

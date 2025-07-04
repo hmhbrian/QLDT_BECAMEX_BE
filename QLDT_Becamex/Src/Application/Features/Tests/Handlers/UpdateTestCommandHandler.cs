@@ -12,12 +12,12 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IBaseService _baseService;
-        public UpdateTestCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IBaseService baseService)
+        private readonly IUserService _userService;
+        public UpdateTestCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _baseService = baseService;
+            _userService = userService;
         }
 
         public async Task<string> Handle(UpdateTestCommand command, CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             var id = command.Id;
             var request = command.Request;
             var courseId = command.CourseId;
-            var (userId, _) = _baseService.GetCurrentUserAuthenticationInfo();
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
             // Kiểm tra Course existence
             var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == courseId);
             if (!courseExists) 

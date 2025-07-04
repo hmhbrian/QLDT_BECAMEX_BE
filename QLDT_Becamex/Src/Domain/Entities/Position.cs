@@ -1,5 +1,4 @@
 ﻿
-
 using Microsoft.AspNetCore.Identity;
 
 namespace QLDT_Becamex.Src.Domain.Entities
@@ -8,7 +7,6 @@ namespace QLDT_Becamex.Src.Domain.Entities
     {
         public int PositionId { get; set; } // Khóa chính
         public string? PositionName { get; set; }
-
 
         public ICollection<CoursePosition> CoursePositions { get; set; } = new List<CoursePosition>();
 

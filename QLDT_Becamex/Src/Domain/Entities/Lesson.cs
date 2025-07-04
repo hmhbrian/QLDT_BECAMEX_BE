@@ -10,7 +10,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string Title { get; set; } = null!;
         public string UrlPdf { get; set; } = null!;
         public string PublicIdUrlPdf { get; set; } = null!;
-        public int? Position { get; set; }
+
         public string? UserIdCreated { get; set; }
         public ApplicationUser? UserCreated { get; set; }
         public string? UserIdEdited { get; set; }
@@ -24,7 +24,6 @@ namespace QLDT_Becamex.Src.Domain.Entities
             UrlPdf = urlPdf;
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;
-            Position = request.Position;
             UserIdCreated = userIdCreated;
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
@@ -41,8 +40,6 @@ namespace QLDT_Becamex.Src.Domain.Entities
             if (!string.IsNullOrWhiteSpace(newFilePublicId) && PublicIdUrlPdf != newFilePublicId)
                 PublicIdUrlPdf = newFilePublicId;
 
-            if (request.Position.HasValue && request.Position != Position)
-                Position = request.Position;
 
             if (courseId != CourseId)
                 CourseId = courseId;

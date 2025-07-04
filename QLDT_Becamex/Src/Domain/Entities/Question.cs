@@ -1,3 +1,5 @@
+﻿using QLDT_Becamex.Src.Application.Features.Questions.Dtos;
+
 namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class Question
@@ -15,5 +17,36 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string? D { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+
+        public void Create(CreateQuestionDto request)
+        {
+            // Gán các giá trị từ DTO vào entity Question
+            QuestionText = request.QuestionText;
+            CorrectOption = request.CorrectOption;
+            QuestionType = request.QuestionType;
+            Explanation = request.Explanation;
+            A = request.A;
+            B = request.B;
+            C = request.C;
+            D = request.D;
+            CreatedAt = DateTime.Now;
+            UpdatedAt = DateTime.Now;
+        }
+
+        public void Update(UpdateQuestionDto request)
+        {
+            // Cập nhật các giá trị nếu các tham số không null
+            if (!string.IsNullOrEmpty(request.QuestionText)) QuestionText = request.QuestionText;
+            if (!string.IsNullOrEmpty(request.CorrectOption)) CorrectOption = request.CorrectOption;
+            if (request.QuestionType.HasValue) QuestionType = request.QuestionType;
+            if (!string.IsNullOrEmpty(request.Explanation)) Explanation = request.Explanation;
+            if (!string.IsNullOrEmpty(request.A)) A = request.A;
+            if (!string.IsNullOrEmpty(request.B)) B = request.B;
+            if (!string.IsNullOrEmpty(request.C)) C = request.C;
+            if (!string.IsNullOrEmpty(request.D)) D = request.D;
+            // Cập nhật thời gian sửa đổi
+            UpdatedAt = DateTime.Now;
+        }
+
     }
 }

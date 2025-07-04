@@ -20,7 +20,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
 
         public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId)
         {
-            Title = request.Title;
+            Title = request.Title.ToLower().Trim();
             UrlPdf = urlPdf;
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;
@@ -31,8 +31,8 @@ namespace QLDT_Becamex.Src.Domain.Entities
 
         public void Update(string courseId, string userIdEdited, UpdateLessonDto request, string urlPdf, string newFilePublicId)
         {
-            if (!string.IsNullOrWhiteSpace(request.Title) && request.Title != Title)
-                Title = request.Title;
+            if (!string.IsNullOrWhiteSpace(request.Title) && request.Title.ToLower().Trim() != Title)
+                Title = request.Title.ToLower().Trim();
 
             if (!string.IsNullOrWhiteSpace(urlPdf) && urlPdf != UrlPdf)
                 UrlPdf = urlPdf;

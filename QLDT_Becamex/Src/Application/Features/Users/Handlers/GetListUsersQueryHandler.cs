@@ -71,20 +71,13 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 }
             }
 
+            var pagination = new Pagination(queryParams.Page, queryParams.Limit, totalItems);
             // 5. Tạo kết quả phân trang
-            var result = new PagedResult<UserDto>
-            {
-                Items = userDtos,
-                Pagination = new Pagination
-                {
-                    TotalItems = totalItems,
-                    ItemsPerPage = queryParams.Limit,
-                    CurrentPage = queryParams.Page,
-                    TotalPages = (int)Math.Ceiling((double)totalItems / queryParams.Limit)
-                }
-            };
+            var result = new PagedResult<UserDto>(
+                userDtos,
+                pagination
+            );
             return result;
         }
     }
-
 }

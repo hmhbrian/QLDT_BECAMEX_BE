@@ -41,6 +41,8 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             {
                 throw new AppException($"Course with ID: {request.CourseId} not found.", 404);
             }
+            //Lấy position tối đa hiện tại của các bài học trong khóa học
+            int maxPosition = await _unitOfWork.LessonRepository.GetMaxPositionAsync(request.CourseId);
 
             // --- 1. Tải file PDF lên Cloudinary ---
             string pdfUrl = null!;
@@ -68,7 +70,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             // Nếu bạn vẫn đang sử dụng phương thức `Create` trên instance `Lesson`:
             var lesson = new Lesson();
 
-            lesson.Create(request.CourseId, userId, request.Request, pdfUrl, filePublicId);
+            lesson.Create(request.CourseId, userId, request.Request, pdfUrl, filePublicId, maxPosition+1);
 
             // --- 3. Thêm entity vào Repository và lưu vào DB ---
             await _unitOfWork.LessonRepository.AddAsync(lesson);

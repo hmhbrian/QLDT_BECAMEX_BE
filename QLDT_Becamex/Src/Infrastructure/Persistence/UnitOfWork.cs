@@ -1,5 +1,7 @@
-﻿using QLDT_Becamex.Src.Domain.Interfaces;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
+using System.Data.Common;
 
 
 namespace QLDT_Becamex.Src.Infrastructure.Persistence
@@ -48,6 +50,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public async Task<int> CompleteAsync()
         {
             return await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<DbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            var transasction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+            return transasction.GetDbTransaction();
         }
         public void Dispose()
         {

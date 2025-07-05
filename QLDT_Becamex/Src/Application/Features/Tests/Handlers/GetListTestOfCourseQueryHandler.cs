@@ -29,6 +29,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 
             var tests = await _unitOfWork.TestRepository.GetFlexibleAsync(
                 predicate: t => t.CourseId == request.CourseId,
+                orderBy: q => q.OrderBy(t => t.Position),
                 includes: q => q
                         .Include(d => d.Questions)
             );

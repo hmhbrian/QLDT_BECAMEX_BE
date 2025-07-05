@@ -1,4 +1,6 @@
-﻿namespace QLDT_Becamex.Src.Domain.Interfaces
+﻿using System.Data.Common;
+
+namespace QLDT_Becamex.Src.Domain.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
@@ -20,5 +22,6 @@
 
 
         public Task<int> CompleteAsync();
+        Task<DbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
     }
 }

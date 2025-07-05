@@ -18,5 +18,33 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
                 .Include(l => l.UserEdited)
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
+        public async Task<int> GetMaxPositionAsync(string courseId)
+        {
+            return await _context.Lessons
+                .Where(l => l.CourseId == courseId)
+                .MaxAsync(l => (int?)l.Position) ?? 0;
+        }
+
+        public async Task UpdatePositionAsync(string courseId, int fromPosition, int toPosition, int offset)
+        {
+            await _context.Lessons
+                .Where( l => l.CourseId == courseId && l.Position >= fromPosition && l.Position <= toPosition)
+                .ExecuteUpdateAsync(l => l.SetProperty(x => x.Position, x => x.Position + offset));
+        }
+
+        public async Task ReorderPositionsAsync(string courseId, CancellationToken cancellationToken = default)
+        {
+            // Lấy tất cả Lesson còn lại trong Course, sắp xếp theo Position
+            var lessons = await _context.Lessons
+                .Where(l => l.CourseId == courseId)
+                .OrderBy(l => l.Position)
+                .ToListAsync(cancellationToken);
+
+            // Gán lại Position từ 1
+            for (int i = 0; i < lessons.Count; i++)
+            {
+                lessons[i].Position = i + 1;
+            }
+        }
     }
 }

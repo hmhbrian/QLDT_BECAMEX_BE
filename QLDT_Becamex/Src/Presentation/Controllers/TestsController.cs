@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
@@ -63,6 +64,14 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         {
             var result = await _mediator.Send(new DeleteTestCommand(id), cancellationToken);
             return Ok(ApiResponse.Ok("Xóa bài kiểm tra thành công"));
+        }
+
+        [HttpPut("reorder")]
+        public async Task<IActionResult> UpdatePositionTest([FromRoute] string courseId, [FromForm] int TestId, [FromForm] int PreviousTestId)
+        {
+
+            await _mediator.Send(new UpdatePositionTestCommand(courseId, TestId, PreviousTestId));
+            return Ok(ApiResponse.Ok("Position updated successfully."));
         }
     }
 }

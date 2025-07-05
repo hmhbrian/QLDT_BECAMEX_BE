@@ -47,7 +47,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             try
             {
                 int newPosition;
-                if (request?.PreviousLessonId == null)
+                if (request?.PreviousLessonId == 0)
                 {
                     //Nếu không có PreviousLessonId thì đặt vị trí là 1
                     newPosition = 1;
@@ -56,11 +56,11 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 {
                     //Kiểm tra lesson trước đó có tồn tại không
                     var previousLesson = await _unitOfWork.LessonRepository.GetFirstOrDefaultAsync(
-                        predicate: l => l.Id == request.PreviousLessonId && l.CourseId == request.CourseId
+                        predicate: l => l.Id == request!.PreviousLessonId && l.CourseId == request.CourseId
                     );
                     if (previousLesson == null)
                     {
-                        throw new AppException($"Previous lesson with ID: {request.PreviousLessonId} not found.", 404);
+                        throw new AppException($"Previous lesson with ID: {request!.PreviousLessonId} not found.", 404);
                     }
                     //Đặt vị trí mới là vị trí của lesson trước đó + 1
                     newPosition = previousLesson.Position + 1;

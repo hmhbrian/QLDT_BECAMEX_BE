@@ -82,12 +82,14 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.TestId, opt => opt.Ignore())
                 .ForMember(dest => dest.Test, opt => opt.Ignore());
             CreateMap<Question, QuestionDto>();
+
             // Test
             CreateMap<TestCreateDto, Test>()
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
 
             CreateMap<Test, DetailTestDto>()
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()));
 
@@ -97,15 +99,19 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.UserIdCreated, opt => opt.Ignore())
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Tests ?? new List<QuestionDto>()))
                 .AfterMap(ignoreNavigation);
+
             CreateMap<Test, AllTestDto>()
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                 .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0));
 
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();
 
             //Lesson
-            CreateMap<Lesson, AllLessonDto>().ReverseMap();
+            CreateMap<Lesson, AllLessonDto>()
+                .ForMember(dest => dest.Title,opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"));
             CreateMap<Lesson, DetailLessonDto>()
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
                 .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.UserIdCreated))
                 .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserIdEdited))
                 .ForMember(dest => dest.UserNameCreated, opt => opt.MapFrom(src => src.UserCreated != null ? src.UserCreated.FullName : null))

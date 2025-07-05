@@ -39,28 +39,49 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 throw new AppException("Không tìm thấy bất kỳ bài học nào để xoá.", 404);
             }
 
-            foreach (var lesson in lessons)
+            using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
             {
-                // 3. Xoá file PDF nếu có
-                if (!string.IsNullOrEmpty(lesson.PublicIdUrlPdf))
+                foreach (var lesson in lessons)
                 {
-                    try
+                    // 3. Xoá file PDF nếu có
+                    if (!string.IsNullOrEmpty(lesson.PublicIdUrlPdf))
                     {
-                        await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf);
+                        try
+                        {
+                            await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf);
+                        }
+                        catch (AppException ex)
+                        {
+                            Console.WriteLine($"[WARN] Không thể xóa file Cloudinary: {ex.Message}");
+                            // Tiếp tục xoá bài học, không rollback toàn bộ vì 1 file fail
+                        }
                     }
-                    catch (AppException ex)
-                    {
-                        Console.WriteLine($"[WARN] Không thể xóa file Cloudinary: {ex.Message}");
-                        // Tiếp tục xoá bài học, không rollback toàn bộ vì 1 file fail
-                    }
+
+                    // 4. Xoá lesson khỏi repo
+                    _unitOfWork.LessonRepository.Remove(lesson);
                 }
+                // 5. Lưu thay đổi
+                await _unitOfWork.CompleteAsync();
 
-                // 4. Xoá lesson khỏi repo
-                _unitOfWork.LessonRepository.Remove(lesson);
+                //6.Cập nhật lại position các lesson còn lại
+                await _unitOfWork.LessonRepository.ReorderPositionsAsync(request.CourseId, cancellationToken);
+
+                //7.Lưu thay đổi position
+                await _unitOfWork.CompleteAsync();
+
+                //8.Commit transaction
+                await transaction.CommitAsync(cancellationToken);
             }
+            catch (Exception ex)
+            {
+                // Rollback transaction nếu có lỗi xảy ra
+                await transaction.RollbackAsync(cancellationToken);
+                throw new AppException($"Lỗi khi xóa bài học và cập nhật vị trí: {ex.Message}", 500);
+            }
+            
 
-            // 5. Lưu thay đổi
-            await _unitOfWork.CompleteAsync();
+            
         }
     }
 }

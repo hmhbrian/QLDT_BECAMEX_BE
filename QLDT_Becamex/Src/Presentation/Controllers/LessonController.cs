@@ -80,7 +80,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             await _mediator.Send(new DeleteLessonCommand(courseId, lessonIds));
             return Ok(ApiResponse.Ok("Xoá bài học thành công."));
         }
-            
+
         /// <summary>
         /// Lấy chi tiết bài học của khóa học. HOCVIEN, HR, ADMIN có quyền truy cập.
         /// </summary>
@@ -91,6 +91,14 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetLessonByIdQuery(id));
             return Ok(ApiResponse<DetailLessonDto>.Ok(result));
+        }
+
+        [HttpPut("reorder")]
+        public async Task<IActionResult> UpdatePositionLesson([FromRoute] string courseId, [FromForm] int LessonId, [FromForm] int PreviousLessonId)
+        {
+
+            await _mediator.Send(new UpdatePositionLessonCommand(courseId, LessonId, PreviousLessonId));
+            return Ok(ApiResponse.Ok("Position updated successfully."));
         }
     }
 }

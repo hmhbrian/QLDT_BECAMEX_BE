@@ -1,4 +1,4 @@
-
+﻿
 using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 using QLDT_Becamex.Src.Shared.Helpers;
 namespace QLDT_Becamex.Src.Domain.Entities
@@ -19,12 +19,13 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId)
+        public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId, int position)
         {
             Title = request.Title.ToLower().Trim();
             UrlPdf = urlPdf;
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;
+            Position = position;
             UserIdCreated = userIdCreated;
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;

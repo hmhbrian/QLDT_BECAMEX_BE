@@ -34,8 +34,8 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                         .Include(d => d.Questions)
             );
 
-            if (tests == null || !tests.Any())
-                throw new AppException("Không tìm thấy bài kiểm tra nào cho khóa học này", 200);
+            //if (tests == null || !tests.Any())
+            //    throw new AppException("Không tìm thấy bài kiểm tra nào cho khóa học này", 200);
             var dto = _mapper.Map<List<AllTestDto>>(tests);
 
             return dto;

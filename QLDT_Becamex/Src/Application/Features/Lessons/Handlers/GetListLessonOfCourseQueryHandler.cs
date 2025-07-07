@@ -33,8 +33,8 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             );
 
             // Kiểm tra nếu không có bài học nào
-            if (lessons == null || !lessons.Any())
-                throw new AppException("Không tìm thấy bài học nào cho khóa học này", 200);
+            //if (lessons == null || !lessons.Any())
+            //    throw new AppException("Không tìm thấy bài học nào cho khóa học này", 200);
 
             var dto = _mapper.Map<List<AllLessonDto>>(lessons);
             return dto;

@@ -18,6 +18,8 @@ using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 using QLDT_Becamex.Src.Infrastructure.Services.UserServices;
 using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
+using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
+using QLDT_Becamex.Src.Infrastructure.Services.BackgroundServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -129,6 +131,8 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddHostedService<CourseStatusUpdateBackgroundService>();
 
 
 

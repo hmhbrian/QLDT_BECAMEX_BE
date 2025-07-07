@@ -36,7 +36,7 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
             // Lấy danh sách câu hỏi đã phân trang, sắp xếp
             var questions = await _unitOfWork.QuestionRepository.GetFlexibleAsync(
                 predicate: predicate,
-                orderBy: orderBy,
+                orderBy: q => q.OrderBy(t => t.Position),
                 page: request.BaseQueryParam.Page,
                 pageSize: request.BaseQueryParam.Limit,
                 asNoTracking: true

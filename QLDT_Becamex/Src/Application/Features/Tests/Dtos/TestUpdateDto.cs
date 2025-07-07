@@ -4,9 +4,8 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
 {
     public class TestUpdateDto
     {
-        public string title { get; set; } = null!; // Bắt buộc
-        public float pass_threshold { get; set; }
-        public int time_test { get; set; }
-        public int Position { get; set; }
+        public string Title { get; set; } = null!; // Bắt buộc
+        public float PassThreshold { get; set; }
+        public int TimeTest { get; set; }
     }
 }

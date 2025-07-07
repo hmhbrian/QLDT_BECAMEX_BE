@@ -16,7 +16,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 
         public UpdateLessonCommandHandler(IUnitOfWork unitOfWork, IUserService userService, ICloudinaryService cloudinaryService)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork; 
             _userService = userService;
             _cloudinaryService = cloudinaryService;
         }
@@ -44,6 +44,14 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             {
                 throw new AppException($"Course with ID: {request.CourseId} not found.", 404);
             }
+
+            var ProcessTitle = request.Request.Title?.Trim();
+            if (!string.IsNullOrEmpty(ProcessTitle) && ProcessTitle.StartsWith("Bài ") && ProcessTitle.Contains(": "))
+            {
+                int index = ProcessTitle.IndexOf(": ");
+                ProcessTitle = ProcessTitle.Substring(index + 2).Trim(); // Lấy phần sau dấu ": "
+            }
+            request.Request.Title = ProcessTitle; // Cập nhật tiêu đề đã xử lý
 
             // 3. Xử lý file PDF mới nếu có và xóa file cũ
             string? newPdfUrl = lesson.UrlPdf; // Giữ lại URL cũ làm mặc định

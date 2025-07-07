@@ -54,6 +54,16 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             {
                 throw new AppException($"Position {test.Position} đã được sử dụng bởi một bài kiểm tra khác trong khóa học này", 400);
             }
+
+            // Xử lý title
+            var ProcessTitle = request.Title.Trim();
+            if (!string.IsNullOrEmpty(ProcessTitle) && ProcessTitle.StartsWith("Bài kiểm tra ") && ProcessTitle.Contains(": "))
+            {
+                int index = ProcessTitle.IndexOf(": ");
+                ProcessTitle = ProcessTitle.Substring(index + 2).Trim(); // Lấy phần sau dấu ": "
+            }
+            request.Title = ProcessTitle; // Cập nhật tiêu đề đã xử lý
+
             // Map TestUpdateDto to existing Test
             _mapper.Map(request, test);
 

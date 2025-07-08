@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Questions.Commands;
+using QLDT_Becamex.Src.Application.Features.Questions.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
@@ -19,34 +20,39 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
 
         public async Task<string> Handle(CreateQuestionCommand request, CancellationToken cancellationToken)
         {
-            var createQuestionDto = request.Request;
-
             // Kiểm tra bài kiểm tra tồn tại
             var existTest = await _unitOfWork.TestRepository.GetByIdAsync(request.TestId);
             if (existTest == null)
             {
                 throw new AppException("Bài kiểm tra không tồn tại", 404);
             }
+            await using var transaction = await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                int maxPosition = await _unitOfWork.QuestionRepository.GetMaxPositionAsync(request.TestId);
 
-            var allQuestions = await _unitOfWork.QuestionRepository.GetAllAsync();
-            var existingQuestions = allQuestions.Where(q => q.TestId == request.TestId).ToList();
+                foreach (var questionDto in request.Request)
+                {
+                    maxPosition++; // Tăng maxPosition cho mỗi câu hỏi mới
+                    // Tạo câu hỏi và gán Position
+                    var newQuestion = new Question();
+                    newQuestion.Create(request.TestId, questionDto, maxPosition);
 
-            int maxPosition = existingQuestions.Any()
-                ? existingQuestions.Max(q => q.Position)
-                : 0;
+                    // Lưu vào DB
+                    await _unitOfWork.QuestionRepository.AddAsync(newQuestion);
+                }
+                
+                await _unitOfWork.CompleteAsync();
 
-            // Tạo câu hỏi và gán Position
-            var newQuestion = new Question();
-            newQuestion.Create(request.TestId, createQuestionDto);
-            newQuestion.Position = maxPosition + 1;
-            newQuestion.CreatedAt = DateTime.UtcNow;
-            newQuestion.UpdatedAt = DateTime.UtcNow;
+                await transaction.CommitAsync();
 
-            // Lưu vào DB
-            await _unitOfWork.QuestionRepository.AddAsync(newQuestion);
-            await _unitOfWork.CompleteAsync();
-
-            return $"Tạo câu hỏi thành công. ID của câu hỏi mới là: {newQuestion.Id}";
+                return $"Tạo câu hỏi thành công";
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new AppException($"Lỗi khi tạo câu hỏi: {ex.Message}", 500);
+            }
         }
     }
 }

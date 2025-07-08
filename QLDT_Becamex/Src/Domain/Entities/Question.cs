@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public void Create(int testId, CreateQuestionDto request)
+        public void Create(int testId, CreateQuestionDto request, int position)
         {
             TestId = testId;
             QuestionText = request.QuestionText;
@@ -32,6 +32,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
             D = request.D;
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
+            Position = position;
         }
 
         public void Update(UpdateQuestionDto request)

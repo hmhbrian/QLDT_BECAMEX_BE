@@ -32,7 +32,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Create new question under a test
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromRoute] int testId, [FromBody] CreateQuestionDto request)
+        public async Task<IActionResult> Create([FromRoute] int testId, [FromBody] List<CreateQuestionDto> request)
         {
             var command = new CreateQuestionCommand(testId, request);
             var result = await _mediator.Send(command);

@@ -27,6 +27,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<LessonProgress> LessonProgresses { get; set; }
+        public DbSet<TypeDocument> TypeDocuments { get; set; }
 
 
 
@@ -54,6 +56,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureLesson(modelBuilder);
             ConfigureTest(modelBuilder);
             ConfigureQuestion(modelBuilder);
+            ConfigureTypeDocument(modelBuilder);
+            ConfigureLessonProgress(modelBuilder);
 
         }
 
@@ -469,11 +473,40 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             });
         }
 
+        private void ConfigureTypeDocument(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TypeDocument>(entity =>
+            {
+                entity.ToTable("TypeDocument");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .IsRequired()
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.NameType)
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnName("name_type");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("GETDATE()");
+            });
+        }
+
         private void ConfigureLesson(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Lesson>(entity =>
             {
-                entity.ToTable("Lessons"); // ✅ table snake_case
+                entity.ToTable("Lessons", l =>
+                {
+                    l.HasCheckConstraint("CK_Lesson_Metadata",
+                    "(type_doc_id = 2 AND total_duration_seconds IS NOT NULL AND total_pages IS NULL) OR " +
+                    "(type_doc_id = 1 AND total_pages IS NOT NULL AND total_duration_seconds IS NULL)");
+                });
 
                 entity.HasKey(e => e.Id);
 
@@ -491,10 +524,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                         .IsRequired()
                         .HasColumnName("position");
 
-                entity.Property(e => e.UrlPdf)
+                entity.Property(e => e.FileUrl)
                       .IsRequired()
-                      .HasMaxLength(255)
-                      .HasColumnName("url_pdf");
+                      .HasMaxLength(500)
+                      .HasColumnName("file_url");
 
                 entity.Property(e => e.PublicIdUrlPdf)
                      .IsRequired()
@@ -503,6 +536,15 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.Property(e => e.CourseId)
                       .HasColumnName("course_id");
+
+                entity.Property(e => e.TypeDocId)
+                    .HasColumnName("type_doc_id");
+
+                entity.Property(e => e.TotalDurationSeconds)
+                    .HasColumnName("total_duration_seconds");
+
+                entity.Property(e => e.TotalPages)
+                    .HasColumnName("total_pages");
 
                 entity.Property(e => e.UserIdCreated)
                       .HasColumnName("user_id_created");
@@ -519,24 +561,28 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.HasOne(e => e.Course)
                       .WithMany(c => c.Lessons)
                       .HasForeignKey(e => e.CourseId)
-                      .HasConstraintName("fk_lessons_courses") // ✅ snake_case constraint
+                      .HasConstraintName("fk_lessons_courses") 
                       .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(e => e.UserCreated)
                       .WithMany(u => u.CreatedLesson)
                       .HasForeignKey(e => e.UserIdCreated)
-                      .HasConstraintName("fk_lessons_user_created") // ✅ snake_case constraint
+                      .HasConstraintName("fk_lessons_user_created") 
                       .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(e => e.UserEdited)
                       .WithMany(u => u.UpdatedLesson)
                       .HasForeignKey(e => e.UserIdEdited)
-                      .HasConstraintName("fk_lessons_user_edited") // ✅ snake_case constraint
+                      .HasConstraintName("fk_lessons_user_edited") 
                       .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.TypeDoc)
+                   .WithMany()
+                   .HasForeignKey(e => e.TypeDocId)
+                   .HasConstraintName("fk_lessons_type_document")
+                   .OnDelete(DeleteBehavior.Restrict);
             });
         }
-
-
 
         private void ConfigureTest(ModelBuilder modelBuilder)
         {
@@ -600,7 +646,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasConstraintName("fk_tests_user_edited");
             });
         }
-
 
         private void ConfigureQuestion(ModelBuilder modelBuilder)
         {
@@ -667,5 +712,56 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             });
         }
 
+        private void ConfigureLessonProgress(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<LessonProgress>(entity =>
+            {
+                entity.ToTable("LessonProgress", t =>
+                {
+                    t.HasCheckConstraint("CK_Progress_Type",
+                        "(current_time_seconds IS NOT NULL AND current_page IS NULL) OR " +
+                        "(current_time_seconds IS NULL AND current_page IS NOT NULL) OR " +
+                        "(current_time_seconds IS NULL AND current_page IS NULL)");
+                });
+
+                entity.HasKey(e => new { e.UserId, e.LessonId });
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasColumnName("user_id");
+
+                entity.Property(e => e.LessonId)
+                    .IsRequired()
+                    .HasColumnName("lesson_id");
+
+                entity.Property(e => e.CurrentTimeSeconds)
+                    .HasColumnName("current_time_seconds");
+
+                entity.Property(e => e.CurrentPage)
+                    .HasColumnName("current_page");
+
+                entity.Property(e => e.IsCompleted)
+                    .IsRequired()
+                    .HasColumnName("is_completed")
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.LastUpdated)
+                    .IsRequired()
+                    .HasColumnName("last_accessed")
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.LessonProgress)
+                    .HasForeignKey(e => e.UserId)
+                    .HasConstraintName("fk_student_lesson_progress_user")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Lesson)
+                    .WithMany(l => l.LessonProgress)
+                    .HasForeignKey(e => e.LessonId)
+                    .HasConstraintName("fk_student_lesson_progress_lesson")
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
     }
 }

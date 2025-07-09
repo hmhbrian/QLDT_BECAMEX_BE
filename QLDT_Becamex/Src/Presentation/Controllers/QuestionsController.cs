@@ -50,7 +50,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             return Ok(ApiResponse<string>.Ok(result));
         }
 
-        /// <summary>
+        /// <summary>s
         /// Delete questions under a test
         /// </summary>
         [HttpDelete]

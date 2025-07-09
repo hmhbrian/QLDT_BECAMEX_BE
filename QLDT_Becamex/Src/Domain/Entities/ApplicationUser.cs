@@ -35,6 +35,7 @@ namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp
         public ICollection<Lesson>? UpdatedLesson { get; set; } = new List<Lesson>();
         public ICollection<Test>? CreatedTest { get; set; } = new List<Test>();
         public ICollection<Test>? UpdatedTest { get; set; } = new List<Test>();
+        public ICollection<LessonProgress>? LessonProgress { get; set; } = new List<LessonProgress>();
 
 
     }

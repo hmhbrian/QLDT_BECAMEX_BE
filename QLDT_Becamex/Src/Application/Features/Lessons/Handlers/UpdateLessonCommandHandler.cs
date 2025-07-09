@@ -1,5 +1,6 @@
 ﻿// QLDT_Becamex.Src.Application.Features.Lessons.Handlers/UpdateLessonCommandHandler.cs
 using MediatR;
+using PdfSharpCore.Pdf.IO;
 using QLDT_Becamex.Src.Application.Common.Dtos; // AppException
 using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces;
@@ -54,42 +55,60 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             request.Request.Title = ProcessTitle; // Cập nhật tiêu đề đã xử lý
 
             // 3. Xử lý file PDF mới nếu có và xóa file cũ
-            string? newPdfUrl = lesson.FileUrl; // Giữ lại URL cũ làm mặc định
-            string? oldPdfUrl = lesson.FileUrl; // Lưu URL PDF cũ để xóa sau
+            string? newUrl = lesson.FileUrl; // Giữ lại URL cũ làm mặc định
+            string? oldUrl = lesson.FileUrl; // Lưu URL PDF cũ để xóa sau
             string? newPdfPublicId = null; // Lưu URL PDF cũ để xóa sau
 
-            if (request.Request.FilePdf != null && request.Request.FilePdf.Length > 0)
+            int totalDurationSeconds = 0; // biến tổng thời gian video
+            int totalPages = 0;// biến tổng số trang của PDF
+
+            if (request.Request.Link != null && request.Request.TotalDurationSeconds > 0 && request.Request.TypeDocId == 2) // Kiểm tra nếu là link
             {
-                var folderName = "lesson_pdfs"; // Thư mục trên Cloudinary
 
-                // Tải file mới lên Cloudinary
-                var uploadResult = await _cloudinaryService.UploadPdfAsync(request.Request.FilePdf, folderName);
-
-                newPdfUrl = uploadResult.Value.url;       // Lấy URL mới
-                newPdfPublicId = uploadResult.Value.publicId; // Lấy PublicId mới
-
-                if (string.IsNullOrEmpty(newPdfUrl))
+                newUrl = request.Request.Link!; // Lấy URL từ request
+                totalDurationSeconds = request.Request.TotalDurationSeconds; // Lấy tổng thời gian của video
+            }
+            else if (request.Request.FilePdf != null && request.Request.FilePdf.Length > 0)
+            {
+                using (var stream = request.Request.FilePdf.OpenReadStream())
                 {
-                    throw new AppException("Failed to upload new PDF file to Cloudinary.", 500);
-                }
-
-                // Nếu có URL cũ và nó khác với URL mới (đảm bảo không xóa nhầm file vừa upload nếu có lỗi)
-                if (!string.IsNullOrEmpty(oldPdfUrl) && oldPdfUrl != newPdfUrl)
-                {
-
-                    if (!string.IsNullOrEmpty(newPdfPublicId))
+                    using (var pdfDocument = PdfReader.Open(stream, PdfDocumentOpenMode.ReadOnly))
                     {
-                        // Xóa file PDF cũ trên Cloudinary
-                        var deleteSuccess = await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf);
-                        if (!deleteSuccess)
+                        totalPages = pdfDocument.PageCount; // Lấy tổng số trang của PDF
+
+                        var folderName = "lesson_pdfs"; // Thư mục trên Cloudinary
+
+                        // Tải file mới lên Cloudinary
+                        var uploadResult = await _cloudinaryService.UploadPdfAsync(request.Request.FilePdf, folderName);
+
+                        newUrl = uploadResult.Value.url;       // Lấy URL mới
+                        newPdfPublicId = uploadResult.Value.publicId; // Lấy PublicId mới
+
+                        if (string.IsNullOrEmpty(newUrl))
                         {
-                            Console.WriteLine($"Warning: Failed to delete old PDF file {newPdfPublicId} from Cloudinary.");
+                            throw new AppException("Failed to upload new PDF file to Cloudinary.", 500);
                         }
+
                     }
                 }
             }
 
-            lesson.Update(request.CourseId, userId, request.Request, newPdfUrl, newPdfPublicId);
+            // Nếu có URL cũ là file pdf và nó khác với URL mới (đảm bảo không xóa nhầm file vừa upload nếu có lỗi)
+            if (lesson.TypeDocId == 1 && !string.IsNullOrEmpty(oldUrl) && oldUrl != newUrl)
+            {
+
+                if (!string.IsNullOrEmpty(newPdfPublicId))
+                {
+                    // Xóa file PDF cũ trên Cloudinary
+                    var deleteSuccess = await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf);
+                    if (!deleteSuccess)
+                    {
+                        Console.WriteLine($"Warning: Failed to delete old PDF file {newPdfPublicId} from Cloudinary.");
+                    }
+                }
+            }
+
+            lesson.Update(request.CourseId, userId, request.Request, newUrl, newPdfPublicId!, totalDurationSeconds, totalPages);
 
             _unitOfWork.LessonRepository.Update(lesson);
 

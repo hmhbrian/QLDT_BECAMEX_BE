@@ -32,7 +32,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             }
 
             // 2. Tìm bài học cần cập nhật
-            var lesson = await _unitOfWork.LessonRepository.GetByIdAsync(request.LessonId); // Giả định có GetByIdAsync
+            var lesson = await _unitOfWork.LessonRepository.GetByIdAsync(request.LessonId);
 
             if (lesson == null)
             {
@@ -92,6 +92,11 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                     }
                 }
             }
+            else
+            {
+                // Nếu file PDF là bắt buộc, hãy ném ngoại lệ
+                throw new AppException("Updating a lesson must have Pdf file or link video.", 400); // Mã 400 cho Bad Request
+            }
 
             // Nếu có URL cũ là file pdf và nó khác với URL mới (đảm bảo không xóa nhầm file vừa upload nếu có lỗi)
             if (lesson.TypeDocId == 1 && !string.IsNullOrEmpty(oldUrl) && oldUrl != newUrl)
@@ -100,7 +105,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 if (!string.IsNullOrEmpty(newPdfPublicId))
                 {
                     // Xóa file PDF cũ trên Cloudinary
-                    var deleteSuccess = await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf);
+                    var deleteSuccess = await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf!);
                     if (!deleteSuccess)
                     {
                         Console.WriteLine($"Warning: Failed to delete old PDF file {newPdfPublicId} from Cloudinary.");

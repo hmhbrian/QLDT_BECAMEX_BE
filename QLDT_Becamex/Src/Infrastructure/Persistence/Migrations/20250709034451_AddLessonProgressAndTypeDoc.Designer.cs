@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709034451_AddLessonProgressAndTypeDoc")]
+    partial class AddLessonProgressAndTypeDoc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -551,60 +554,6 @@ namespace QLDT_Becamex.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("Departments");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Feedback", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("comment");
-
-                    b.Property<string>("CourseId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("course_id");
-
-                    b.Property<DateTime>("SubmissionDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("feedback_at");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("user_id");
-
-                    b.Property<int>("q1_revelance")
-                        .HasColumnType("int")
-                        .HasColumnName("q1_revelance");
-
-                    b.Property<int>("q2_clarity")
-                        .HasColumnType("int")
-                        .HasColumnName("q2_clarity");
-
-                    b.Property<int>("q3_structure")
-                        .HasColumnType("int")
-                        .HasColumnName("q3_structure");
-
-                    b.Property<int>("q4_duration")
-                        .HasColumnType("int")
-                        .HasColumnName("q4_duration");
-
-                    b.Property<int>("q5_material")
-                        .HasColumnType("int")
-                        .HasColumnName("q5_material");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Feedbacks", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lecturer", b =>
@@ -1162,21 +1111,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Manager");
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Feedback", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId");
-
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Course");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lesson", b =>

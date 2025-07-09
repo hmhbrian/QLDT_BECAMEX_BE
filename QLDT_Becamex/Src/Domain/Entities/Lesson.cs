@@ -9,8 +9,12 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string CourseId { get; set; } = null!;
         public Course Course { get; set; } = null!;
         public string Title { get; set; } = null!;
-        public string UrlPdf { get; set; } = null!;
+        public int TypeDocId { get; set; } = 1; // Mặc định là PDF
+        public TypeDocument TypeDoc { get; set; } = null!;
+        public string FileUrl { get; set; } = null!;
         public string PublicIdUrlPdf { get; set; } = null!;
+        public int? TotalDurationSeconds { get; set; } // Tổng thời gian của bài học (tính bằng giây)
+        public int? TotalPages { get; set; } // Tổng số trang của tài liệu PDF
         public int Position { get; set; }
         public string? UserIdCreated { get; set; }
         public ApplicationUser? UserCreated { get; set; }
@@ -18,11 +22,12 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public ApplicationUser? UserEdited { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public ICollection<LessonProgress>? LessonProgress { get; set; } = new List<LessonProgress>();
 
         public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId, int position)
         {
             Title = request.Title.ToLower().Trim();
-            UrlPdf = urlPdf;
+            FileUrl = urlPdf;
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;
             Position = position;
@@ -31,13 +36,13 @@ namespace QLDT_Becamex.Src.Domain.Entities
             UpdatedAt = DateTime.Now;
         }
 
-        public void Update(string courseId, string userIdEdited, UpdateLessonDto request, string urlPdf, string newFilePublicId)
+        public void Update(string courseId, string userIdEdited, UpdateLessonDto request, string fileUrl, string newFilePublicId)
         {
             if (!string.IsNullOrWhiteSpace(request.Title) && request.Title != Title)
                 Title = request.Title;
 
-            if (!string.IsNullOrWhiteSpace(urlPdf) && urlPdf != UrlPdf)
-                UrlPdf = urlPdf;
+            if (!string.IsNullOrWhiteSpace(fileUrl) && fileUrl != FileUrl)
+                FileUrl = fileUrl;
 
             if (!string.IsNullOrWhiteSpace(newFilePublicId) && PublicIdUrlPdf != newFilePublicId)
                 PublicIdUrlPdf = newFilePublicId;

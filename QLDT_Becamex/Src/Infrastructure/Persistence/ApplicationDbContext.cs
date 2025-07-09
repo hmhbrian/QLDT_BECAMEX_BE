@@ -37,37 +37,35 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-            // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
-            base.OnModelCreating(modelBuilder);
-
-            // --- Cấu hình Fluent API ở đây ---
-            // Gọi các phương thức cấu hình riêng biệt để giữ cho OnModelCreating gọn gàng và dễ đọc
-            ConfigureApplicationUser(modelBuilder);
-            ConfigureDepartment(modelBuilder);
-            ConfigurePosition(modelBuilder);
-            ConfigureUserStatus(modelBuilder);
-            ConfigureCourse(modelBuilder);
-            ConfigureCourseStatus(modelBuilder);
-            ConfigureCourseDepartment(modelBuilder);
-            ConfigureCoursePosition(modelBuilder);
-            ConfigureCourseAttachedFile(modelBuilder);
-            ConfigureUserCourse(modelBuilder);
-            ConfigureCourseCategory(modelBuilder);
-            ConfigureLecturer(modelBuilder);
-            ConfigureLesson(modelBuilder);
-            ConfigureTest(modelBuilder);
-            ConfigureQuestion(modelBuilder);
-            ConfigureTypeDocument(modelBuilder);
-            ConfigureLessonProgress(modelBuilder);
-            ConfigureFeedback(modelBuilder);
+                  // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
+                  base.OnModelCreating(modelBuilder);
+      
+                  // --- Cấu hình Fluent API ở đây ---
+                  // Gọi các phương thức cấu hình riêng biệt để giữ cho OnModelCreating gọn gàng và dễ đọc
+                  ConfigureApplicationUser(modelBuilder);
+                  ConfigureDepartment(modelBuilder);
+                  ConfigurePosition(modelBuilder);
+                  ConfigureUserStatus(modelBuilder);
+                  ConfigureCourse(modelBuilder);
+                  ConfigureCourseStatus(modelBuilder);
+                  ConfigureCourseDepartment(modelBuilder);
+                  ConfigureCoursePosition(modelBuilder);
+                  ConfigureCourseAttachedFile(modelBuilder);
+                  ConfigureUserCourse(modelBuilder);
+                  ConfigureCourseCategory(modelBuilder);
+                  ConfigureLecturer(modelBuilder);
+                  ConfigureLesson(modelBuilder);
+                  ConfigureTest(modelBuilder);
+                  ConfigureQuestion(modelBuilder);
+                  ConfigureTypeDocument(modelBuilder);
+                  ConfigureLessonProgress(modelBuilder);
+                  ConfigureFeedback(modelBuilder);
 
             }
 
             private void ConfigureApplicationUser(ModelBuilder modelBuilder)
             {
                   modelBuilder.Entity<ApplicationUser>(entity =>
-                  {
-                        modelBuilder.Entity<ApplicationUser>(entity =>
                         {
                               // Cấu hình bảng và tên cột nếu cần (mặc định IdentityDbContext sẽ tự xử lý)
                               // entity.ToTable("Users");
@@ -113,7 +111,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                               .OnDelete(DeleteBehavior.SetNull);
 
                         });
-                  });
             }
 
             private void ConfigureDepartment(ModelBuilder modelBuilder)

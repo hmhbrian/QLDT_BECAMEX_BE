@@ -36,12 +36,11 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
             // Lấy danh sách câu hỏi đã phân trang, sắp xếp
             var questions = await _unitOfWork.QuestionRepository.GetFlexibleAsync(
                 predicate: predicate,
-                orderBy: q => q.OrderBy(t => t.Position),
+                orderBy: orderBy,
                 page: request.BaseQueryParam.Page,
                 pageSize: request.BaseQueryParam.Limit,
                 asNoTracking: true
             );
-
             // Đếm tổng câu hỏi (không phân trang)
             var totalCount = await _unitOfWork.QuestionRepository.CountAsync(predicate);
 

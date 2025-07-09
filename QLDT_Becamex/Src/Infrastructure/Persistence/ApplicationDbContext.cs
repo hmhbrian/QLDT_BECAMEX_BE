@@ -66,51 +66,51 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             private void ConfigureApplicationUser(ModelBuilder modelBuilder)
             {
                   modelBuilder.Entity<ApplicationUser>(entity =>
-                        {
-                              // Cấu hình bảng và tên cột nếu cần (mặc định IdentityDbContext sẽ tự xử lý)
-                              // entity.ToTable("Users");
+                  {
+                      // Cấu hình bảng và tên cột nếu cần (mặc định IdentityDbContext sẽ tự xử lý)
+                      // entity.ToTable("Users");
 
-                              // Cấu hình thuộc tính
-                              entity.Property(u => u.FullName)
-                              .HasMaxLength(255); // Giới hạn độ dài tối đa 255 ký tự
+                      // Cấu hình thuộc tính
+                      entity.Property(u => u.FullName)
+                      .HasMaxLength(255); // Giới hạn độ dài tối đa 255 ký tự
 
-                              entity.Property(u => u.UrlAvatar)
-                              .HasMaxLength(500); // Giới hạn độ dài URL avatar
+                      entity.Property(u => u.UrlAvatar)
+                      .HasMaxLength(500); // Giới hạn độ dài URL avatar
 
-                              entity.Property(u => u.IdCard)
-                              .HasMaxLength(100); // Giới hạn độ dài ID Card (ví dụ: CCCD)
+                      entity.Property(u => u.IdCard)
+                      .HasMaxLength(100); // Giới hạn độ dài ID Card (ví dụ: CCCD)
 
-                              entity.Property(u => u.StatusId)
-                              .HasMaxLength(100); // Giới hạn độ dài trạng thái
+                      entity.Property(u => u.StatusId)
+                      .HasMaxLength(100); // Giới hạn độ dài trạng thái
 
-                              // Cấu hình mối quan hệ khóa ngoại với Department
-                              entity.HasOne(u => u.Department)      // Một ApplicationUser có MỘT Department
-                              .WithMany(d => d.Users)         // Một Department có NHIỀU ApplicationUser
-                              .HasForeignKey(u => u.DepartmentId) // Khóa ngoại là DepartmentId
-                              .IsRequired(false)              // DepartmentId có thể là NULL (tức là không bắt buộc User phải thuộc phòng ban)
-                              .OnDelete(DeleteBehavior.SetNull); // Nếu một Department bị xóa, DepartmentId của các User liên quan sẽ được đặt thành NULL
+                      // Cấu hình mối quan hệ khóa ngoại với Department
+                      entity.HasOne(u => u.Department)      // Một ApplicationUser có MỘT Department
+                      .WithMany(d => d.Users)         // Một Department có NHIỀU ApplicationUser
+                      .HasForeignKey(u => u.DepartmentId) // Khóa ngoại là DepartmentId
+                      .IsRequired(false)              // DepartmentId có thể là NULL (tức là không bắt buộc User phải thuộc phòng ban)
+                      .OnDelete(DeleteBehavior.SetNull); // Nếu một Department bị xóa, DepartmentId của các User liên quan sẽ được đặt thành NULL
 
-                              // Cấu hình mối quan hệ khóa ngoại với Position
-                              entity.HasOne(u => u.Position)        // Một ApplicationUser có MỘT Position
-                              .WithMany(p => p.Users)         // Một Position có NHIỀU ApplicationUser
-                              .HasForeignKey(u => u.PositionId)   // Khóa ngoại là PositionId
-                              .IsRequired(false)              // PositionId có thể là NULL (tức là không bắt buộc User phải có vị trí)
-                              .OnDelete(DeleteBehavior.SetNull); // Nếu một Position bị xóa, PositionId của các User liên quan sẽ được đặt thành NULL
+                      // Cấu hình mối quan hệ khóa ngoại với Position
+                      entity.HasOne(u => u.Position)        // Một ApplicationUser có MỘT Position
+                      .WithMany(p => p.Users)         // Một Position có NHIỀU ApplicationUser
+                      .HasForeignKey(u => u.PositionId)   // Khóa ngoại là PositionId
+                      .IsRequired(false)              // PositionId có thể là NULL (tức là không bắt buộc User phải có vị trí)
+                      .OnDelete(DeleteBehavior.SetNull); // Nếu một Position bị xóa, PositionId của các User liên quan sẽ được đặt thành NULL
 
-                              entity.HasOne(u => u.ManagerU)        // Một User có MỘT quản lý trực tiếp
-                              .WithMany(p => p.Children)         // Một quản lý qly NHIỀU User
-                              .HasForeignKey(u => u.ManagerUId)   // Khóa ngoại là ManagerUId
-                              .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
-                              .OnDelete(DeleteBehavior.NoAction);
+                      entity.HasOne(u => u.ManagerU)        // Một User có MỘT quản lý trực tiếp
+                      .WithMany(p => p.Children)         // Một quản lý qly NHIỀU User
+                      .HasForeignKey(u => u.ManagerUId)   // Khóa ngoại là ManagerUId
+                      .IsRequired(false)              // ManagerUId có thể là NULL (tức là không bắt buộc User phải có qly)
+                      .OnDelete(DeleteBehavior.NoAction);
 
-                              // User status
-                              entity.HasOne(u => u.UserStatus)
-                              .WithMany()
-                              .HasForeignKey(u => u.StatusId)
-                              .IsRequired(false)
-                              .OnDelete(DeleteBehavior.SetNull);
+                      // User status
+                      entity.HasOne(u => u.UserStatus)
+                      .WithMany()
+                      .HasForeignKey(u => u.StatusId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
 
-                        });
+                  });
             }
 
             private void ConfigureDepartment(ModelBuilder modelBuilder)
@@ -532,9 +532,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                         .HasColumnName("file_url");
 
                         entity.Property(e => e.PublicIdUrlPdf)
-                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnName("public_id_url_pdf");
+                        .HasColumnName("public_id_url_pdf")
+                        .IsRequired(false); ;
 
                         entity.Property(e => e.CourseId)
                         .HasColumnName("course_id");

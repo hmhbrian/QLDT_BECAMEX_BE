@@ -13,7 +13,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public int TypeDocId { get; set; } = 1; // Mặc định là PDF
         public TypeDocument TypeDoc { get; set; } = null!;
         public string FileUrl { get; set; } = null!;
-        public string PublicIdUrlPdf { get; set; } = null!;
+        public string? PublicIdUrlPdf { get; set; }
         public int? TotalDurationSeconds { get; set; } // Tổng thời gian của bài học (tính bằng giây)
         public int? TotalPages { get; set; } // Tổng số trang của tài liệu PDF
         public int Position { get; set; }
@@ -55,7 +55,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
             // Kiểm tra và xóa PublicIdUrlPdf nếu newFilePublicId là null hoặc TypeDocId là 2
             if (newFilePublicId == null || request.TypeDocId == 2)
             {
-                PublicIdUrlPdf = null; // Xóa dữ liệu cũ của PublicIdUrlPdf
+                PublicIdUrlPdf = null!; // Xóa dữ liệu cũ của PublicIdUrlPdf
             }
             else if (!string.IsNullOrWhiteSpace(newFilePublicId) && PublicIdUrlPdf != newFilePublicId)
             {

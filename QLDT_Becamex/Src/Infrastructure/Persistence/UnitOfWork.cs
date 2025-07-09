@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public ICourseAttachedFileRepository CourseAttachedFileRepository { get; }
         public ILessonRepository LessonRepository { get; }
         public IQuestionRepository QuestionRepository { get; }
-
+        public IFeedbackRepository FeedbackRepository { get; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -45,6 +45,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             CourseAttachedFileRepository = new CourseAttachedFileRepository(dbContext);
             LessonRepository = new LessonRepository(dbContext);
             QuestionRepository = new QuestionRepository(dbContext);
+            FeedbackRepository = new FeedbackRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709020239_AddFeedbacks")]
+    partial class AddFeedbacks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -657,12 +660,6 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("FileUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("file_url");
-
                     b.Property<int>("Position")
                         .HasColumnType("int")
                         .HasColumnName("position");
@@ -679,21 +676,15 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("title");
 
-                    b.Property<int?>("TotalDurationSeconds")
-                        .HasColumnType("int")
-                        .HasColumnName("total_duration_seconds");
-
-                    b.Property<int?>("TotalPages")
-                        .HasColumnType("int")
-                        .HasColumnName("total_pages");
-
-                    b.Property<int>("TypeDocId")
-                        .HasColumnType("int")
-                        .HasColumnName("type_doc_id");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
+
+                    b.Property<string>("UrlPdf")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("url_pdf");
 
                     b.Property<string>("UserIdCreated")
                         .HasColumnType("nvarchar(450)")
@@ -707,56 +698,11 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("TypeDocId");
-
                     b.HasIndex("UserIdCreated");
 
                     b.HasIndex("UserIdEdited");
 
-                    b.ToTable("Lessons", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_Lesson_Metadata", "(type_doc_id = 2 AND total_duration_seconds IS NOT NULL AND total_pages IS NULL) OR (type_doc_id = 1 AND total_pages IS NOT NULL AND total_duration_seconds IS NULL)");
-                        });
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.LessonProgress", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("user_id");
-
-                    b.Property<int>("LessonId")
-                        .HasColumnType("int")
-                        .HasColumnName("lesson_id");
-
-                    b.Property<int?>("CurrentPage")
-                        .HasColumnType("int")
-                        .HasColumnName("current_page");
-
-                    b.Property<int?>("CurrentTimeSeconds")
-                        .HasColumnType("int")
-                        .HasColumnName("current_time_seconds");
-
-                    b.Property<bool>("IsCompleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_completed");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("last_accessed")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.HasKey("UserId", "LessonId");
-
-                    b.HasIndex("LessonId");
-
-                    b.ToTable("LessonProgress", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_Progress_Type", "(current_time_seconds IS NOT NULL AND current_page IS NULL) OR (current_time_seconds IS NULL AND current_page IS NOT NULL) OR (current_time_seconds IS NULL AND current_page IS NULL)");
-                        });
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Position", b =>
@@ -904,32 +850,6 @@ namespace QLDT_Becamex.Migrations
                     b.HasIndex("UserIdEdited");
 
                     b.ToTable("Tests", (string)null);
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TypeDocument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<string>("NameType")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("name_type");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TypeDocument", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
@@ -1188,13 +1108,6 @@ namespace QLDT_Becamex.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_lessons_courses");
 
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.TypeDocument", "TypeDoc")
-                        .WithMany()
-                        .HasForeignKey("TypeDocId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_lessons_type_document");
-
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
                         .WithMany("CreatedLesson")
                         .HasForeignKey("UserIdCreated")
@@ -1209,32 +1122,9 @@ namespace QLDT_Becamex.Migrations
 
                     b.Navigation("Course");
 
-                    b.Navigation("TypeDoc");
-
                     b.Navigation("UserCreated");
 
                     b.Navigation("UserEdited");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.LessonProgress", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Lesson", "Lesson")
-                        .WithMany("LessonProgress")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_student_lesson_progress_lesson");
-
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "User")
-                        .WithMany("LessonProgress")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_student_lesson_progress_user");
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Question", b =>
@@ -1303,8 +1193,6 @@ namespace QLDT_Becamex.Migrations
 
                     b.Navigation("CreatedTest");
 
-                    b.Navigation("LessonProgress");
-
                     b.Navigation("UpdatedLesson");
 
                     b.Navigation("UpdatedTest");
@@ -1349,11 +1237,6 @@ namespace QLDT_Becamex.Migrations
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lecturer", b =>
                 {
                     b.Navigation("Courses");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lesson", b =>
-                {
-                    b.Navigation("LessonProgress");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Position", b =>

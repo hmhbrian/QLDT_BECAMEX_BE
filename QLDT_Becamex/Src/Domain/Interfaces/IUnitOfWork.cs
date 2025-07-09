@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
         public ICourseAttachedFileRepository CourseAttachedFileRepository { get; }
         public ILessonRepository LessonRepository { get; }
         public IQuestionRepository QuestionRepository { get; }
-
+        public IFeedbackRepository FeedbackRepository { get; }
 
         public Task<int> CompleteAsync();
         Task<DbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

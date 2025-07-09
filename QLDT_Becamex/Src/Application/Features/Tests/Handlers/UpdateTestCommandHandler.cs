@@ -70,7 +70,6 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             // Set foreign key properties
             test.UserIdEdited = userId; // Use userId from authentication info
             test.UpdatedAt = DateTime.UtcNow;
-
             // Update Test in repository
             _unitOfWork.TestRepository.Update(test);
 

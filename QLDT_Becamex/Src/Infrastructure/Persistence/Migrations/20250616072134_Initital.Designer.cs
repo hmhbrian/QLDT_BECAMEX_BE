@@ -16,7 +16,7 @@ namespace QLDT_Becamex.Migrations
     partial class Initital
     {
         /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        private static void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

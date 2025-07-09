@@ -54,8 +54,8 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             request.Request.Title = ProcessTitle; // Cập nhật tiêu đề đã xử lý
 
             // 3. Xử lý file PDF mới nếu có và xóa file cũ
-            string? newPdfUrl = lesson.UrlPdf; // Giữ lại URL cũ làm mặc định
-            string? oldPdfUrl = lesson.UrlPdf; // Lưu URL PDF cũ để xóa sau
+            string? newPdfUrl = lesson.FileUrl; // Giữ lại URL cũ làm mặc định
+            string? oldPdfUrl = lesson.FileUrl; // Lưu URL PDF cũ để xóa sau
             string? newPdfPublicId = null; // Lưu URL PDF cũ để xóa sau
 
             if (request.Request.FilePdf != null && request.Request.FilePdf.Length > 0)

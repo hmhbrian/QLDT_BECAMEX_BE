@@ -42,14 +42,6 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
         public string? Email { get; set; } = null;
 
 
-        [StringLength(100, ErrorMessage = "The password must be at least 6 and at max 100 characters long.", MinimumLength = 6)]
-        public string? NewPassword { get; set; } = null;
-
-        // Thêm trường ConfirmPassword
-
-        [Compare("NewPassword", ErrorMessage = "The password and confirmation password do not match.")]
-        public string? ConfirmNewPassword { get; set; } = null;
-
 
     }
 }

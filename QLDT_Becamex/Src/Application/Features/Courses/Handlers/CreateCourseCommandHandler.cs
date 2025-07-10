@@ -2,7 +2,6 @@
 using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
-using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
@@ -19,21 +18,31 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IDepartmentService _departmentService;
+        private readonly IUserService _userService;
 
 
-        public CreateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService)
+
+        public CreateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _departmentService = departmentService;
+            _userService = userService;
         }
 
         public async Task<string> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
 
             var dto = request.Request;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                // Sử dụng AppException của bạn với mã lỗi phù hợp
+                throw new AppException("Bạn không có quyền tạo khóa học này", 403);
+            }
 
             if (await _unitOfWork.CourseRepository.AnyAsync(c => c.Code == dto.Code.Trim().ToLower()))
                 throw new AppException("Mã khóa học đã tồn tại", 409);
@@ -106,8 +115,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var course = _mapper.Map<Course>(dto);
             course.Id = Guid.NewGuid().ToString();
             course.CreatedAt = DateTime.Now;
+            course.ModifiedAt = DateTime.Now;
             course.ThumbUrl = imageUrl;
-
+            course.CreateById = currentUserId;
             await _unitOfWork.CourseRepository.AddAsync(course);
 
             if (dto.DepartmentIds != null && dto.DepartmentIds.Any())
@@ -155,7 +165,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                         CourseId = course.Id,
                         AssignedAt = DateTime.Now,
                         IsMandatory = true,
-                        Status = ConstantStatus.ASSIGINED
+                        Status = ConstantStatus.ASSIGINED,
+                        CreatedAt = DateTime.Now,
+                        ModifiedAt = DateTime.Now,
                     }).ToList();
 
                     await _unitOfWork.UserCourseRepository.AddRangeAsync(userCourses);

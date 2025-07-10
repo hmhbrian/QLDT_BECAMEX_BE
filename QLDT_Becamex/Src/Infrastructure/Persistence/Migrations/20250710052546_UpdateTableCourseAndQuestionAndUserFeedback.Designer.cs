@@ -12,8 +12,8 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250709034451_AddLessonProgressAndTypeDoc")]
-    partial class AddLessonProgressAndTypeDoc
+    [Migration("20250710052546_UpdateTableCourseAndQuestionAndUserFeedback")]
+    partial class UpdateTableCourseAndQuestionAndUserFeedback
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -167,17 +167,25 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("code");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CreateById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
                     b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("department_id");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -187,18 +195,22 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("EndWork")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_work");
 
                     b.Property<string>("FullName")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name");
 
                     b.Property<string>("IdCard")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("id_card");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("is_deleted");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -207,10 +219,12 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ManagerUId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("manager_u_id");
 
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("modified_at");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -230,30 +244,40 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int?>("PositionId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("position_id");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("StartWork")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_work");
 
                     b.Property<int?>("StatusId")
-                        .HasMaxLength(100)
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("status_id");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<string>("UpdateById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("update_by_id");
+
                     b.Property<string>("UrlAvatar")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("url_avatar");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreateById");
 
                     b.HasIndex("DepartmentId");
 
@@ -271,100 +295,136 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("StatusId");
 
+                    b.HasIndex("UpdateById");
+
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("id");
 
                     b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("category_id");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("code");
+
+                    b.Property<string>("CreateById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("created_by_id");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("description");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_date");
 
                     b.Property<string>("Format")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("format");
 
                     b.Property<int?>("HoursPerSessions")
-                        .HasMaxLength(100)
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("hours_per_sessions");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<int?>("LecturerId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("lecturer_id");
 
                     b.Property<string>("Location")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("location");
 
                     b.Property<int?>("MaxParticipant")
-                        .HasMaxLength(100)
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("max_participant");
 
                     b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("modified_at");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name");
 
                     b.Property<string>("Objectives")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("objectives");
 
                     b.Property<string>("Optional")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("optional");
 
                     b.Property<DateTime?>("RegistrationClosingDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("registration_closing_date");
 
                     b.Property<DateTime?>("RegistrationStartDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("registration_start_date");
 
                     b.Property<int?>("Sessions")
-                        .HasMaxLength(100)
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("sessions");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
 
                     b.Property<int?>("StatusId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("status_id");
 
                     b.Property<string>("ThumbUrl")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("thumb_url");
+
+                    b.Property<string>("UpdateById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("update_by_id");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("CreateById");
+
                     b.HasIndex("LecturerId");
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Course", (string)null);
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseAttachedFile", b =>
@@ -383,15 +443,15 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Link")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("ModifiedTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PublicIdUrlPdf")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -556,6 +616,60 @@ namespace QLDT_Becamex.Migrations
                     b.ToTable("Departments");
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("comment");
+
+                    b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("course_id");
+
+                    b.Property<DateTime>("SubmissionDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("feedback_at");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id");
+
+                    b.Property<int>("q1_revelance")
+                        .HasColumnType("int")
+                        .HasColumnName("q1_revelance");
+
+                    b.Property<int>("q2_clarity")
+                        .HasColumnType("int")
+                        .HasColumnName("q2_clarity");
+
+                    b.Property<int>("q3_structure")
+                        .HasColumnType("int")
+                        .HasColumnName("q3_structure");
+
+                    b.Property<int>("q4_duration")
+                        .HasColumnType("int")
+                        .HasColumnName("q4_duration");
+
+                    b.Property<int>("q5_material")
+                        .HasColumnType("int")
+                        .HasColumnName("q5_material");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks", (string)null);
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lecturer", b =>
                 {
                     b.Property<int>("Id")
@@ -598,11 +712,10 @@ namespace QLDT_Becamex.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CourseId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)")
                         .HasColumnName("course_id");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
@@ -617,7 +730,6 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnName("position");
 
                     b.Property<string>("PublicIdUrlPdf")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("public_id_url_pdf");
@@ -640,7 +752,7 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("int")
                         .HasColumnName("type_doc_id");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
@@ -662,10 +774,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("UserIdEdited");
 
-                    b.ToTable("Lessons", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_Lesson_Metadata", "(type_doc_id = 2 AND total_duration_seconds IS NOT NULL AND total_pages IS NULL) OR (type_doc_id = 1 AND total_pages IS NOT NULL AND total_duration_seconds IS NULL)");
-                        });
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.LessonProgress", b =>
@@ -755,6 +864,11 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("correct_option");
 
+                    b.Property<string>("CreateById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("created_by_id");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
@@ -786,13 +900,22 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("int")
                         .HasColumnName("test_id");
 
+                    b.Property<string>("UpdateById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("update_by_id");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreateById");
+
                     b.HasIndex("TestId");
+
+                    b.HasIndex("UpdateById");
 
                     b.ToTable("Questions", (string)null);
                 });
@@ -885,26 +1008,40 @@ namespace QLDT_Becamex.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("AssignedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("assigned_at");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("course_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
                     b.Property<bool>("IsMandatory")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("is_mandatory");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("modified_at");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("status");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
@@ -986,6 +1123,11 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", b =>
                 {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Department", "Department")
                         .WithMany("Users")
                         .HasForeignKey("DepartmentId")
@@ -994,7 +1136,7 @@ namespace QLDT_Becamex.Migrations
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "ManagerU")
                         .WithMany("Children")
                         .HasForeignKey("ManagerUId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Position", "Position")
                         .WithMany("Users")
@@ -1006,11 +1148,20 @@ namespace QLDT_Becamex.Migrations
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreateBy");
+
                     b.Navigation("Department");
 
                     b.Navigation("ManagerU");
 
                     b.Navigation("Position");
+
+                    b.Navigation("UpdateBy");
 
                     b.Navigation("UserStatus");
                 });
@@ -1020,6 +1171,11 @@ namespace QLDT_Becamex.Migrations
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.CourseCategory", "Category")
                         .WithMany("Courses")
                         .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Lecturer", "Lecturer")
@@ -1032,11 +1188,20 @@ namespace QLDT_Becamex.Migrations
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Category");
+
+                    b.Navigation("CreateBy");
 
                     b.Navigation("Lecturer");
 
                     b.Navigation("Status");
+
+                    b.Navigation("UpdateBy");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.CourseAttachedFile", b =>
@@ -1113,13 +1278,27 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Parent");
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Feedback", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Lesson", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
                         .WithMany("Lessons")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
                         .HasConstraintName("fk_lessons_courses");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.TypeDocument", "TypeDoc")
@@ -1132,13 +1311,13 @@ namespace QLDT_Becamex.Migrations
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
                         .WithMany("CreatedLesson")
                         .HasForeignKey("UserIdCreated")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_lessons_user_created");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserEdited")
                         .WithMany("UpdatedLesson")
                         .HasForeignKey("UserIdEdited")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_lessons_user_edited");
 
                     b.Navigation("Course");
@@ -1173,6 +1352,11 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Question", b =>
                 {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Test", "Test")
                         .WithMany("Questions")
                         .HasForeignKey("TestId")
@@ -1180,7 +1364,16 @@ namespace QLDT_Becamex.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_questions_tests");
 
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreateBy");
+
                     b.Navigation("Test");
+
+                    b.Navigation("UpdateBy");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Test", b =>
@@ -1194,13 +1387,13 @@ namespace QLDT_Becamex.Migrations
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserCreated")
                         .WithMany("CreatedTest")
                         .HasForeignKey("UserIdCreated")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_tests_user_created");
 
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "UserEdited")
                         .WithMany("UpdatedTest")
                         .HasForeignKey("UserIdEdited")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_tests_user_edited");
 
                     b.Navigation("Course");

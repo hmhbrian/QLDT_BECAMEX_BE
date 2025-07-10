@@ -9,10 +9,10 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public float PassThreshold { get; set; }
         public int TimeTest { get; set; }
         public int Position { get; set; }
-        public string? UserIdCreated { get; set; }
-        public ApplicationUser? UserCreated { get; set; }
-        public string? UserIdEdited { get; set; }
-        public ApplicationUser? UserEdited { get; set; }
+        public string? CreatedById { get; set; }
+        public ApplicationUser? CreatedBy { get; set; }
+        public string? UpdatedById { get; set; }
+        public ApplicationUser? UpdatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public ICollection<Question>? Questions { get; set; } = new List<Question>();

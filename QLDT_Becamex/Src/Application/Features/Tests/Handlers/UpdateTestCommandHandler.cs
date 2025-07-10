@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
             // Kiểm tra Course existence
             var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == courseId);
-            if (!courseExists) 
+            if (!courseExists)
             {
                 throw new AppException("Khóa học không tồn tại", 404);
             }
@@ -68,7 +68,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             _mapper.Map(request, test);
 
             // Set foreign key properties
-            test.UserIdEdited = userId; // Use userId from authentication info
+            test.UpdatedById = userId; // Use userId from authentication info
             test.UpdatedAt = DateTime.UtcNow;
             // Update Test in repository
             _unitOfWork.TestRepository.Update(test);

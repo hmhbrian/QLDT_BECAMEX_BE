@@ -12,18 +12,18 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string Title { get; set; } = null!;
         public int TypeDocId { get; set; } = 1; // Mặc định là PDF
         public TypeDocument TypeDoc { get; set; } = null!;
-        public string FileUrl { get; set; } = null!;
+        public string? FileUrl { get; set; }
         public string? PublicIdUrlPdf { get; set; }
         public int? TotalDurationSeconds { get; set; } // Tổng thời gian của bài học (tính bằng giây)
         public int? TotalPages { get; set; } // Tổng số trang của tài liệu PDF
         public int Position { get; set; }
-        public string? UserIdCreated { get; set; }
-        public ApplicationUser? UserCreated { get; set; }
-        public string? UserIdEdited { get; set; }
-        public ApplicationUser? UserEdited { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public ICollection<LessonProgress>? LessonProgress { get; set; } = new List<LessonProgress>();
+        public string? CreatedById { get; set; }
+        public ApplicationUser? CreatedBy { get; set; }
+        public string? UpdatedById { get; set; }
+        public ApplicationUser? UpdatedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public ICollection<LessonProgress> LessonProgress { get; set; } = new List<LessonProgress>();
 
         public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId, int position,int typeId, int totalDurations, int totalPages)
         {
@@ -32,13 +32,12 @@ namespace QLDT_Becamex.Src.Domain.Entities
             PublicIdUrlPdf = filePublicId;
             CourseId = courseId;
             Position = position;
-            UserIdCreated = userIdCreated;
+            CreatedById = userIdCreated;
 
-            if(totalDurations > 0)   
+            if (totalDurations > 0)
                 TotalDurationSeconds = totalDurations; // Lưu tổng thời gian của bài học
             else
                 TotalPages = totalPages;//lưu tổng số trang của PDF
-
             TypeDocId = typeId; 
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
@@ -73,13 +72,13 @@ namespace QLDT_Becamex.Src.Domain.Entities
                 TotalPages = totalPages;//lưu tổng số trang của PDF
                 TotalDurationSeconds = null; // Đặt TotalDurationSeconds là null nếu có tổng số trang
             }
-             
+
             TypeDocId = typeId;
 
             if (courseId != CourseId)
                 CourseId = courseId;
 
-            UserIdEdited = userIdEdited;
+            UpdatedById = userIdEdited;
             UpdatedAt = DateTime.UtcNow;
         }
 

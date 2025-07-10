@@ -54,7 +54,10 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 includes: q => q.Include(u => u.Position)
                                 .Include(u => u.Department)
                                 .Include(u => u.ManagerU)
-                                .Include(u => u.UserStatus),
+                                .Include(u => u.UserStatus)
+                                .Include(u => u.CreateBy)
+                                .Include(u => u.UpdateBy),
+
                 asNoTracking: true
             );
 

@@ -41,6 +41,9 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 .Include(u => u.Department)
                 .Include(u => u.ManagerU)
                 .Include(u => u.UserStatus)
+                .Include(u => u.CreateBy)
+                .Include(u => u.CreateBy)
+                .Include(u => u.CreateBy)
                 .FirstOrDefaultAsync(u => u.Email == loginDto.Email, cancellationToken);
 
             if (user == null)
@@ -54,7 +57,6 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 var userDto = _mapper.Map<UserDto>(user);
                 var roles = await _userManager.GetRolesAsync(user);
                 userDto.Role = roles.FirstOrDefault();
-                userDto.Position = _mapper.Map<PositionDto>(user.Position);
                 userDto.AccessToken = _jwtService.GenerateJwtToken(user.Id, user.Email!, userDto.Role!);
 
                 return userDto;

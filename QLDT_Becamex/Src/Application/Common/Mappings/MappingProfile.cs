@@ -13,6 +13,7 @@ using QLDT_Becamex.Src.Application.Features.Questions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
+using QLDT_Becamex.Src.Application.Features.TypeDocument.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 
@@ -51,6 +52,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             //Role
             CreateMap<IdentityRole, RoleDto>().ReverseMap();
             CreateMap<CreateRoleDto, IdentityRole>();
+
+            //TypeDocument
+            CreateMap<TypeDocument, TypeDocumentDto>().ReverseMap();
+            CreateMap<TypeDocumentRqDto, TypeDocument>();
 
             //Course
             CreateMap<CreateCourseDto, Course>()

@@ -40,7 +40,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteLecturer([FromBody] List<int> ids)
+        public async Task<IActionResult> DeleteTypeDocument([FromBody] List<int> ids)
         {
             if (ids == null || !ids.Any())
                 return BadRequest(ApiResponse.Fail("Danh sách ID không được để trống"));

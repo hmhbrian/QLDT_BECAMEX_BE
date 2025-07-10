@@ -48,6 +48,10 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             {
                 throw new AppException("Creating a lesson can't have both Pdf file and link video.", 400); // Mã 400 cho Bad Request
             }
+            if(request.Request.FilePdf != null && request.Request.TotalDurationSeconds > 0)
+            {
+                throw new AppException("Creating a lesson can't have Pdf file and Total DurationSeconds.", 400); 
+            }
             //Lấy position tối đa hiện tại của các bài học trong khóa học
             int maxPosition = await _unitOfWork.LessonRepository.GetMaxPositionAsync(request.CourseId);
 

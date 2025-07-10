@@ -143,7 +143,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //Lesson
             CreateMap<Lesson, AllLessonDto>()
-                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"));
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc.NameType));
                     
             CreateMap<Lesson, DetailLessonDto>()

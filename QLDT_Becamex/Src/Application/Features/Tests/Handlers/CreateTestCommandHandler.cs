@@ -50,8 +50,8 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 
             // Set navigation properties
             test.CourseId = courseId;
-            test.UserIdCreated = userId;
-            test.UserIdEdited = userId;
+            test.CreatedById = userId;
+            test.UpdatedById = userId;
             test.CreatedAt = DateTime.UtcNow;
             test.UpdatedAt = DateTime.UtcNow;
             test.Position = maxPosition + 1;

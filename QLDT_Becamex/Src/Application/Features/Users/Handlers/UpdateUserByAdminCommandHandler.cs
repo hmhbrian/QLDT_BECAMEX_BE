@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Infrastructure.Services;
 using System;
 using System.Linq;
 using System.Threading;
@@ -15,19 +16,29 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUserService _userService;
 
         public UpdateUserByAdminCommandHandler(
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+             IUserService userService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _userService = userService;
         }
 
         public async Task<string> Handle(UpdateUserByAdminCommand command, CancellationToken cancellationToken)
         {
             var rq = command.Request;
             var userId = command.UserId;
+
+            var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
+            if (currentUserId == null)
+            {
+                throw new AppException("Không có quyền cập nhật thông tin người dùng", 403);
+
+            }
 
             var userToUpdate = await _userManager.Users
                 .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
@@ -60,6 +71,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
             if (rq.PositionId.HasValue)
                 userToUpdate.PositionId = rq.PositionId;
 
+            userToUpdate.UpdateById = currentUserId;
             userToUpdate.ModifiedAt = DateTime.UtcNow;
 
             // Kiểm tra email có trùng
@@ -106,16 +118,6 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                     await _userManager.RemoveFromRolesAsync(userToUpdate, currentRoles);
                     await _userManager.AddToRoleAsync(userToUpdate, role.Name);
                 }
-            }
-
-            // Reset mật khẩu nếu có
-            if (!string.IsNullOrWhiteSpace(rq.NewPassword))
-            {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(userToUpdate);
-                var resetResult = await _userManager.ResetPasswordAsync(userToUpdate, token, rq.NewPassword);
-
-                if (!resetResult.Succeeded)
-                    throw new AppException("Mật khẩu không hợp lệ", 400);
             }
 
             // Cập nhật cuối

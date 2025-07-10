@@ -5,6 +5,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
     public class Question
     {
         public int Id { get; set; }
+
         public int TestId { get; set; }
         public Test? Test { get; set; }
         public int Position { get; set; }
@@ -16,6 +17,10 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string? B { get; set; }
         public string? C { get; set; }
         public string? D { get; set; }
+        public string? CreateById { get; set; }
+        public ApplicationUser? CreateBy { get; set; }
+        public string? UpdateById { get; set; }
+        public ApplicationUser? UpdateBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

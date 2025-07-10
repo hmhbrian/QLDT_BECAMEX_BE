@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Infrastructure.Services;
 
 namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
 {
@@ -20,20 +21,28 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUserService _userService;
 
         public CreateUserCommandHandler(
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+             IUserService userService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _userService = userService;
         }
 
         public async Task<string> Handle(CreateUserCommand command, CancellationToken cancellationToken)
         {
+
+
             cancellationToken.ThrowIfCancellationRequested();
 
+
             var request = command.Request;
+
+            var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
 
             // 1. Kiểm tra role
             var role = await _roleManager.FindByNameAsync("HOCVIEN");
@@ -54,11 +63,13 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
                 PhoneNumber = request.NumberPhone,
                 StartWork = request.StartWork,
                 CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
                 Code = request.Code,
                 DepartmentId = request.DepartmentId,
                 PositionId = request.PositionId,
                 StatusId = request.StatusId,
-                ManagerUId = request.ManagerUId
+                ManagerUId = request.ManagerUId,
+                CreateById = currentUserId,
             };
 
             var createResult = await _userManager.CreateAsync(user, request.Password);

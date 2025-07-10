@@ -14,8 +14,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
         public async Task<Lesson?> GetByIdAsync(int id)
         {
             return await _context.Lessons
-                .Include(l => l.UserCreated)
-                .Include(l => l.UserEdited)
+                .Include(l => l.CreatedBy)
+                .Include(l => l.UpdatedBy)
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
         public async Task<int> GetMaxPositionAsync(string courseId)
@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
         public async Task UpdatePositionAsync(string courseId, int fromPosition, int toPosition, int offset)
         {
             await _context.Lessons
-                .Where( l => l.CourseId == courseId && l.Position >= fromPosition && l.Position <= toPosition)
+                .Where(l => l.CourseId == courseId && l.Position >= fromPosition && l.Position <= toPosition)
                 .ExecuteUpdateAsync(l => l.SetProperty(x => x.Position, x => x.Position + offset));
         }
 

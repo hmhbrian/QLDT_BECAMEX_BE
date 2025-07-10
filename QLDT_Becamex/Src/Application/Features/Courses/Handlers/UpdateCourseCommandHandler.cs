@@ -8,7 +8,7 @@ using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
-using QLDT_Becamex.Src.Shared.Helpers;
+
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -18,22 +18,34 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IDepartmentService _departmentService;
-        public UpdateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService)
+        private readonly IUserService _userService;
+
+
+
+        public UpdateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _departmentService = departmentService;
+            _userService = userService;
         }
 
         public async Task<string> Handle(UpdateCourseCommand command, CancellationToken cancellationToken)
         {
             var id = command.Id;
             var request = command.Request;
+            var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
             var course = await _unitOfWork.CourseRepository.GetByIdAsync(id);
+
+
             if (course == null)
                 throw new AppException("Khóa học không tồn tại", 404);
 
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                throw new AppException("Bạn không có quyền tạo khóa học này", 403);
+            }
             if (await _unitOfWork.CourseRepository.AnyAsync(c => c.Code == request.Code && c.Id != id))
                 throw new AppException("Mã khóa học đã tồn tại", 409);
 
@@ -94,6 +106,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
 
             _mapper.Map(request, course);
+
             string? imageUrl = null;
             if (request.ThumbUrl != null)
             {
@@ -101,7 +114,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 course.ThumbUrl = imageUrl;
 
             }
+
             course.ModifiedAt = DateTime.Now;
+            course.UpdateById = currentUserId;
             _unitOfWork.CourseRepository.Update(course);
 
             // Replace course-department

@@ -5,8 +5,8 @@ namespace QLDT_Becamex.Src.Domain.Entities
     public class Course
     {
         public string Id { get; set; } = null!;
-        public string? Code { get; set; }
-        public string? Name { get; set; }
+        public string Code { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Objectives { get; set; }
         public string? ThumbUrl { get; set; }
@@ -19,7 +19,6 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime? EndDate { get; set; }
         public DateTime? RegistrationStartDate { get; set; }
         public DateTime? RegistrationClosingDate { get; set; }
-
         public string? Location { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
@@ -30,6 +29,10 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public int? LecturerId { get; set; }
         public Lecturer? Lecturer { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public string? CreateById { get; set; }
+        public ApplicationUser? CreateBy { get; set; }
+        public string? UpdateById { get; set; }
+        public ApplicationUser? UpdateBy { get; set; }
         public ICollection<CourseDepartment>? CourseDepartments { get; set; } = new List<CourseDepartment>();
         public ICollection<CoursePosition>? CoursePositions { get; set; } = new List<CoursePosition>();
         public ICollection<UserCourse>? UserCourses { get; set; } = new List<UserCourse>();

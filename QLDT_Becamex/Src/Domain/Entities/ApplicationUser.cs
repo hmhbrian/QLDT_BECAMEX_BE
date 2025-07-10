@@ -13,31 +13,22 @@ namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp
         public DateTime? EndWork { get; set; }
         public int? StatusId { get; set; }
         public UserStatus? UserStatus { get; set; }
-
         public bool IsDeleted { get; set; } = false;
-
         public string? ManagerUId { get; set; } // Khóa ngoại tới ApplicationUser khác (không cần [ForeignKey] nữa)
         public ApplicationUser? ManagerU { get; set; }
         public int? DepartmentId { get; set; }
         public Department? Department { get; set; } // Navigation property
-
         public int? PositionId { get; set; }
         public Position? Position { get; set; } // Navigation property
-
-
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-
-        public ICollection<ApplicationUser>? Children { get; set; }
-
-        public ICollection<UserCourse>? UserCourse { get; set; }
-        public ICollection<Lesson>? CreatedLesson { get; set; } = new List<Lesson>();
-        public ICollection<Lesson>? UpdatedLesson { get; set; } = new List<Lesson>();
-        public ICollection<Test>? CreatedTest { get; set; } = new List<Test>();
-        public ICollection<Test>? UpdatedTest { get; set; } = new List<Test>();
-        public ICollection<LessonProgress>? LessonProgress { get; set; } = new List<LessonProgress>();
-
-
+        public string? CreateById { get; set; }
+        public ApplicationUser? CreateBy { get; set; }
+        public string? UpdateById { get; set; }
+        public ApplicationUser? UpdateBy { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
+        public ICollection<ApplicationUser> Children { get; set; } = new List<ApplicationUser>();
+        public ICollection<UserCourse> UserCourse { get; set; } = new List<UserCourse>();
+        public ICollection<LessonProgress> LessonProgress { get; set; } = new List<LessonProgress>();
     }
 
 }

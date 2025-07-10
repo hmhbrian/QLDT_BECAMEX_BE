@@ -82,7 +82,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                     }
                     TestToMove.Position = newPosition; // Cập nhật vị trí mới cho test
                     TestToMove.UpdatedAt = DateTime.UtcNow;
-                    TestToMove.UserIdEdited = userId;
+                    TestToMove.UpdatedById = userId;
                     _unitOfWork.TestRepository.Update(TestToMove); // Cập nhật test
 
                     await _unitOfWork.CompleteAsync(); // Lưu thay đổi

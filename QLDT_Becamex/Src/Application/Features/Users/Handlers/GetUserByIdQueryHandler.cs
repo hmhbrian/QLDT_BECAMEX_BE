@@ -29,6 +29,8 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 .Include(u => u.Department)
                 .Include(u => u.UserStatus)
                 .Include(u => u.ManagerU)
+                .Include(u => u.CreateBy)
+                .Include(u => u.CreateBy)
                 .FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
 
             if (user == null)

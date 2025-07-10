@@ -9,7 +9,6 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Dtos
         public IFormFile? FilePdf { get; set; } = null;
         public string? Link { get; set; } = null;
         public int TotalDurationSeconds { get; set; } = 0; // Tổng thời gian của video (nếu có)
-        public int TypeDocId { get; set; }
     }
 
     public class UpdateLessonDto
@@ -19,6 +18,5 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Dtos
         public IFormFile? FilePdf { get; set; }
         public string? Link { get; set; } = null;
         public int TotalDurationSeconds { get; set; } = 0;
-        public int TypeDocId { get; set; }
     }
 }

@@ -39,6 +39,7 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                 predicate: lp => lp.CourseId == request.CourseId,
                 orderBy: q => q.OrderBy(lp => lp.Position),
                 includes: q => q
+                    .Include(l => l.TypeDoc)
                     .Include(l => l.LessonProgress!.Where(lp => lp.UserId == userId))
             );
             // Chuyển đổi sang DTO và tính toán ProgressPercenttage
@@ -82,7 +83,8 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                     Id = lesson.Id,
                     Title = lesson.Title,
                     UrlPdf = lesson.FileUrl,
-                    ProgressPercentage = progressPercentage
+                    ProgressPercentage = progressPercentage,
+                    Type = lesson.TypeDoc?.NameType ?? "Unknown",
                 };
             }).ToList();
 

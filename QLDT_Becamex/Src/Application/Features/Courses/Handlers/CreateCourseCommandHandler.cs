@@ -142,9 +142,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 await _unitOfWork.CoursePositionRepository.AddRangeAsync(coursePositions);
             }
 
+            var userCoursesToCreate = new List<UserCourse>();
+
+            // ... (code kiểm tra validation của bạn) ...
+
+            // --- Logic ghi danh người dùng vào khóa học ---
             if (dto.Optional == ConstantCourse.OPTIONAL_BATBUOC)
             {
-                var usersToEnroll = new HashSet<string>();
+                var usersFromDepartmentsAndPositions = new HashSet<string>();
 
                 if (dto.DepartmentIds != null && dto.DepartmentIds.Any() &&
                     dto.PositionIds != null && dto.PositionIds.Any())
@@ -154,24 +159,48 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                                         u.PositionId.HasValue && dto.PositionIds.Contains(u.PositionId.Value));
 
                     foreach (var user in matchedUsers)
-                        usersToEnroll.Add(user.Id);
+                        usersFromDepartmentsAndPositions.Add(user.Id);
                 }
 
-                if (usersToEnroll.Any())
+                foreach (var userId in usersFromDepartmentsAndPositions)
                 {
-                    var userCourses = usersToEnroll.Select(userId => new UserCourse
+                    // Thêm vào danh sách chung
+                    userCoursesToCreate.Add(new UserCourse
                     {
                         UserId = userId,
                         CourseId = course.Id,
                         AssignedAt = DateTime.Now,
-                        IsMandatory = true,
+                        IsMandatory = true, // Ghi danh bắt buộc
                         Status = ConstantStatus.ASSIGINED,
                         CreatedAt = DateTime.Now,
                         ModifiedAt = DateTime.Now,
-                    }).ToList();
-
-                    await _unitOfWork.UserCourseRepository.AddRangeAsync(userCourses);
+                    });
                 }
+            }
+            else // Nếu khóa học là TÙY CHỌN
+            {
+                if (dto.UserIds != null && dto.UserIds.Any())
+                {
+                    foreach (var userId in dto.UserIds)
+                    {
+                        userCoursesToCreate.Add(new UserCourse
+                        {
+                            UserId = userId,
+                            CourseId = course.Id,
+                            AssignedAt = DateTime.Now,
+                            IsMandatory = false, // Ghi danh tùy chọn
+                            Status = ConstantStatus.ASSIGINED,
+                            CreatedAt = DateTime.Now,
+                            ModifiedAt = DateTime.Now,
+                        });
+                    }
+                }
+            }
+
+            // Cuối cùng, thêm tất cả các UserCourse vào database
+            if (userCoursesToCreate.Any())
+            {
+                await _unitOfWork.UserCourseRepository.AddRangeAsync(userCoursesToCreate);
             }
 
             await _unitOfWork.CompleteAsync();

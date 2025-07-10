@@ -78,5 +78,14 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new DeleteCourseCommand(id));
             return Ok(ApiResponse.Ok("Xóa khóa học thành công"));
         }
+
+        [HttpPost("{courseId}/enroll")]
+        [Authorize]
+        public async Task<IActionResult> EnrollCourse(string courseId)
+        {
+            var result = await _mediator.Send(new EnrollCourseCommand(courseId));
+            return Ok(ApiResponse.Ok(result));
+
+        }
     }
 }

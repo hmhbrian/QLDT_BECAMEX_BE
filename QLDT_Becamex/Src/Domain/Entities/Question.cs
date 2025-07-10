@@ -21,8 +21,8 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public ApplicationUser? CreateBy { get; set; }
         public string? UpdateById { get; set; }
         public ApplicationUser? UpdateBy { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public void Create(int testId, CreateQuestionDto request, int position)
         {

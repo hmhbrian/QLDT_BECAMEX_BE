@@ -5,7 +5,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
 {
     public class UpdateCourseDto
     {
-
         public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
@@ -23,7 +22,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? MaxParticipant { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public DateTime? RegistrationStartDate { get; set; } 
+        public DateTime? RegistrationStartDate { get; set; }
         public DateTime? RegistrationClosingDate { get; set; }
         public string? Location { get; set; }
         public int? StatusId { get; set; }
@@ -31,6 +30,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? LecturerId { get; set; }
         public List<int>? DepartmentIds { get; set; }
         public List<int>? PositionIds { get; set; }
+        public List<string>? UserIds { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (RegistrationStartDate.HasValue && StartDate.HasValue &&

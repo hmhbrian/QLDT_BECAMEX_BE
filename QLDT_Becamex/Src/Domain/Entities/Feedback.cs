@@ -13,6 +13,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public int q4_duration { get; set; }
         public int q5_material { get; set; }
         public string? Comment { get; set; }
-        public DateTime SubmissionDate { get; set; }
+        public DateTime? SubmissionDate { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

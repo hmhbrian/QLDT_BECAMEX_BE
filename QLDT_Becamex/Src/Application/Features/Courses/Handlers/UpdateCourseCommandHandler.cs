@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
 using QLDT_Becamex.Src.Constant;
@@ -8,7 +9,7 @@ using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
-
+using System.Linq;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -19,8 +20,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IDepartmentService _departmentService;
         private readonly IUserService _userService;
-
-
 
         public UpdateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService, IUserService userService)
         {
@@ -36,74 +35,86 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var id = command.Id;
             var request = command.Request;
             var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
-            var course = await _unitOfWork.CourseRepository.GetByIdAsync(id);
 
+            var course = await _unitOfWork.CourseRepository.GetByIdAsync(id);
 
             if (course == null)
                 throw new AppException("Khóa học không tồn tại", 404);
 
             if (string.IsNullOrEmpty(currentUserId))
             {
-                throw new AppException("Bạn không có quyền tạo khóa học này", 403);
+                throw new AppException("Bạn không có quyền cập nhật khóa học này", 403);
             }
+
+            // --- 1. Kiểm tra tính hợp lệ của dữ liệu đầu vào ---
+
+            // Mã và tên khóa học trùng lặp
             if (await _unitOfWork.CourseRepository.AnyAsync(c => c.Code == request.Code && c.Id != id))
                 throw new AppException("Mã khóa học đã tồn tại", 409);
 
             if (await _unitOfWork.CourseRepository.AnyAsync(c => c.Name == request.Name && c.Id != id))
                 throw new AppException("Tên khóa học đã tồn tại", 409);
 
-            if (request.StatusId.HasValue)
-            {
-                var statusExists = await _unitOfWork.CourseStatusRepository.AnyAsync(s => s.Id == request.StatusId);
-                if (!statusExists)
-                    throw new AppException("Trạng thái khóa học không hợp lệ", 400);
-            }
-            if (request.CategoryId.HasValue)
-            {
-                var CategoryExists = await _unitOfWork.CourseCategoryRepository.AnyAsync(s => s.Id == request.CategoryId.Value);
-                if (!CategoryExists)
-                    throw new AppException("Loại khóa học không hợp lệ", 400);
-            }
+            // Kiểm tra tính hợp lệ của Status, Category, Lecturer
+            if (request.StatusId.HasValue && !await _unitOfWork.CourseStatusRepository.AnyAsync(s => s.Id == request.StatusId.Value))
+                throw new AppException("Trạng thái khóa học không hợp lệ", 400);
 
-            if (request.LecturerId.HasValue)
-            {
-                var LecturerExists = await _unitOfWork.LecturerRepository.AnyAsync(s => s.Id == request.LecturerId.Value);
-                if (!LecturerExists)
-                    throw new AppException("Giảng viên khóa học không hợp lệ", 400);
-            }
+            if (request.CategoryId.HasValue && !await _unitOfWork.CourseCategoryRepository.AnyAsync(s => s.Id == request.CategoryId.Value))
+                throw new AppException("Loại khóa học không hợp lệ", 400);
 
+            if (request.LecturerId.HasValue && !await _unitOfWork.LecturerRepository.AnyAsync(s => s.Id == request.LecturerId.Value))
+                throw new AppException("Giảng viên khóa học không hợp lệ", 400);
+
+            // Tối ưu hóa kiểm tra DepartmentIds
             if (request.DepartmentIds != null && request.DepartmentIds.Any())
             {
-                var allIds = new HashSet<int>();
-                var invalid = new List<int>();
-                foreach (var deptId in request.DepartmentIds)
-                {
-                    var dept = await _unitOfWork.DepartmentRepository.GetByIdAsync(deptId);
-                    if (dept == null) invalid.Add(deptId);
-                    else
-                    {
-                        allIds.Add(deptId);
-                        var children = await _departmentService.GetAllChildDepartmentIds(deptId);
-                        foreach (var child in children) allIds.Add(child);
-                    }
+                var validDeptIds = await _unitOfWork.DepartmentRepository.GetQueryable()
+                                                       .Where(d => request.DepartmentIds.Contains(d.DepartmentId))
+                                                       .Select(d => d.DepartmentId)
+                                                       .ToListAsync();
 
+                var invalidDepts = request.DepartmentIds.Except(validDeptIds).ToList();
+                if (invalidDepts.Any())
+                    throw new AppException($"Phòng ban không hợp lệ: {string.Join(", ", invalidDepts)}", 400);
+
+                var allDepartmentIdsIncludingChildren = new HashSet<int>(validDeptIds);
+                foreach (var deptId in validDeptIds)
+                {
+                    var children = await _departmentService.GetAllChildDepartmentIds(deptId);
+                    foreach (var child in children)
+                        allDepartmentIdsIncludingChildren.Add(child);
                 }
-                if (invalid.Any())
-                    throw new AppException($"Phòng ban không hợp lệ: {string.Join(", ", invalid)}", 400);
-                request.DepartmentIds = allIds.ToList();
+                request.DepartmentIds = allDepartmentIdsIncludingChildren.ToList();
             }
 
+            // Tối ưu hóa kiểm tra PositionIds
             if (request.PositionIds != null && request.PositionIds.Any())
             {
-                var invalid = new List<int>();
-                foreach (var posId in request.PositionIds)
-                {
-                    var exists = await _unitOfWork.PositionRepository.AnyAsync(p => p.PositionId == posId);
-                    if (!exists) invalid.Add(posId);
-                }
-                if (invalid.Any())
-                    throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalid)}", 400);
+                var validPosIds = await _unitOfWork.PositionRepository.GetQueryable()
+                                                      .Where(p => request.PositionIds.Contains(p.PositionId))
+                                                      .Select(p => p.PositionId)
+                                                      .ToListAsync();
+
+                var invalidPositions = request.PositionIds.Except(validPosIds).ToList();
+                if (invalidPositions.Any())
+                    throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalidPositions)}", 400);
             }
+
+            // --- Kiểm tra UserIds tùy chọn (chỉ khi khóa học là TÙY CHỌN) ---
+            if (request.Optional != ConstantCourse.OPTIONAL_BATBUOC && request.UserIds != null && request.UserIds.Any())
+            {
+                var validUserIds = await _unitOfWork.UserRepository.GetQueryable()
+                                                       .Where(u => request.UserIds.Contains(u.Id))
+                                                       .Select(u => u.Id)
+                                                       .ToListAsync();
+
+                var invalidUserIds = request.UserIds.Except(validUserIds).ToList();
+                if (invalidUserIds.Any())
+                    throw new AppException($"Người dùng không hợp lệ: {string.Join(", ", invalidUserIds)}", 400);
+            }
+            // --- Kết thúc kiểm tra UserIds ---
+
+            // --- 2. Cập nhật thông tin khóa học cơ bản ---
 
             _mapper.Map(request, course);
 
@@ -112,56 +123,111 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             {
                 imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
                 course.ThumbUrl = imageUrl;
-
             }
 
             course.ModifiedAt = DateTime.Now;
             course.UpdateById = currentUserId;
             _unitOfWork.CourseRepository.Update(course);
 
-            // Replace course-department
-            var oldDeps = await _unitOfWork.CourseDepartmentRepository.FindAsync(cd => cd.CourseId == id);
-            _unitOfWork.CourseDepartmentRepository.RemoveRange(oldDeps);
-            if (request.DepartmentIds != null && request.DepartmentIds.Any())
+            // --- 3. Cập nhật các mối quan hệ Many-to-Many ---
+
+            // Thay thế Course-Department
+            if (request.DepartmentIds != null)
             {
-                var deps = request.DepartmentIds.Select(d => new CourseDepartment { CourseId = id, DepartmentId = d });
-                await _unitOfWork.CourseDepartmentRepository.AddRangeAsync(deps);
+                var currentCourseDepartments = await _unitOfWork.CourseDepartmentRepository.FindAsync(cd => cd.CourseId == id);
+                _unitOfWork.CourseDepartmentRepository.RemoveRange(currentCourseDepartments);
+
+                if (request.DepartmentIds.Any())
+                {
+                    var newCourseDepartments = request.DepartmentIds.Select(d => new CourseDepartment { CourseId = id, DepartmentId = d }).ToList();
+                    await _unitOfWork.CourseDepartmentRepository.AddRangeAsync(newCourseDepartments);
+                }
             }
 
-            // Replace course-position
-            var oldPos = await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == id);
-            _unitOfWork.CoursePositionRepository.RemoveRange(oldPos);
-            if (request.PositionIds != null && request.PositionIds.Any())
+            // Thay thế Course-Position
+            if (request.PositionIds != null)
             {
-                var pos = request.PositionIds.Select(p => new CoursePosition { CourseId = id, PositionId = p });
-                await _unitOfWork.CoursePositionRepository.AddRangeAsync(pos);
+                var currentCoursePositions = await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == id);
+                _unitOfWork.CoursePositionRepository.RemoveRange(currentCoursePositions);
+
+                if (request.PositionIds.Any())
+                {
+                    var newCoursePositions = request.PositionIds.Select(p => new CoursePosition { CourseId = id, PositionId = p }).ToList();
+                    await _unitOfWork.CoursePositionRepository.AddRangeAsync(newCoursePositions);
+                }
             }
 
-            // Replace user-course nếu là bắt buộc
-            var oldUsers = await _unitOfWork.UserCourseRepository.FindAsync(uc => uc.CourseId == id && uc.IsMandatory);
-            _unitOfWork.UserCourseRepository.RemoveRange(oldUsers);
+            // --- 4. Cập nhật User-Course (ghi danh) ---
+
+            // Lấy tất cả UserCourse hiện có cho khóa học này
+            var allCurrentUserCourses = await _unitOfWork.UserCourseRepository.FindAsync(uc => uc.CourseId == id);
+            _unitOfWork.UserCourseRepository.RemoveRange(allCurrentUserCourses); // Xóa tất cả các gán cũ
+
+            var newUserCoursesToAssign = new List<UserCourse>();
+            var assignedUserIds = new HashSet<string>(); // Để theo dõi các user đã được gán/ghi danh
+
+            // 4a. Ghi danh người dùng nếu khóa học là BẮT BUỘC
             if (request.Optional == ConstantCourse.OPTIONAL_BATBUOC)
             {
-                var userSet = new HashSet<string>();
-                if (request.DepartmentIds != null && request.PositionIds != null &&
-                    request.DepartmentIds.Any() && request.PositionIds.Any())
+                if (request.DepartmentIds != null && request.DepartmentIds.Any() &&
+                    request.PositionIds != null && request.PositionIds.Any())
                 {
-                    var users = await _unitOfWork.UserRepository.FindAsync(u =>
-                        u.DepartmentId.HasValue && request.DepartmentIds.Contains(u.DepartmentId.Value) &&
-                        u.PositionId.HasValue && request.PositionIds.Contains(u.PositionId.Value));
-                    foreach (var user in users) userSet.Add(user.Id);
+                    var matchedUsersFromDeptPos = await _unitOfWork.UserRepository.GetQueryable()
+                        .Where(u => u.DepartmentId.HasValue && request.DepartmentIds.Contains(u.DepartmentId.Value) &&
+                                    u.PositionId.HasValue && request.PositionIds.Contains(u.PositionId.Value))
+                        .Select(u => u.Id)
+                        .ToListAsync();
+
+                    foreach (var userId in matchedUsersFromDeptPos)
+                    {
+                        if (assignedUserIds.Add(userId)) // Chỉ thêm nếu chưa được xử lý
+                        {
+                            newUserCoursesToAssign.Add(new UserCourse
+                            {
+                                UserId = userId,
+                                CourseId = id,
+                                AssignedAt = DateTime.Now,
+                                IsMandatory = true, // Gán là bắt buộc
+                                Status = ConstantStatus.ASSIGINED,
+                                CreatedAt = DateTime.Now,
+                                ModifiedAt = DateTime.Now,
+                            });
+                        }
+                    }
                 }
-                var userCourses = userSet.Select(uid => new UserCourse
+            }
+            // 4b. Ghi danh người dùng nếu khóa học là TÙY CHỌN
+            else // request.Optional != ConstantCourse.OPTIONAL_BATBUOC (tức là TÙY CHỌN)
+            {
+                if (request.UserIds != null && request.UserIds.Any())
                 {
-                    UserId = uid,
-                    CourseId = id,
-                    AssignedAt = DateTime.Now,
-                    IsMandatory = true,
-                    Status = ConstantStatus.ASSIGINED
-                });
-                await _unitOfWork.UserCourseRepository.AddRangeAsync(userCourses);
+                    // Lấy user IDs đã được validate ở trên, không cần truy vấn lại
+                    // Giả sử request.UserIds đã được kiểm tra tính hợp lệ và không chứa ID rỗng/null
+                    foreach (var userId in request.UserIds)
+                    {
+                        if (assignedUserIds.Add(userId)) // Chỉ thêm nếu chưa được xử lý
+                        {
+                            newUserCoursesToAssign.Add(new UserCourse
+                            {
+                                UserId = userId,
+                                CourseId = id,
+                                AssignedAt = DateTime.Now,
+                                IsMandatory = false, // Gán là tùy chọn
+                                Status = ConstantStatus.ASSIGINED,
+                                CreatedAt = DateTime.Now,
+                                ModifiedAt = DateTime.Now,
+                            });
+                        }
+                    }
+                }
             }
 
+            if (newUserCoursesToAssign.Any())
+            {
+                await _unitOfWork.UserCourseRepository.AddRangeAsync(newUserCoursesToAssign);
+            }
+
+            // --- Hoàn tất tất cả thay đổi trong một transaction ---
             await _unitOfWork.CompleteAsync();
 
             return course.Id;

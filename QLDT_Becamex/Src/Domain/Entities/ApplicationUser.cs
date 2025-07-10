@@ -24,8 +24,8 @@ namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp
         public ApplicationUser? CreateBy { get; set; }
         public string? UpdateById { get; set; }
         public ApplicationUser? UpdateBy { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime ModifiedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
         public ICollection<ApplicationUser> Children { get; set; } = new List<ApplicationUser>();
         public ICollection<UserCourse> UserCourse { get; set; } = new List<UserCourse>();
         public ICollection<LessonProgress> LessonProgress { get; set; } = new List<LessonProgress>();

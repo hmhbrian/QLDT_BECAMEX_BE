@@ -44,22 +44,29 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             {
                 throw new AppException($"Course with ID: {request.CourseId} not found.", 404);
             }
+            if(request.Request.FilePdf != null && request.Request.Link != null && request.Request.TotalDurationSeconds >= 0)
+            {
+                throw new AppException("Creating a lesson can't have both Pdf file and link video.", 400); // Mã 400 cho Bad Request
+            }
             //Lấy position tối đa hiện tại của các bài học trong khóa học
             int maxPosition = await _unitOfWork.LessonRepository.GetMaxPositionAsync(request.CourseId);
 
             string Url = null!;
             string filePublicId = null!;
+            int TypeId;
             int totalDurationSeconds = 0; // biến tổng thời gian video
             int totalPages = 0; // biến tổng số trang của PDF
 
+
             if (request.Request.Link != null && request.Request.TotalDurationSeconds > 0 && request.Request.FilePdf == null) // Kiểm tra nếu là link
             {
-                
+                TypeId = 2;
                 Url = request.Request.Link!; // Lấy URL từ request
                 totalDurationSeconds = request.Request.TotalDurationSeconds; // Lấy tổng thời gian của video
             }
             else if (request.Request.FilePdf != null && request.Request.FilePdf.Length > 0)
             {
+                TypeId = 1; // PDF
                 using (var stream = request.Request.FilePdf.OpenReadStream())
                 {
                     using (var pdfDocument = PdfReader.Open(stream, PdfDocumentOpenMode.ReadOnly))
@@ -70,7 +77,6 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                         var uploadResult = await _cloudinaryService.UploadPdfAsync(request.Request.FilePdf, "Lesson_pdfs");
                         Url = uploadResult?.url!; // Lấy URL từ kết quả upload
                         filePublicId = uploadResult?.publicId!; // Lấy PublicId từ kết quả upload
-
                         if (string.IsNullOrEmpty(Url))
                         {
                             throw new AppException("Failed to upload PDF file to Cloudinary.", 500);
@@ -87,7 +93,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             // Nếu bạn vẫn đang sử dụng phương thức `Create` trên instance `Lesson`:
             var lesson = new Lesson();
 
-            lesson.Create(request.CourseId, userId, request.Request, Url, filePublicId, maxPosition+1, totalDurationSeconds, totalPages);
+            lesson.Create(request.CourseId, userId, request.Request, Url, filePublicId, maxPosition+1, TypeId, totalDurationSeconds, totalPages);
 
             // --- 3. Thêm entity vào Repository và lưu vào DB ---
             await _unitOfWork.LessonRepository.AddAsync(lesson);

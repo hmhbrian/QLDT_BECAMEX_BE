@@ -1,0 +1,94 @@
+﻿using AutoMapper;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.LessonProgresses.Dtos;
+using QLDT_Becamex.Src.Application.Features.LessonProgresses.Queries;
+using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services;
+
+namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
+{
+    public class GetListLessonProgressOfUserQueryHandler : IRequestHandler<GetListLessonProgressOfUserQuery, List<AllLessonProgressDto>>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
+        public GetListLessonProgressOfUserQueryHandler(IUnitOfWork unitOfWork, IUserService userService)
+        {
+            _unitOfWork = unitOfWork;
+            _userService = userService;
+        }
+        public async Task<List<AllLessonProgressDto>> Handle(GetListLessonProgressOfUserQuery request, CancellationToken cancellationToken)
+        {
+            // Lấy User ID từ BaseService
+            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new AppException("User ID not found. User must be authenticated.", 404);
+            }
+
+            // Validate CourseId
+            var course = await _unitOfWork.CourseRepository.GetByIdAsync(request.CourseId);
+            if (course == null)
+            {
+                throw new AppException("Khóa học không tồn tại", 404);
+            }
+
+            // Lấy danh sách bài học theo CourseId
+            var lesson = await _unitOfWork.LessonRepository.GetFlexibleAsync(
+                predicate: lp => lp.CourseId == request.CourseId,
+                orderBy: q => q.OrderBy(lp => lp.Position),
+                includes: q => q
+                    .Include(l => l.TypeDoc)
+                    .Include(l => l.LessonProgress!.Where(lp => lp.UserId == userId))
+            );
+            // Chuyển đổi sang DTO và tính toán ProgressPercenttage
+            var dtoList = lesson.Select(lesson =>
+            {
+                var progress = lesson.LessonProgress?.FirstOrDefault();
+                double progressPercentage = 0;
+                if (progress != null)
+                {
+                    if (progress.IsCompleted)
+                    {
+                        progressPercentage = 1.0; // Hoàn thành
+                    }
+                    else
+                    {
+                        if (lesson.TypeDocId == 1) //PDF
+                        {
+                            if (lesson.TotalPages.HasValue && lesson.TotalPages > 0 && progress.CurrentPage.HasValue)
+                            {
+                                progressPercentage = (double)progress.CurrentPage!.Value / lesson.TotalPages.Value;
+                            }
+                        }
+                        else if (lesson.TypeDocId == 2) //Video
+                        {
+                            if (lesson.TotalDurationSeconds.HasValue && lesson.TotalDurationSeconds > 0 && progress.CurrentTimeSeconds.HasValue)
+                            {
+                                progressPercentage = (double)progress.CurrentTimeSeconds!.Value / lesson.TotalDurationSeconds.Value;
+                            }
+                        }
+                    }
+                }
+
+                // Làm tròn tới 2 chữ số thập phân
+                progressPercentage = Math.Round(progressPercentage, 2);
+
+                // Đảm bảo ProgressPercentage nằm trong khoảng 0-1
+                progressPercentage = Math.Max(0, Math.Min(1, progressPercentage));
+
+                return new AllLessonProgressDto
+                {
+                    Id = lesson.Id,
+                    Title = lesson.Title,
+                    UrlPdf = lesson.FileUrl,
+                    ProgressPercentage = progressPercentage,
+                    Type = lesson.TypeDoc?.NameType ?? "Unknown",
+                };
+            }).ToList();
+
+            return dtoList;
+        }
+    }
+}

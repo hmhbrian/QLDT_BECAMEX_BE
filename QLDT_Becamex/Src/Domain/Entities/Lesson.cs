@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime UpdatedAt { get; set; }
         public ICollection<LessonProgress> LessonProgress { get; set; } = new List<LessonProgress>();
 
-        public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId, int position, int totalDurations, int totalPages)
+        public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId, int position,int typeId, int totalDurations, int totalPages)
         {
             Title = request.Title.ToLower().Trim();
             FileUrl = urlPdf;
@@ -38,13 +38,12 @@ namespace QLDT_Becamex.Src.Domain.Entities
                 TotalDurationSeconds = totalDurations; // Lưu tổng thời gian của bài học
             else
                 TotalPages = totalPages;//lưu tổng số trang của PDF
-
-            TypeDocId = request.TypeDocId;
+            TypeDocId = typeId; 
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
         }
 
-        public void Update(string courseId, string userIdEdited, UpdateLessonDto request, string urlPdf, string newFilePublicId, int totalDurations, int totalPages)
+        public void Update(string courseId, string userIdEdited, UpdateLessonDto request, string urlPdf, string newFilePublicId, int typeId, int totalDurations, int totalPages)
         {
             if (!string.IsNullOrWhiteSpace(request.Title) && request.Title != Title)
                 Title = request.Title;
@@ -53,7 +52,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
                 FileUrl = urlPdf;
 
             // Kiểm tra và xóa PublicIdUrlPdf nếu newFilePublicId là null hoặc TypeDocId là 2
-            if (newFilePublicId == null || request.TypeDocId == 2)
+            if (newFilePublicId == null || typeId == 2)
             {
                 PublicIdUrlPdf = null!; // Xóa dữ liệu cũ của PublicIdUrlPdf
             }
@@ -74,7 +73,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
                 TotalDurationSeconds = null; // Đặt TotalDurationSeconds là null nếu có tổng số trang
             }
 
-            TypeDocId = request.TypeDocId;
+            TypeDocId = typeId;
 
             if (courseId != CourseId)
                 CourseId = courseId;

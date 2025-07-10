@@ -4,6 +4,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lessons.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 {
@@ -28,8 +29,8 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             // Lấy danh sách bài học của khóa học theo CourseId
             var lessons = await _unitOfWork.LessonRepository.GetFlexibleAsync(
                 predicate: l => l.CourseId == request.CourseId,
-                orderBy: q => q.OrderBy(l => l.Position)
-
+                orderBy: q => q.OrderBy(l => l.Position),
+                includes:q => q.Include(l => l.TypeDoc)
             );
 
             // Kiểm tra nếu không có bài học nào

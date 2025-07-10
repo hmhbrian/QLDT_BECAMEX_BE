@@ -20,6 +20,8 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
         public ILessonRepository LessonRepository { get; }
         public IQuestionRepository QuestionRepository { get; }
         public IFeedbackRepository FeedbackRepository { get; }
+        public ILessonProgressRepository LessonProgressRepository { get; }
+        public ITypeDocumentRepository TypeDocumentRepository { get; }
 
         public Task<int> CompleteAsync();
         Task<DbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

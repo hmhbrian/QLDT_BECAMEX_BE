@@ -26,6 +26,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public ILessonRepository LessonRepository { get; }
         public IQuestionRepository QuestionRepository { get; }
         public IFeedbackRepository FeedbackRepository { get; }
+        public ILessonProgressRepository LessonProgressRepository { get; }
+        public ITypeDocumentRepository TypeDocumentRepository { get; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -46,6 +48,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             LessonRepository = new LessonRepository(dbContext);
             QuestionRepository = new QuestionRepository(dbContext);
             FeedbackRepository = new FeedbackRepository(dbContext);
+            LessonProgressRepository = new LessonProgressRepository(dbContext);
+            TypeDocumentRepository = new TypeDocumentRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

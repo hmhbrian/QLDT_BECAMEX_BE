@@ -6,5 +6,6 @@
         public string? Title { get; set; }
         public string? UrlPdf { get; set; }
         public double ProgressPercentage { get; set; } // Tỷ lệ hoàn thành bài học (0-100%)
+        public string? Type { get; set; }
     }
 }

@@ -58,13 +58,13 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             string? newUrl = lesson.FileUrl; // Giữ lại URL cũ làm mặc định
             string? oldUrl = lesson.FileUrl; // Lưu URL PDF cũ để xóa sau
             string? newPdfPublicId = null; // Lưu URL PDF cũ để xóa sau
-
+            int TypeId = 0;
             int totalDurationSeconds = 0; // biến tổng thời gian video
             int totalPages = 0;// biến tổng số trang của PDF
 
-            if (request.Request.Link != null && request.Request.TotalDurationSeconds > 0 && request.Request.TypeDocId == 2) // Kiểm tra nếu là link
+            if (request.Request.Link != null && request.Request.TotalDurationSeconds > 0) // Kiểm tra nếu là link
             {
-
+                TypeId = 2; // video
                 newUrl = request.Request.Link!; // Lấy URL từ request
                 totalDurationSeconds = request.Request.TotalDurationSeconds; // Lấy tổng thời gian của video
             }
@@ -83,6 +83,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 
                         newUrl = uploadResult.Value.url;       // Lấy URL mới
                         newPdfPublicId = uploadResult.Value.publicId; // Lấy PublicId mới
+                        TypeId = 1; // PDF
 
                         if (string.IsNullOrEmpty(newUrl))
                         {
@@ -105,7 +106,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 if (!string.IsNullOrEmpty(newPdfPublicId))
                 {
                     // Xóa file PDF cũ trên Cloudinary
-                    var deleteSuccess = await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf);
+                    var deleteSuccess = await _cloudinaryService.DeleteFileAsync(lesson.PublicIdUrlPdf!);
                     if (!deleteSuccess)
                     {
                         Console.WriteLine($"Warning: Failed to delete old PDF file {newPdfPublicId} from Cloudinary.");
@@ -113,7 +114,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 }
             }
 
-            lesson.Update(request.CourseId, userId, request.Request, newUrl, newPdfPublicId!, totalDurationSeconds, totalPages);
+            lesson.Update(request.CourseId, userId, request.Request, newUrl, newPdfPublicId!,TypeId, totalDurationSeconds, totalPages);
 
             _unitOfWork.LessonRepository.Update(lesson);
 

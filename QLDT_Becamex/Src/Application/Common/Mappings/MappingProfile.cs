@@ -119,13 +119,15 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //Lesson
             CreateMap<Lesson, AllLessonDto>()
-                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"));
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc.NameType));
             CreateMap<Lesson, DetailLessonDto>()
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
                 .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.UserIdCreated))
                 .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UserIdEdited))
                 .ForMember(dest => dest.UserNameCreated, opt => opt.MapFrom(src => src.UserCreated != null ? src.UserCreated.FullName : null))
                 .ForMember(dest => dest.UserNameEdited, opt => opt.MapFrom(src => src.UserEdited != null ? src.UserEdited.FullName : null));
+
             // Feedback
             CreateMap<CreateFeedbackDto, Feedback>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

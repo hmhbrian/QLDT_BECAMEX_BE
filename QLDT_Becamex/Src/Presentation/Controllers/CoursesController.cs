@@ -5,8 +5,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
-using QLDT_Becamex.Src.Application.Features.Status.Dtos;
-using QLDT_Becamex.Src.Application.Features.Users.Dtos;
+
 
 namespace QLDT_Becamex.Src.Controllers
 {
@@ -25,6 +24,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// Tạo mới một khóa học.
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> CreateCourse([FromForm] CreateCourseDto request)
         {
             var result = await _mediator.Send(new CreateCourseCommand(request));
@@ -35,6 +35,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// Cập nhật một khóa học theo Id.
         /// </summary>
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> UpdateCourse(string id, [FromForm] UpdateCourseDto request)
         {
             var result = await _mediator.Send(new UpdateCourseCommand(id, request));

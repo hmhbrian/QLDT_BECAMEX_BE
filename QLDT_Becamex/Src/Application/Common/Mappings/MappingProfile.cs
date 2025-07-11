@@ -39,11 +39,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             // Ánh xạ tên của Department vào DepartmentName
             .ForMember(dest => dest.DepartmentName,
-                       opt => opt.MapFrom(src => src.Department != null ? src.Department.DepartmentName : null))
+                       opt => opt.MapFrom(src => src.Department != null ? src.Department.DepartmentName : null));
 
-            // Ánh xạ tên của UserStatus vào UserStatus (trong DTO)
-            .ForMember(dest => dest.Status,
-                       opt => opt.MapFrom(src => src.UserStatus != null ? src.UserStatus.Name : null));
+          
 
             //UserStatus
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();
@@ -143,7 +141,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>()
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc.NameType));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc != null ? src.TypeDoc.NameType : "Unknown"));
 
             //Lesson
             CreateMap<Lesson, AllLessonDto>()

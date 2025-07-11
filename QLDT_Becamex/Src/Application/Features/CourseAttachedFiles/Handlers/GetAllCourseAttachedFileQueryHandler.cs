@@ -37,6 +37,10 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                 // Ví dụ: throw new AppException($"Không tìm thấy file đính kèm nào cho khóa học với ID: {request.CourseId}", 404);
                 return new List<CourseAttachedFileDto>(); // Trả về danh sách rỗng nếu không có
             }
+            foreach (var file in attachedFiles)
+            {
+                Console.WriteLine($"File ID: {file.Id}, TypeDoc: {file.TypeDoc?.NameType ?? "null"}, Link: {file.Link}");
+            }
             // 2. Ánh xạ các đối tượng Domain Entities sang DTO
             var attachedFileDtos = _mapper.Map<List<CourseAttachedFileDto>>(attachedFiles);
 

@@ -58,7 +58,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
             foreach (var request in requests)
             {
                 string? fileOrLinkUrl = null;
-                string fileType = "";
+                int fileType = 1;
                 string? filePublicId = null; // Biến để lưu PublicId
 
                 // Kiểm tra xem có Title không
@@ -71,7 +71,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                 if (request.Link != null && request.File == null)
                 {
                     fileOrLinkUrl = request.Link;
-                    fileType = "Link";
+                    fileType = 2; //link
                 }
                 // 2. Nếu không có Link, kiểm tra File
                 else if (request.File != null)
@@ -97,7 +97,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                     // Đơn giản hóa logic fileType, chỉ gán là "PDF"
                     if (fileExtension == ".pdf")
                     {
-                        fileType = "PDF";
+                        fileType = 1; //pdf
                     }
                     // Không cần else if cho PPT/PPTX nữa, vì chúng ta đã loại bỏ chúng ở trên
 
@@ -110,6 +110,10 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                         if (fileOrLinkUrl == null)
                         {
                             throw new AppException($"Không thể tải file '{request.File.FileName}' lên dịch vụ lưu trữ.", 500);
+                        }
+                        if (string.IsNullOrEmpty(filePublicId))
+                        {
+                            throw new AppException("Không thể lấy PublicId từ file tải lên.", 500);
                         }
                     }
                     catch (Exception ex)
@@ -125,17 +129,8 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                 }
 
                 // --- Lưu thông tin vào Database ---
-                var newAttachedFile = new DomainEntities.CourseAttachedFile()
-                    {
-                        CourseId = courseId!, // Sử dụng CourseId từ command
-                        Title = request.Title!,
-                        Type = fileType,
-                        Link = fileOrLinkUrl,
-                        PublicIdUrlPdf = filePublicId,
-                        UserId = userId!,
-                        CreatedAt = DateTime.Now,
-                        ModifiedTime = DateTime.Now
-                    };
+                var newAttachedFile = new DomainEntities.CourseAttachedFile();
+                newAttachedFile.Create(courseId, userId, request.Title, fileOrLinkUrl, filePublicId, fileType);
 
                 await _unitOfWork.CourseAttachedFileRepository.AddAsync(newAttachedFile);
 
@@ -146,7 +141,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                 {
                     CourseId = newAttachedFile.CourseId,
                     Title = newAttachedFile.Title,
-                    Type = newAttachedFile.Type,
+                    Type = newAttachedFile.TypeDoc?.NameType ?? "Unknown",
                     Link = newAttachedFile.Link,
                     PublicIdUrlPdf = newAttachedFile.PublicIdUrlPdf,
                     CreatedAt = newAttachedFile.CreatedAt

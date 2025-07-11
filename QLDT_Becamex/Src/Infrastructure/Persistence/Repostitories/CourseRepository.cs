@@ -6,15 +6,15 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
 {
     public class CourseRepository : GenericRepository<Course>, ICourseRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _context;
         public CourseRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
+            _context = dbContext;
         }
 
         public async Task<List<Course>> GetCoursesForStatusUpdateAsync(DateTime currentDate)
         {
-            return await _dbContext.Course
+            return await _context.Course
             .Where(c => c.StatusId != 4 &&
                        (c.RegistrationStartDate <= currentDate.AddDays(1) ||
                         c.RegistrationClosingDate <= currentDate.AddDays(1) ||

@@ -6,14 +6,14 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
 {
     public class QuestionRepository : GenericRepository<Question>, IQuestionRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _context;
         public QuestionRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
+            _context = dbContext;
         }
         public async Task<int> GetMaxPositionAsync(int testId)
         {
-            return await _dbContext.Questions
+            return await _context.Questions
                 .Where(l => l.TestId == testId)
                 .MaxAsync(l => (int?)l.Position) ?? 0;
         }

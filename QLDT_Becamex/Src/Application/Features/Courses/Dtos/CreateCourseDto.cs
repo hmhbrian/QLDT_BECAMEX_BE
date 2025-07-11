@@ -31,6 +31,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
             ErrorMessage = "Giá trị chỉ được là 'tùy chọn' hoặc 'bắt buộc'.")]
         public string? Optional { get; set; } = ConstantCourse.OPTIONAL_TUYCHON;
 
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Số lượng học viên phải lớn hơn không")]
         public int? MaxParticipant { get; set; }
         public DateTime? StartDate { get; set; } = DateTime.Now;
         public DateTime? EndDate { get; set; } = DateTime.Now;
@@ -42,6 +44,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? LecturerId { get; set; }
         public List<int>? DepartmentIds { get; set; }
         public List<int>? PositionIds { get; set; }
+        public List<string>? UserIds { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

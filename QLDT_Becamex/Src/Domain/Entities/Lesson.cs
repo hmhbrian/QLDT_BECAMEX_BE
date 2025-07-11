@@ -21,8 +21,8 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public ApplicationUser? CreatedBy { get; set; }
         public string? UpdatedById { get; set; }
         public ApplicationUser? UpdatedBy { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public ICollection<LessonProgress> LessonProgress { get; set; } = new List<LessonProgress>();
 
         public void Create(string courseId, string userIdCreated, CreateLessonDto request, string urlPdf, string filePublicId, int position,int typeId, int totalDurations, int totalPages)

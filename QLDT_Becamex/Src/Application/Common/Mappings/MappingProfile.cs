@@ -142,7 +142,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.Test, opt => opt.Ignore());
 
             //CourseAttachedFile
-            CreateMap<CourseAttachedFile, CourseAttachedFileDto>().ReverseMap();
+            CreateMap<CourseAttachedFile, CourseAttachedFileDto>()
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc.NameType));
 
             //Lesson
             CreateMap<Lesson, AllLessonDto>()

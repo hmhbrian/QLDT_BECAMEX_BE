@@ -39,7 +39,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Commands
             }
 
             // Nếu đây là một file được tải lên (không phải link) và có URL
-            if (attachedFile.Type != "Link" && !string.IsNullOrEmpty(attachedFile.Link))
+            if (attachedFile.TypeDoc.NameType != "Link" && !string.IsNullOrEmpty(attachedFile.Link))
             {
                 
                 if (!string.IsNullOrEmpty(attachedFile.PublicIdUrlPdf))

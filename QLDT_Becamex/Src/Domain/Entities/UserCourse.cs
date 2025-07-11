@@ -8,8 +8,8 @@
         public DateTime? AssignedAt { get; set; }
         public bool IsMandatory { get; set; } = false;// Đánh dấu là bắt buộc
         public string? Status { get; set; } = null;
-        public ApplicationUser User { get; set; }
-        public Course Course { get; set; }
+        public ApplicationUser? User { get; set; }
+        public Course? Course { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAt { get; set; }
     }

@@ -74,14 +74,14 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <returns>Danh sách các file đính kèm của khóa học.</returns>
         [HttpGet("{courseId}")] // Định tuyến cụ thể cho action GET (không cần thêm gì vì route đã có courseId)
 
-        public async Task<ActionResult<IEnumerable<CourseAttachedFileDto>>> GetAllAttachedFiles(
+        public async Task<IActionResult> GetAllAttachedFiles(
             [FromRoute] string courseId) // Lấy courseId từ URL route
         {
             var query = new GetAllCourseAttachedFileQuery(courseId);
             var result = await _mediator.Send(query);
 
             // Trả về ApiResponse thành công với danh sách DTO
-            return Ok(ApiResponse<IEnumerable<CourseAttachedFileDto>>.Ok(result, "Lấy danh sách file đính kèm thành công"));
+            return Ok(ApiResponse<List<CourseAttachedFileDto>>.Ok(result, "Lấy danh sách file đính kèm thành công"));
         }
     }
 }

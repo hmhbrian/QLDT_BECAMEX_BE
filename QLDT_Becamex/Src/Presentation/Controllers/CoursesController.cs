@@ -23,6 +23,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// Tạo mới một khóa học.
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> CreateCourse([FromForm] CreateCourseDto request)
         {
             var result = await _mediator.Send(new CreateCourseCommand(request));
@@ -33,6 +34,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// Cập nhật một khóa học theo Id.
         /// </summary>
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> UpdateCourse(string id, [FromForm] UpdateCourseDto request)
         {
             var result = await _mediator.Send(new UpdateCourseCommand(id, request));

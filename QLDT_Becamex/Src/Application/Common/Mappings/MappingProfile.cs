@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
-using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Feedbacks.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
@@ -102,6 +101,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<UpdateCourseDto, Course>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
+            //EnrollCourse
+            CreateMap<UserEnrollCourseDto, Course>();
+            CreateMap<Course, UserEnrollCourseDto>();
+            
             //CourseStatus
             CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
             CreateMap<CreateCourseStatusDto, CourseStatus>().ReverseMap();

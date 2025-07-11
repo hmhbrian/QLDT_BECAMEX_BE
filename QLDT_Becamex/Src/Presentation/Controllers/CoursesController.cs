@@ -5,8 +5,6 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
-using QLDT_Becamex.Src.Application.Features.Status.Dtos;
-using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 
 namespace QLDT_Becamex.Src.Controllers
 {
@@ -86,6 +84,12 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new EnrollCourseCommand(courseId));
             return Ok(ApiResponse.Ok(result));
 
+        }
+        [HttpGet("enroll-courses")]
+        public async Task<IActionResult> GetListEnrollCourse([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetListEnrollCourseQuery(queryParams), cancellationToken);
+            return Ok(ApiResponse<PagedResult<UserEnrollCourseDto>>.Ok(result)); // Bao kết quả tại đây
         }
     }
 }

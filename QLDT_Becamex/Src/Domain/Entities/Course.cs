@@ -39,6 +39,5 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public ICollection<CourseAttachedFile>? AttachedFiles { get; set; }
         public ICollection<Lesson>? Lessons { get; set; } = new List<Lesson>();
         public ICollection<Test>? Tests { get; set; } = new List<Test>();
-
     }
 }

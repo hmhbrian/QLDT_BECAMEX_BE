@@ -6,6 +6,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using MediatR;
 using System.Threading;
 using QLDT_Becamex.Src.Application.Features.Users.Queries;
+using QLDT_Becamex.Src.Domain.Entities;
 
 
 namespace QLDT_Becamex.Src.Controllers

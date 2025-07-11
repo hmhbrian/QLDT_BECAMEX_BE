@@ -31,7 +31,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public string? Location { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
-        public CourseStatusDto? Status { get; set; }
+        public StatusDto? Status { get; set; }
         public CourseCategoryDto? Category { get; set; }
         public LecturerDto? Lecturer { get; set; }
         public ICollection<DepartmentDto>? Departments { get; set; } = new List<DepartmentDto>();

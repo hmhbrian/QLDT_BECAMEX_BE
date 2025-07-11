@@ -38,6 +38,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                         .Include(d => d.Parent)
                         .Include(d => d.Manager)
                         .Include(d => d.Children)
+                        .Include(d => d.Status)
                 );
 
                 // Lấy tất cả người dùng để ánh xạ ManagerName

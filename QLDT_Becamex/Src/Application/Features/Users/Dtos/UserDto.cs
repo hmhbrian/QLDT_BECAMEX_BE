@@ -1,6 +1,7 @@
 ﻿
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
+using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using System.ComponentModel.DataAnnotations;
 
 namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
@@ -21,7 +22,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
         public string? ManagerBy { get; set; }
         public string? PositionName { get; set; }
         public string? DepartmentName { get; set; } // Navigation property
-        public int? StatusId { get; set; }
+        public StatusDto? UserStatus { get; set; }
         public DateTime? StartWork { get; set; }
         public DateTime? EndWork { get; set; }
         public DateTime? CreatedAt { get; set; }

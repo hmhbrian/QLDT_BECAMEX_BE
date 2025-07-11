@@ -27,18 +27,18 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         public async Task<IActionResult> GetAllCourseStatuses()
         {
             var result = await _mediator.Send(new GetAllCourseStatusesQuery());
-            return Ok(ApiResponse<IEnumerable<CourseStatusDto>>.Ok(result));
+            return Ok(ApiResponse<IEnumerable<StatusDto>>.Ok(result));
         }
 
         [HttpPost("courses")]
-        public async Task<IActionResult> CreateCourseStatus([FromBody] CreateCourseStatusDto dto)
+        public async Task<IActionResult> CreateCourseStatus([FromBody] CreateStatusDto dto)
         {
             await _mediator.Send(new CreateCourseStatusCommand(dto));
             return StatusCode(201, ApiResponse.Ok("Tạo thành công"));
         }
 
         [HttpPut("courses/{id:int}")]
-        public async Task<IActionResult> UpdateCourseStatus(int id, [FromBody] CreateCourseStatusDto dto)
+        public async Task<IActionResult> UpdateCourseStatus(int id, [FromBody] CreateStatusDto dto)
         {
             await _mediator.Send(new UpdateCourseStatusCommand(id, dto));
             return Ok(ApiResponse.Ok("Cập nhật thành công"));
@@ -84,6 +84,39 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
                 return BadRequest(ApiResponse.Fail("Danh sách ID không được để trống"));
 
             await _mediator.Send(new DeleteUserStatusesCommand(ids));
+            return Ok(ApiResponse.Ok("Xóa thành công"));
+        }
+
+        // ===== Department Status =====
+
+        [HttpGet("department")]
+        public async Task<IActionResult> GetAllDepartmentStatuses()
+        {
+            var result = await _mediator.Send(new GetAllDepartmentStatusesQuery());
+            return Ok(ApiResponse<IEnumerable<StatusDto>>.Ok(result));
+        }
+
+        [HttpPost("department")]
+        public async Task<IActionResult> CreateDepartmentStatus([FromBody] CreateStatusDto dto)
+        {
+            await _mediator.Send(new CreateDepartmentStatusCommand(dto));
+            return StatusCode(201, ApiResponse.Ok("Tạo thành công"));
+        }
+
+        [HttpPut("department/{id:int}")]
+        public async Task<IActionResult> UpdateDepartmentStatus(int id, [FromBody] CreateStatusDto dto)
+        {
+            await _mediator.Send(new UpdateDepartmentStatusCommand(id, dto));
+            return Ok(ApiResponse.Ok("Cập nhật thành công"));
+        }
+
+        [HttpDelete("department")]
+        public async Task<IActionResult> DeleteDepartmentStatuses([FromBody] List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+                return BadRequest(ApiResponse.Fail("Danh sách ID không được để trống"));
+
+            await _mediator.Send(new DeleteDepartmentStatusCommand(ids));
             return Ok(ApiResponse.Ok("Xóa thành công"));
         }
     }

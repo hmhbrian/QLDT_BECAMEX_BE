@@ -16,7 +16,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Dtos
         public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Status is required")]
-        public int Status { get; set; } = 2;
+        public int? StatusId { get; set; }
         public string ManagerId { get; set; } = string.Empty;
         public int? ParentId { get; set; }
     }

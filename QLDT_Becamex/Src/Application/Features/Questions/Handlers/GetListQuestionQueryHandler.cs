@@ -34,11 +34,20 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
             var orderBy = (Func<IQueryable<Question>, IOrderedQueryable<Question>>)(q => q.OrderByDescending(x => x.CreatedAt));
 
             // Lấy danh sách câu hỏi đã phân trang, sắp xếp
+            // var questions = await _unitOfWork.QuestionRepository.GetFlexibleAsync(
+            //     predicate: predicate,
+            //     orderBy: orderBy,
+            //     page: request.BaseQueryParam.Page,
+            //     pageSize: request.BaseQueryParam.Limit,
+            //     asNoTracking: true
+            // );
+            
+            // Lấy danh sách câu hỏi không phân trang
             var questions = await _unitOfWork.QuestionRepository.GetFlexibleAsync(
                 predicate: predicate,
-                orderBy: orderBy,
-                page: request.BaseQueryParam.Page,
-                pageSize: request.BaseQueryParam.Limit,
+                orderBy: null,
+                page: null,
+                pageSize: null,
                 asNoTracking: true
             );
             // Đếm tổng câu hỏi (không phân trang)

@@ -36,9 +36,15 @@ namespace QLDT_Becamex.Src.Application.Features.Feedbacks.Handlers
             {
                 throw new AppException("User đánh giá không tồn tại", 404);
             }
+            var userCourseExists = await _unitOfWork.UserCourseRepository
+                .AnyAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
+            if (!userCourseExists)
+            {
+                throw new AppException("User chưa đăng ký khóa học này", 400);
+            }
             // Check if feedback already exists for this user and course
             var feedbackExists = await _unitOfWork.FeedbackRepository
-                .AnyAsync(f => f.CourseId == courseId && f.UserId == userId);
+            .AnyAsync(f => f.CourseId == courseId && f.UserId == userId);
 
             if (feedbackExists)
             {

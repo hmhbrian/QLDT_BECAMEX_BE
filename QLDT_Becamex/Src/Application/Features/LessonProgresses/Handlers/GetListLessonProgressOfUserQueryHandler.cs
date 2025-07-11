@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.LessonProgresses.Dtos;
 using QLDT_Becamex.Src.Application.Features.LessonProgresses.Queries;
+using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 
@@ -21,7 +22,7 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
         public async Task<List<AllLessonProgressDto>> Handle(GetListLessonProgressOfUserQuery request, CancellationToken cancellationToken)
         {
             // Lấy User ID từ BaseService
-            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
+            var (userId, role) = _userService.GetCurrentUserAuthenticationInfo();
             if (string.IsNullOrEmpty(userId))
             {
                 throw new AppException("User ID not found. User must be authenticated.", 404);
@@ -32,6 +33,17 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
             if (course == null)
             {
                 throw new AppException("Khóa học không tồn tại", 404);
+            }
+
+            // Kiểm tra quyền truy cập khóa họcz
+            if (role == ConstantRole.HOCVIEN)
+            {
+                var courseUser = await _unitOfWork.UserCourseRepository.GetFirstOrDefaultAsync(
+                    predicate: cu => cu.CourseId == request.CourseId && cu.UserId == userId);
+                if (courseUser == null)
+                {
+                    throw new AppException("Bạn không có quyền truy cập bài học của khóa học này", 403);
+                }
             }
 
             // Lấy danh sách bài học theo CourseId

@@ -163,14 +163,18 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(d => d.DepartmentId);
-                entity.Property(d => d.DepartmentId).ValueGeneratedOnAdd();
+                entity.Property(d => d.DepartmentId)
+                      .HasColumnName("department_id")
+                      .ValueGeneratedOnAdd();
 
                 // Cấu hình thuộc tính DepartmentName
                 entity.Property(d => d.DepartmentName)
+                      .HasColumnName("department_name")
                       .IsRequired()               // Bắt buộc phải có giá trị (không NULL)
                       .HasMaxLength(255);         // Giới hạn độ dài tối đa 255 ký tự
 
                 entity.Property(d => d.DepartmentCode)
+                      .HasColumnName("department_code")
                       .IsRequired()               // Bắt buộc phải có giá trị (không NULL)
                       .HasMaxLength(255);
 
@@ -188,17 +192,22 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .IsRequired(false)              // ParentId có thể là NULL (cho các phòng ban gốc)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(d => d.ManagerId).HasColumnName("ManagerId").IsRequired(false);
+                entity.Property(d => d.ManagerId).HasColumnName("manager_id").IsRequired(false);
 
-                entity.Property(d => d.Level);
+                entity.Property(d => d.Level)
+                      .HasColumnName("level");
 
                 // Cấu hình thuộc tính Description
                 entity.Property(d => d.Description)
+                      .HasColumnName("description")
                       .HasMaxLength(1000); // Giới hạn độ dài cho Description
 
-                entity.Property(d => d.Status);
-                entity.Property(d => d.CreatedAt);
-                entity.Property(d => d.UpdatedAt);
+                entity.Property(d => d.Status)
+                      .HasColumnName("status");
+                entity.Property(d => d.CreatedAt)
+                      .HasColumnName("create_at");
+                entity.Property(d => d.UpdatedAt)
+                      .HasColumnName("update_at");
             });
         }
 
@@ -208,9 +217,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.PositionId);
-                entity.Property(p => p.PositionId).ValueGeneratedOnAdd();
+                entity.Property(p => p.PositionId)
+                      .HasColumnName("position_id")
+                      .ValueGeneratedOnAdd();
 
                 entity.Property(p => p.PositionName)
+                      .HasColumnName("position_name")
                       .IsRequired()               // Bắt buộc phải có giá trị
                       .HasMaxLength(255);         // Giới hạn độ 
             });
@@ -223,9 +235,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.ToTable("UserStatus"); // 👉 Đặt tên bảng ở đây
                                               // Định nghĩa khóa chính
                 entity.HasKey(p => p.Id);
-                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+                entity.Property(p => p.Id)
+                      .HasColumnName("id")
+                      .ValueGeneratedOnAdd();
 
                 entity.Property(p => p.Name)
+                      .HasColumnName("name")
                       .IsRequired()               // Bắt buộc phải có giá trị
                       .HasMaxLength(255);         // Giới hạn độ 
             });
@@ -282,8 +297,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasColumnName("location")
                       .HasMaxLength(255);
 
-
-
                 entity.Property(p => p.StartDate)
                       .HasColumnName("start_date");
 
@@ -318,6 +331,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(p => p.CreateById)
                     .HasColumnName("created_by_id")
                     .HasMaxLength(450);
+
                 entity.Property(p => p.UpdateById)
                    .HasColumnName("update_by_id")
                    .HasMaxLength(450);
@@ -396,9 +410,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.HasKey(s => s.Id);
 
                 entity.Property(s => s.Id)
+                      .HasColumnName("id")
                       .IsRequired().ValueGeneratedOnAdd();
 
                 entity.Property(s => s.Name)
+                      .HasColumnName("name")
                       .IsRequired()
                       .HasMaxLength(255);
 
@@ -416,32 +432,41 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.ToTable("CourseAttachedFile");
 
                 entity.HasKey(x => x.Id);
+                entity.Property(s => s.Id)
+                      .HasColumnName("id")
+                      .IsRequired().ValueGeneratedOnAdd();
 
                 entity.Property(x => x.CourseId)
+                      .HasColumnName("course_id")
                       .IsRequired();
 
                 entity.Property(x => x.Title)
+                      .HasColumnName("title")
                       .HasMaxLength(200)
                       .IsRequired();
 
-                entity.Property(x => x.Type)
-                      .IsRequired()
-                      .HasMaxLength(100);
+                entity.Property(e => e.TypeDocId)
+                      .HasColumnName("type_doc_id");
 
                 entity.Property(x => x.Link)
+                      .HasColumnName("link")
                       .HasMaxLength(450);
 
                 entity.Property(x => x.PublicIdUrlPdf)
+                      .HasColumnName("public_id_url_pdf")
                       .HasMaxLength(450);
 
 
 
                 entity.Property(x => x.UserId)
+                      .HasColumnName("created_by_id")
                       .IsRequired();
 
-                entity.Property(x => x.CreatedAt);
+                entity.Property(x => x.CreatedAt)
+                      .HasColumnName("created_at");
 
-                entity.Property(x => x.ModifiedTime);
+                entity.Property(x => x.ModifiedTime)
+                      .HasColumnName("modified_at");
 
                 entity.HasOne(f => f.Course)
                       .WithMany(c => c.AttachedFiles)
@@ -452,6 +477,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .WithMany()
                       .HasForeignKey(f => f.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.TypeDoc)
+                      .WithMany()
+                      .HasForeignKey(e => e.TypeDocId)
+                      .HasConstraintName("fk_AttachedFile_type_document")
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
 
@@ -465,7 +496,13 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.HasKey(e => e.Id);
 
                 entity.Property(s => s.Id)
-                      .IsRequired().ValueGeneratedOnAdd();
+                      .IsRequired().HasColumnName("id").ValueGeneratedOnAdd();
+
+                entity.Property(cd => cd.CourseId)
+                      .IsRequired().HasColumnName("course_id");
+
+                entity.Property(cd => cd.DepartmentId)
+                      .IsRequired().HasColumnName("department_id");
 
                 entity.HasOne(cd => cd.Course)
                       .WithMany(c => c.CourseDepartments)
@@ -488,7 +525,13 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.HasKey(e => e.Id);
 
                 entity.Property(s => s.Id)
-                      .IsRequired().ValueGeneratedOnAdd();
+                      .IsRequired().HasColumnName("id").ValueGeneratedOnAdd();
+
+                entity.Property(cd => cd.CourseId)
+                      .IsRequired().HasColumnName("course_id");
+
+                entity.Property(cd => cd.PositionId)
+                      .IsRequired().HasColumnName("position_id");
 
                 entity.HasOne(cp => cp.Course)
                       .WithMany(c => c.CoursePositions)
@@ -555,13 +598,15 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.Id);
-                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+                entity.Property(p => p.Id).HasColumnName("id").ValueGeneratedOnAdd();
 
                 entity.Property(p => p.Name)
+                      .HasColumnName("name")
                       .IsRequired()
                       .HasMaxLength(255);
 
                 entity.Property(p => p.Description)
+                      .HasColumnName("description")
                       .HasMaxLength(1000);
 
                 entity.HasMany(s => s.Courses)
@@ -577,20 +622,24 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             {
                 // Định nghĩa khóa chính
                 entity.HasKey(p => p.Id);
-                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+                entity.Property(p => p.Id).HasColumnName("id").ValueGeneratedOnAdd();
 
                 entity.Property(p => p.FullName)
+                      .HasColumnName("full_name")
                       .IsRequired()
                       .HasMaxLength(255);
 
                 entity.Property(p => p.Email)
+                       .HasColumnName("email")
                       .IsRequired()
                       .HasMaxLength(255);
 
                 entity.Property(p => p.ProfileImageUrl)
+                      .HasColumnName("profile_image_url")
                       .HasMaxLength(255);
 
                 entity.Property(p => p.PhoneNumber)
+                      .HasColumnName("phone_number")
                       .IsRequired()
                       .HasMaxLength(255);
 
@@ -877,19 +926,19 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(e => e.UserId)
                       .HasColumnName("user_id");
 
-                entity.Property(e => e.q1_revelance)
-                      .HasColumnName("q1_revelance");
+                entity.Property(e => e.Q1_relevance)
+                      .HasColumnName("q1_relevance");
 
-                entity.Property(e => e.q2_clarity)
+                entity.Property(e => e.Q2_clarity)
                       .HasColumnName("q2_clarity");
 
-                entity.Property(e => e.q3_structure)
+                entity.Property(e => e.Q3_structure)
                       .HasColumnName("q3_structure");
 
-                entity.Property(e => e.q4_duration)
+                entity.Property(e => e.Q4_duration)
                       .HasColumnName("q4_duration");
 
-                entity.Property(e => e.q5_material)
+                entity.Property(e => e.Q5_material)
                       .HasColumnName("q5_material");
                 entity.Property(e => e.Comment)
                       .HasColumnName("comment");

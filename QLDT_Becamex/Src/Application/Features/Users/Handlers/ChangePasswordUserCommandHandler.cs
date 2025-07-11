@@ -21,11 +21,13 @@ public class ChangePasswordUserCommandHandler : IRequestHandler<ChangePasswordUs
         var rq = command.Request;
 
         var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
-
+        
+        if (userId == null)
+            throw new AppException("Không tìm thấy người dùng", 404);
         var user = await _userManager.FindByIdAsync(userId);
+
         if (user == null)
             throw new AppException("Không tìm thấy người dùng", 404);
-
         var result = await _userManager.ChangePasswordAsync(user, rq.OldPassword, rq.NewPassword);
 
         if (!result.Succeeded)

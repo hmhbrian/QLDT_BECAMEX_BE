@@ -1,5 +1,4 @@
 ﻿using QLDT_Becamex.Src.Constant;
-using System.ComponentModel.DataAnnotations;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
 {

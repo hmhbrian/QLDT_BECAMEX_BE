@@ -3,11 +3,12 @@ using MediatR;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using System.Data.Entity;
 
 namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
 {
     public class GetAllCourseAttachedFileQueryHandler :
-        IRequestHandler<GetAllCourseAttachedFileQuery, IEnumerable<CourseAttachedFileDto>>
+        IRequestHandler<GetAllCourseAttachedFileQuery, List<CourseAttachedFileDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -19,13 +20,16 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CourseAttachedFileDto>> Handle(
+        public async Task<List<CourseAttachedFileDto>> Handle(
             GetAllCourseAttachedFileQuery request,
             CancellationToken cancellationToken)
         {
             // 1. Lấy tất cả các file đính kèm từ repository dựa trên CourseId
             var attachedFiles = await _unitOfWork.CourseAttachedFileRepository
-                                                 .FindAsync(f => f.CourseId == request.CourseId);
+                .GetFlexibleAsync(
+                predicate: f => f.CourseId == request.CourseId,
+                includes: f => f.Include(l => l.TypeDoc)
+            );
 
             if (attachedFiles == null || !attachedFiles.Any())
             {
@@ -33,9 +37,8 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
                 // Ví dụ: throw new AppException($"Không tìm thấy file đính kèm nào cho khóa học với ID: {request.CourseId}", 404);
                 return new List<CourseAttachedFileDto>(); // Trả về danh sách rỗng nếu không có
             }
-
             // 2. Ánh xạ các đối tượng Domain Entities sang DTO
-            var attachedFileDtos = _mapper.Map<IEnumerable<CourseAttachedFileDto>>(attachedFiles);
+            var attachedFileDtos = _mapper.Map<List<CourseAttachedFileDto>>(attachedFiles);
 
             return attachedFileDtos;
         }

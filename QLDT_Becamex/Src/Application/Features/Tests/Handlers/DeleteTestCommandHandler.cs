@@ -24,7 +24,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             {
                 throw new AppException("Bài kiểm tra không tồn tại", 404);
             }
-            string courseId = test.CourseId;
+            string courseId = test.CourseId!;
             // Remove Test from repository
             _unitOfWork.TestRepository.Remove(test);
 

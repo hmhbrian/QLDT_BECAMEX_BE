@@ -25,6 +25,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             // Define ignoreNavigation as a no-op action for AfterMap
             Action<object, object, ResolutionContext> ignoreNavigation = (src, dest, context) => { };
 
+            CreateMap<UserStatus, StatusDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+
             CreateMap<ApplicationUser, UserDto>()
             // Ánh xạ tên của ManagerU vào ManagerBy
             .ForMember(dest => dest.CreatedBy,
@@ -39,9 +43,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             // Ánh xạ tên của Department vào DepartmentName
             .ForMember(dest => dest.DepartmentName,
-                       opt => opt.MapFrom(src => src.Department != null ? src.Department.DepartmentName : null));
+                       opt => opt.MapFrom(src => src.Department != null ? src.Department.DepartmentName : null))
+            .ForMember(dest => dest.UserStatus,opt => opt.MapFrom(src => src.UserStatus));
 
-          
+
 
             //UserStatus
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();
@@ -56,8 +61,15 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<CourseCategoryRqDto, CourseCategory>();
 
             //Department
-            CreateMap<DepartmentRequestDto, Department>().ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId));
-            CreateMap<Department, DepartmentDto>();
+            CreateMap<DepartmentRequestDto, Department>()
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId))
+                .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null));
+            CreateMap<Department, DepartmentDto>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
+            //DepartmentStatus
+            CreateMap<DepartmentStatus, StatusDto>().ReverseMap();
+            CreateMap<CreateStatusDto, DepartmentStatus>().ReverseMap();
 
             //Position
             CreateMap<Position, PositionDto>().ReverseMap();
@@ -104,8 +116,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Course, UserEnrollCourseDto>();
             
             //CourseStatus
-            CreateMap<CourseStatus, CourseStatusDto>().ReverseMap();
-            CreateMap<CreateCourseStatusDto, CourseStatus>().ReverseMap();
+            CreateMap<CourseStatus, StatusDto>().ReverseMap();
+            CreateMap<CreateStatusDto, CourseStatus>().ReverseMap();
 
             // Question
             CreateMap<QuestionDto, Question>()

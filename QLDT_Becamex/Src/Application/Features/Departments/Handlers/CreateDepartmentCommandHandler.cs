@@ -33,6 +33,13 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
             if (nameExists)
                 throw new AppException("Tên phòng ban hoặc mã phòng ban đã tồn tại", 409);
 
+            if (request.StatusId.HasValue)
+            {
+                var statusExists = await _unitOfWork.DepartmentStatusRepository.AnyAsync(s => s.Id == request.StatusId.Value);
+                if (!statusExists)
+                    throw new AppException("Trạng thái phòng ban không hợp lệ", 400);
+            }
+
             // Kiểm tra và xử lý ParentId
             int? parentId = request.ParentId == 0 ? null : request.ParentId;
             int calculatedLevel = 1;

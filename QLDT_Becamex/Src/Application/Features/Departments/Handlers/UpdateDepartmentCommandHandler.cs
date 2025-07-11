@@ -70,6 +70,9 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                     }
                 }
 
+                if (request.StatusId.HasValue && !await _unitOfWork.DepartmentStatusRepository.AnyAsync(s => s.Id == request.StatusId.Value))
+                    throw new AppException("Trạng thái phòng ban không hợp lệ", 400);
+
                 // Lấy tất cả phòng ban để tra cứu và kiểm tra vòng lặp
                 var allDepartments = await _unitOfWork.DepartmentRepository.GetFlexibleAsync(
                     predicate: null,
@@ -122,7 +125,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                 department.Description = request.Description;
                 department.ParentId = newParentId;
                 department.ManagerId = managerId;
-                department.Status = request.Status;
+                department.StatusId = request.StatusId;
                 department.Level = newLevel;
                 department.UpdatedAt = DateTime.Now;
 

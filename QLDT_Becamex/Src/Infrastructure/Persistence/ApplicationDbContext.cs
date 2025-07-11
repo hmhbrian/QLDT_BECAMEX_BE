@@ -60,6 +60,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureTypeDocument(modelBuilder);
             ConfigureLessonProgress(modelBuilder);
             ConfigureFeedback(modelBuilder);
+            ConfigureDepartmentStatus(modelBuilder);
 
         }
 
@@ -202,12 +203,38 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasColumnName("description")
                       .HasMaxLength(1000); // Giới hạn độ dài cho Description
 
-                entity.Property(d => d.Status)
-                      .HasColumnName("status");
+                entity.Property(d => d.StatusId)
+                      .HasColumnName("status_id");
+
                 entity.Property(d => d.CreatedAt)
                       .HasColumnName("create_at");
+
                 entity.Property(d => d.UpdatedAt)
                       .HasColumnName("update_at");
+
+                entity.HasOne(u => u.Status)
+                      .WithMany()
+                      .HasForeignKey(u => u.StatusId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+        }
+
+        private void ConfigureDepartmentStatus(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DepartmentStatus>(entity =>
+            {
+                entity.ToTable("DepartmentStatus"); // 👉 Đặt tên bảng ở đây
+                                              // Định nghĩa khóa chính
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Id)
+                      .HasColumnName("id")
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(p => p.Name)
+                      .HasColumnName("name")
+                      .IsRequired()               // Bắt buộc phải có giá trị
+                      .HasMaxLength(255);         // Giới hạn độ 
             });
         }
 

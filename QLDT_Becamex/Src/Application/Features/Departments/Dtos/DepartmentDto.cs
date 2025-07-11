@@ -1,4 +1,6 @@
-﻿namespace QLDT_Becamex.Src.Application.Features.Departments.Dtos
+﻿using QLDT_Becamex.Src.Application.Features.Status.Dtos;
+
+namespace QLDT_Becamex.Src.Application.Features.Departments.Dtos
 {
     public class DepartmentDto
     {
@@ -10,7 +12,7 @@
         public string? ParentName { get; set; }
         public string? ManagerId { get; set; }
         public string? ManagerName { get; set; }
-        public int? Status { get; set; }
+        public StatusDto? Status { get; set; }
         public int Level { get; set; }
         public List<string>? Path { get; set; }
         public DateTime CreatedAt { get; set; }

@@ -179,9 +179,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     });
                 }
 
-                if (dto.UserIds != null && dto.UserIds.Any())
+                if (dto.StudentIds != null && dto.StudentIds.Any())
                 {
-                    foreach (var userId in dto.UserIds)
+                    foreach (var userId in dto.StudentIds)
                     {
                         if (!usersFromDepartmentsAndPositions.Contains(userId))
                         {

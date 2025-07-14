@@ -57,11 +57,31 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
             await _dbContext.Set<T>().AddRangeAsync(entities);
         }
 
-        public void Update(T entity)
+        public void UpdateEntity(T entity)
         {
 
             _dbContext.Set<T>().Attach(entity);
             _dbContext.Entry(entity).State = EntityState.Modified;
+        }
+
+        public void Update(T entity, T updatedEntity)
+        {
+            var entry = _dbContext.Entry(entity);
+
+            foreach (var prop in entry.Properties)
+            {
+                var propertyInfo = typeof(T).GetProperty(prop.Metadata.Name);
+                if (propertyInfo == null) continue;
+
+                var updatedValue = propertyInfo.GetValue(updatedEntity);
+                var currentValue = prop.CurrentValue;
+
+                if (!Equals(currentValue, updatedValue))
+                {
+                    prop.CurrentValue = updatedValue;
+                    prop.IsModified = true;
+                }
+            }
         }
 
         public void Remove(T entity)

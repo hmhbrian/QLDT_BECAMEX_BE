@@ -65,13 +65,13 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             request.Title = ProcessTitle; // Cập nhật tiêu đề đã xử lý
 
             // Map TestUpdateDto to existing Test
-            _mapper.Map(request, test);
+            var updateTest = _mapper.Map(request, test);
 
             // Set foreign key properties
-            test.UpdatedById = userId; // Use userId from authentication info
-            test.UpdatedAt = DateTime.UtcNow;
+            updateTest.UpdatedById = userId; // Use userId from authentication info
+            updateTest.UpdatedAt = DateTime.UtcNow;
             // Update Test in repository
-            _unitOfWork.TestRepository.Update(test);
+            _unitOfWork.TestRepository.Update(test, updateTest);
 
             // Save changes to database
             await _unitOfWork.CompleteAsync();

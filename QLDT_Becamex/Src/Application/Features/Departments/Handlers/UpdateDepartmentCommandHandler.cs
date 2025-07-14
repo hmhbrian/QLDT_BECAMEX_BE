@@ -120,17 +120,21 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                 await _departmentService.ValidateManagerIdDeparmentAsync(managerId, false, department.ManagerId, id);
 
                 // Cập nhật thông tin phòng ban
-                department.DepartmentName = request.DepartmentName;
-                department.DepartmentCode = request.DepartmentCode;
-                department.Description = request.Description;
-                department.ParentId = newParentId;
-                department.ManagerId = managerId;
-                department.StatusId = request.StatusId;
-                department.Level = newLevel;
-                department.UpdatedAt = DateTime.Now;
+                var updatedDepartment = new Department
+                {
+                    DepartmentId = department.DepartmentId,
+                    DepartmentName = request.DepartmentName.Trim(),
+                    DepartmentCode = request.DepartmentCode.Trim().ToLower(),
+                    Description = request.Description?.Trim(),
+                    ParentId = newParentId,
+                    ManagerId = managerId,
+                    StatusId = request.StatusId,
+                    Level = newLevel,
+                    UpdatedAt = DateTime.Now
+                };
 
                 // Cập nhật departmentDict với thông tin mới
-                departmentDict[department.DepartmentId] = department;
+                departmentDict[department.DepartmentId] = updatedDepartment;
 
                 // Cập nhật level của các phòng ban con
                 if (levelDifference != 0 && department.Children?.Any() == true)
@@ -138,7 +142,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                     await UpdateChildrenLevels(department, levelDifference, departmentDict);
                 }
 
-                _unitOfWork.DepartmentRepository.Update(department);
+                _unitOfWork.DepartmentRepository.Update(department, updatedDepartment);
                 await _unitOfWork.CompleteAsync();
 
                 // Lấy tất cả người dùng để ánh xạ ManagerName

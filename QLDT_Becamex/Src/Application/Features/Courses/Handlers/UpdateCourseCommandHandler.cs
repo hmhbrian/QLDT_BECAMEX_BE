@@ -104,19 +104,19 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     throw new AppException($"Người dùng không hợp lệ: {string.Join(", ", invalidUserIds)}", 400);
             }
 
-            _mapper.Map(request, course);
+            var updateCourse = _mapper.Map(request, course);
 
             string? imageUrl = null;
             if (request.ThumbUrl != null)
             {
                 imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
-                course.ThumbUrl = imageUrl;
+                updateCourse.ThumbUrl = imageUrl;
             }
 
-            course.ModifiedAt = DateTime.Now;
-            course.UpdateById = currentUserId;
+            updateCourse.ModifiedAt = DateTime.Now;
+            updateCourse.UpdateById = currentUserId;
 
-            _unitOfWork.CourseRepository.Update(course);
+            _unitOfWork.CourseRepository.Update(course, updateCourse);
 
             if (request.DepartmentIds != null)
             {

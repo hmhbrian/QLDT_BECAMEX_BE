@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
@@ -23,10 +24,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (course.RegistrationStartDate.HasValue && DateTime.Now > course.RegistrationStartDate.Value)
                 throw new AppException("Ngày xóa phải trước ngày bắt đầu đăng ký", 400);
 
-            course.IsDeleted = true;
-            course.ModifiedAt = DateTime.Now;
+            var deleteCourse = new Course
+            {
+                Id = course.Id,
+                IsDeleted = true,
+                ModifiedAt = DateTime.Now
+            };
 
-            _unitOfWork.CourseRepository.Update(course);
+            _unitOfWork.CourseRepository.Update(course, deleteCourse);
             await _unitOfWork.CompleteAsync();
 
             return course.Id;

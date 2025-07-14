@@ -49,9 +49,13 @@ namespace QLDT_Becamex.Src.Application.Features.Positions.Handlers
             var exists = await _unitOfWork.PositionRepository.GetFirstOrDefaultAsync(x => x.PositionName!.ToLower() == request.Request.PositionName.ToLower() && x.PositionId != request.Id);
             if (exists != null)
                 throw new AppException("Tên vị trí đã tồn tại", 409);
-
-            entity.PositionName = request.Request.PositionName;
-            _unitOfWork.PositionRepository.Update(entity);
+            var updatePosition = new Position
+            {
+                PositionId = request.Id,
+                PositionName = request.Request.PositionName?.Trim()
+            };
+            //entity.PositionName = request.Request.PositionName;
+            _unitOfWork.PositionRepository.Update(entity, updatePosition);
             await _unitOfWork.CompleteAsync();
 
             _mapper.Map<PositionDto>(entity);

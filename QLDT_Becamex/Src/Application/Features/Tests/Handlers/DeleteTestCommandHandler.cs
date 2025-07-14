@@ -36,9 +36,13 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             int position = 1;
             foreach (var t in remainingTests.OrderBy(t => t.Position))
             {
-                t.Position = position++;
-                t.UpdatedAt = DateTime.UtcNow;
-                _unitOfWork.TestRepository.Update(t);
+                var updateTest = new Test
+                {
+                    Id = t.Id,
+                    Position = position++,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _unitOfWork.TestRepository.Update(t, updateTest);
             }
 
             await _unitOfWork.CompleteAsync();

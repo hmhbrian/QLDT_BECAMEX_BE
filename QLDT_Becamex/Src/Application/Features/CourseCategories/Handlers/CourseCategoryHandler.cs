@@ -66,9 +66,14 @@ namespace QLDT_Becamex.Src.Application.Features.CourseCategory.Handlers
                 throw new AppException("Danh mục khóa học đã tồn tại", 409);
             }
 
-            entity.Name = request.Request.Name?.Trim();
-            entity.Description = request.Request.Description?.Trim();
-            _unitOfWork.CourseCategoryRepository.Update(entity);
+            var updateCategory = new Domain.Entities.CourseCategory
+            {
+                Id = request.id,
+                Name = request.Request.Name?.Trim(),
+                Description = request.Request.Description?.Trim()
+            };
+
+            _unitOfWork.CourseCategoryRepository.Update(entity, updateCategory);
             await _unitOfWork.CompleteAsync();
             return Unit.Value;
         }

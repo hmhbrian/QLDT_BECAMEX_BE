@@ -30,7 +30,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? LecturerId { get; set; }
         public List<int>? DepartmentIds { get; set; }
         public List<int>? PositionIds { get; set; }
-        public List<string>? UserIds { get; set; }
+        public List<string>? StudentIds { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

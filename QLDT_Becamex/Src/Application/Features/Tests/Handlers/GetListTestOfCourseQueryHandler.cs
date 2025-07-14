@@ -50,6 +50,9 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 orderBy: q => q.OrderBy(t => t.Position),
                 includes: q => q
                         .Include(d => d.Questions)
+                        .Include(d => d.CreatedBy)
+                        .Include(d => d.UpdatedBy)
+
             );
 
             // if (tests == null || !tests.Any())

@@ -30,23 +30,18 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
             CreateMap<ApplicationUser, UserDto>()
-            // Ánh xạ tên của ManagerU vào ManagerBy
             .ForMember(dest => dest.CreatedBy,
-                       opt => opt.MapFrom(src => src.CreateBy != null ? src.CreateBy.FullName : null))
-
+                opt => opt.MapFrom(src => src.CreateBy != null
+                    ? new ByUser { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
+                    : null))
+            .ForMember(dest => dest.UpdatedBy,
+                opt => opt.MapFrom(src => src.UpdateBy != null
+                    ? new ByUser { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
+                    : null))
             .ForMember(dest => dest.ManagerBy,
-                       opt => opt.MapFrom(src => src.ManagerU != null ? src.ManagerU.FullName : null))
-
-            // Ánh xạ tên của Position vào PositionName
-            .ForMember(dest => dest.PositionName,
-                       opt => opt.MapFrom(src => src.Position != null ? src.Position.PositionName : null))
-
-            // Ánh xạ tên của Department vào DepartmentName
-            .ForMember(dest => dest.DepartmentName,
-                       opt => opt.MapFrom(src => src.Department != null ? src.Department.DepartmentName : null))
-            .ForMember(dest => dest.UserStatus,opt => opt.MapFrom(src => src.UserStatus));
-
-
+                opt => opt.MapFrom(src => src.ManagerU != null
+                    ? new ByUser { Id = src.ManagerU.Id, Name = src.ManagerU.FullName }
+                    : null));
 
             //UserStatus
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();
@@ -101,11 +96,24 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 }).ToList()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.Lecturer))
+                .ForMember(dest => dest.Students, opt => opt.MapFrom(src =>
+                    (src.UserCourses ?? Enumerable.Empty<UserCourse>())
+                    .Where(cp => cp.User != null)
+                    .Select(cp => new ByUser
+                    {
+                        Id = cp.UserId,
+                        Name = cp.User!.FullName ?? null
+                    }).ToList()
+                ))
+
                 .ForMember(dest => dest.CreatedBy,
-                       opt => opt.MapFrom(src => src.CreateBy != null ? src.CreateBy.FullName : null))
+                opt => opt.MapFrom(src => src.CreateBy != null
+                    ? new ByUser { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
+                    : null))
                 .ForMember(dest => dest.UpdatedBy,
-                       opt => opt.MapFrom(src => src.UpdateBy != null ? src.UpdateBy.FullName : null))
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category));
+                opt => opt.MapFrom(src => src.UpdateBy != null
+                    ? new ByUser { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
+                    : null));
 
             CreateMap<CourseDto, Course>();
             CreateMap<UpdateCourseDto, Course>()
@@ -114,7 +122,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             //EnrollCourse
             CreateMap<UserEnrollCourseDto, Course>();
             CreateMap<Course, UserEnrollCourseDto>();
-            
+
             //CourseStatus
             CreateMap<CourseStatus, StatusDto>().ReverseMap();
             CreateMap<CreateStatusDto, CourseStatus>().ReverseMap();
@@ -134,7 +142,15 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Test, DetailTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
-                    .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()));
+                    .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()))
+                      .ForMember(dest => dest.CreatedBy,
+                     opt => opt.MapFrom(src => src.CreatedBy != null
+                    ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
+                    : null))
+                    .ForMember(dest => dest.UpdatedBy,
+                    opt => opt.MapFrom(src => src.UpdatedBy != null
+                    ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
+                    : null)); ;
 
             CreateMap<TestUpdateDto, Test>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -144,7 +160,15 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             CreateMap<Test, AllTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
-                    .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0));
+                    .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0))
+                    .ForMember(dest => dest.CreatedBy,
+                     opt => opt.MapFrom(src => src.CreatedBy != null
+                    ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
+                    : null))
+                    .ForMember(dest => dest.UpdatedBy,
+                    opt => opt.MapFrom(src => src.UpdatedBy != null
+                    ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
+                    : null));
 
             CreateMap<CreateQuestionDto, Question>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -159,10 +183,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Lesson, AllLessonDto>()
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc.NameType));
-                    
+
             CreateMap<Lesson, DetailLessonDto>()
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
-               
+
                 .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.CreatedBy))
                 .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UpdatedBy))
                 .ForMember(dest => dest.UserNameCreated, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.FullName : null))

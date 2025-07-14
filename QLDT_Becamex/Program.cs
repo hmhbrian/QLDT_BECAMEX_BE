@@ -137,6 +137,8 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddHostedService<CourseStatusUpdateBackgroundService>();
 
+builder.Services.AddHttpContextAccessor();
+
 
 
 // 6. Cấu hình Controllers và Swagger/OpenAPI

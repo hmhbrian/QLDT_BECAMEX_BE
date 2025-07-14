@@ -115,6 +115,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             course.ModifiedAt = DateTime.Now;
             course.UpdateById = currentUserId;
+
             _unitOfWork.CourseRepository.Update(course);
 
             if (request.DepartmentIds != null)

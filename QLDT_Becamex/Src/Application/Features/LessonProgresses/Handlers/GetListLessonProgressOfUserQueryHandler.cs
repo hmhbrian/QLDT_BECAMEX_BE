@@ -58,6 +58,8 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
             var dtoList = lesson.Select(lesson =>
             {
                 var progress = lesson.LessonProgress?.FirstOrDefault();
+                int currentPage = 0;
+                int currentTimeSeconds = 0;
                 double progressPercentage = 0;
                 if (progress != null)
                 {
@@ -72,6 +74,7 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                             if (lesson.TotalPages.HasValue && lesson.TotalPages > 0 && progress.CurrentPage.HasValue)
                             {
                                 progressPercentage = (double)progress.CurrentPage!.Value / lesson.TotalPages.Value;
+                                currentPage = progress.CurrentPage.Value;
                             }
                         }
                         else if (lesson.TypeDocId == 2) //Video
@@ -79,6 +82,7 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                             if (lesson.TotalDurationSeconds.HasValue && lesson.TotalDurationSeconds > 0 && progress.CurrentTimeSeconds.HasValue)
                             {
                                 progressPercentage = (double)progress.CurrentTimeSeconds!.Value / lesson.TotalDurationSeconds.Value;
+                                currentTimeSeconds = progress.CurrentTimeSeconds.Value;
                             }
                         }
                     }
@@ -97,6 +101,8 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                     UrlPdf = lesson.FileUrl,
                     ProgressPercentage = progressPercentage,
                     Type = lesson.TypeDoc?.NameType ?? "Unknown",
+                    CurrentPage = lesson.TypeDocId == 1 ? currentPage : null, // Chỉ trả CurrentPage nếu là PDF
+                    CurrentTimeSecond = lesson.TypeDocId == 2 ? currentTimeSeconds : null // Chỉ trả CurrentTimeSecond nếu là Video
                 };
             }).ToList();
 

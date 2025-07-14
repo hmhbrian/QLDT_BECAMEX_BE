@@ -23,7 +23,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Lấy danh sách bài kiểm tra của khóa học.HOCVIEN, HR, ADMIN có quyền truy cập
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "ADMIN, HR")]
+        [Authorize(Roles = "ADMIN, HR, HOCVIEN")]
         public async Task<IActionResult> GetListTestOfCourse([FromRoute] string courseId)
         {
             var result = await _mediator.Send(new GetListTestOfCourseQuery(courseId));

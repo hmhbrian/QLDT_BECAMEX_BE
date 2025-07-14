@@ -127,6 +127,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             course.ModifiedAt = DateTime.Now;
             course.UpdateById = currentUserId;
+
             _unitOfWork.CourseRepository.Update(course);
 
             // --- 3. Cập nhật các mối quan hệ Many-to-Many ---

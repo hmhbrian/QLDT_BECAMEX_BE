@@ -4,6 +4,7 @@ using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 
 
@@ -22,8 +23,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? HoursPerSessions { get; set; }
         public string? Optional { get; set; }
         public int? MaxParticipant { get; set; }
-        public string? CreatedBy { get; set; }
-        public string? UpdatedBy { get; set; }
+        public ByUser? CreatedBy { get; set; }
+        public ByUser? UpdatedBy { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime? RegistrationStartDate { get; set; }

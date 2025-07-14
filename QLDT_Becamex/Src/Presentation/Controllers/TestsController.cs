@@ -23,7 +23,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Lấy danh sách bài kiểm tra của khóa học.HOCVIEN, HR, ADMIN có quyền truy cập
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "ADMIN, HR")]
+        [Authorize]
         public async Task<IActionResult> GetListTestOfCourse([FromRoute] string courseId)
         {
             var result = await _mediator.Send(new GetListTestOfCourseQuery(courseId));
@@ -31,7 +31,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "ADMIN, HR")]
+        [Authorize]
         public async Task<IActionResult> GetTestById(int id, [FromRoute] string courseId)
         {
             var result = await _mediator.Send(new GetTestByIdQuery(id, courseId));
@@ -44,7 +44,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles = "ADMIN, HR")]
-        public async Task<IActionResult> CreateTest([FromRoute] string courseId ,[FromBody] TestCreateDto request, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateTest([FromRoute] string courseId, [FromBody] TestCreateDto request, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new CreateTestCommand(request, courseId), cancellationToken);
             return Ok(ApiResponse<string>.Ok(result, "Thêm bài kiểm tra thành công"));

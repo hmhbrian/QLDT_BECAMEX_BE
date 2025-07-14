@@ -34,7 +34,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                     page: null,
                     pageSize: 1, // Giới hạn 1 bản ghi
                     asNoTracking: true,
-                    includes: t => t.Include(t => t.Questions)
+                    includes: t => t.Include(t => t.Questions).Include(d => d.CreatedBy).Include(d => d.UpdatedBy)
                 );
 
                 var testEntity = test.FirstOrDefault();

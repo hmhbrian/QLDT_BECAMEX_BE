@@ -1108,6 +1108,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                     {
                         var propName = prop.Metadata.Name;
 
+                        if (prop.Metadata.IsPrimaryKey() && prop.IsTemporary)
+                        {
+                            audit.TemporaryProperties.Add(prop);  // lưu lại prop cần lấy sau
+                        }
+
                         if (entry.State == EntityState.Added)
                         {
                             audit.NewValues[propName] = prop.CurrentValue ?? "Unknown";
@@ -1136,11 +1141,18 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             foreach (var audit in auditEntries)
             {
+                foreach (var prop in audit.TemporaryProperties)
+                {
+                    if (prop.Metadata.IsPrimaryKey())
+                    {
+                        audit.NewValues[prop.Metadata.Name] = prop.CurrentValue!;
+                    }
+                }
                 AuditLogs.Add(new AuditLog
                 {
                     EntityName = audit.TableName,
                     Action = audit.Action,
-                    EntityId = audit.PrimaryKey?.ToString(),
+                    EntityId = audit.GetPrimaryKeyAsString(),
                     UserId = audit.UserId,
                     Changes = audit.ToJsonChanges(),
                     Timestamp = DateTime.UtcNow

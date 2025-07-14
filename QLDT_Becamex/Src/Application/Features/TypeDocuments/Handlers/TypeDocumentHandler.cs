@@ -65,9 +65,13 @@ namespace QLDT_Becamex.Src.Application.Features.TypeDocument.Handlers
             {
                 throw new AppException("Danh mục khóa học đã tồn tại", 409);
             }
-
-            entity.NameType = request.Request.NameType?.Trim()!;
-            _unitOfWork.TypeDocumentRepository.Update(entity);
+            var updateTypeDocument = new Domain.Entities.TypeDocument
+            {
+                Id = request.id,
+                NameType = request.Request.NameType?.Trim()!
+            };
+            //entity.NameType = request.Request.NameType?.Trim()!;
+            _unitOfWork.TypeDocumentRepository.Update(entity, updateTypeDocument);
             await _unitOfWork.CompleteAsync();
             return Unit.Value;
         }

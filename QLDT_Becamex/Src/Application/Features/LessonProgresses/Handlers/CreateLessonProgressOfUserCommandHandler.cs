@@ -46,9 +46,10 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
             
             if(lessonprogress != null) {
                 // Nếu đã có LessonProgress, cập nhật nó
-                lessonprogress.Update(request.Request, isCompleted);
+                var updatedLessonProgress = new LessonProgress();
+                updatedLessonProgress.Update(request.Request, isCompleted);
                 // Cập nhật vào repository
-                _unitOfWork.LessonProgressRepository.Update(lessonprogress);
+                _unitOfWork.LessonProgressRepository.Update(lessonprogress, updatedLessonProgress);
             }
             else
             {

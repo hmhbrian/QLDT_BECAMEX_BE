@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using CloudinaryDotNet;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Commands;
@@ -61,8 +62,12 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
 
                 foreach (var user in usersInDepartment)
                 {
-                    user.DepartmentId = null;
-                    _unitOfWork.UserRepository.Update(user);
+                    var updateUser = new ApplicationUser
+                    {
+                        Id = user.Id,
+                        DepartmentId = null,
+                    };
+                    _unitOfWork.UserRepository.Update(user, updateUser);
                 }
 
                 // Xử lý phòng ban con

@@ -3,6 +3,7 @@ using MediatR;
 using PdfSharpCore.Pdf.IO;
 using QLDT_Becamex.Src.Application.Common.Dtos; // AppException
 using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
@@ -113,10 +114,9 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                     }
                 }
             }
-
             lesson.Update(request.CourseId, userId, request.Request, newUrl, newPdfPublicId!,TypeId, totalDurationSeconds, totalPages);
 
-            _unitOfWork.LessonRepository.Update(lesson);
+            //_unitOfWork.LessonRepository.Update(lesson, updatelesson);
 
             await _unitOfWork.CompleteAsync();
         }

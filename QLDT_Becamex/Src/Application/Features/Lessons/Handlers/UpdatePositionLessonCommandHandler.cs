@@ -89,7 +89,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                     lessonToMove.Position = newPosition; // Cập nhật vị trí mới cho lesson
                     lessonToMove.UpdatedAt = DateTime.UtcNow;
                     lessonToMove.UpdatedById = userId;
-                    _unitOfWork.LessonRepository.Update(lessonToMove); // Cập nhật lesson
+                    //_unitOfWork.LessonRepository.Update(lessonToMove); // Cập nhật lesson
 
                     await _unitOfWork.CompleteAsync(); // Lưu thay đổi
                 }

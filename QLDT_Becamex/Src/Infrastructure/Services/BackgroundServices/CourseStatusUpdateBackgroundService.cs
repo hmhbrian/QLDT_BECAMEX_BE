@@ -49,7 +49,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.BackgroundServices
                     courseService.UpdateCourseStatus(course);
                     if (course.StatusId != originalStatus)
                     {
-                        unitOfWork.CourseRepository.Update(course); // Cập nhật trạng thái khóa học
+                        unitOfWork.CourseRepository.UpdateEntity(course); // Cập nhật trạng thái khóa học
                     }
                 }
                 await unitOfWork.CompleteAsync(); // Lưu các thay đổi vào cơ sở dữ liệu

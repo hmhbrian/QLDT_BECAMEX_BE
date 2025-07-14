@@ -92,14 +92,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalidPositions)}", 400);
             }
 
-            if (request.Optional != ConstantCourse.OPTIONAL_BATBUOC && request.UserIds != null && request.UserIds.Any())
+            if (request.Optional != ConstantCourse.OPTIONAL_BATBUOC && request.StudentIds != null && request.StudentIds.Any())
             {
                 var validUserIds = await _unitOfWork.UserRepository.GetQueryable()
-                    .Where(u => request.UserIds.Contains(u.Id))
+                    .Where(u => request.StudentIds.Contains(u.Id))
                     .Select(u => u.Id)
                     .ToListAsync();
 
-                var invalidUserIds = request.UserIds.Except(validUserIds).ToList();
+                var invalidUserIds = request.StudentIds.Except(validUserIds).ToList();
                 if (invalidUserIds.Any())
                     throw new AppException($"Người dùng không hợp lệ: {string.Join(", ", invalidUserIds)}", 400);
             }
@@ -202,9 +202,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     }
                 }
 
-                if (request.UserIds != null && request.UserIds.Any())
+                if (request.StudentIds != null && request.StudentIds.Any())
                 {
-                    foreach (var userId in request.UserIds)
+                    foreach (var userId in request.StudentIds)
                     {
                         if (assignedUserIds.Add(userId))
                         {
@@ -224,9 +224,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
             else
             {
-                if (request.UserIds != null && request.UserIds.Any())
+                if (request.StudentIds != null && request.StudentIds.Any())
                 {
-                    foreach (var userId in request.UserIds)
+                    foreach (var userId in request.StudentIds)
                     {
                         if (assignedUserIds.Add(userId))
                         {

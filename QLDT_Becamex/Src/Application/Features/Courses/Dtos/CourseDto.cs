@@ -35,6 +35,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public StatusDto? Status { get; set; }
         public CourseCategoryDto? Category { get; set; }
         public LecturerDto? Lecturer { get; set; }
+        public ICollection<ByUser>? Students { get; set; } = new List<ByUser>();
         public ICollection<DepartmentDto>? Departments { get; set; } = new List<DepartmentDto>();
         public ICollection<PositionDto>? Positions { get; set; } = new List<PositionDto>();
     }

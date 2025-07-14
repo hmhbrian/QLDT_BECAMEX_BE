@@ -31,7 +31,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public string? Optional { get; set; } = ConstantCourse.OPTIONAL_TUYCHON;
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Số lượng học viên phải lớn hơn không")]
+        [Range(1, 200, ErrorMessage = "Số lượng học viên phải lớn hơn không và nhỏ hon 200")]
         public int? MaxParticipant { get; set; }
         public DateTime? StartDate { get; set; } = DateTime.Now;
         public DateTime? EndDate { get; set; } = DateTime.Now;

@@ -96,6 +96,16 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 }).ToList()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.Lecturer))
+                .ForMember(dest => dest.Students, opt => opt.MapFrom(src =>
+                    (src.UserCourses ?? Enumerable.Empty<UserCourse>())
+                    .Where(cp => cp.User != null)
+                    .Select(cp => new ByUser
+                    {
+                        Id = cp.UserId,
+                        Name = cp.User!.FullName ?? null
+                    }).ToList()
+                ))
+
                 .ForMember(dest => dest.CreatedBy,
                 opt => opt.MapFrom(src => src.CreateBy != null
                     ? new ByUser { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }

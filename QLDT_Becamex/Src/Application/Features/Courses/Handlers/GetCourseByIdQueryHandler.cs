@@ -27,7 +27,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 includes: q => q
                     .Include(c => c.CourseDepartments)!.ThenInclude(cd => cd.Department)
                     .Include(c => c.CoursePositions)!.ThenInclude(cp => cp.Position)
-                    .Include(c => c.UserCourses)
+                    .Include(c => c.UserCourses)!.ThenInclude(uc => uc.User)
                     .Include(c => c.Status)
                     .Include(c => c.Category)
                     .Include(c => c.Lecturer)

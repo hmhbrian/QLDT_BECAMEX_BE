@@ -4,5 +4,5 @@ using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Commands
 {
-    public record UpdatePositionLessonCommand(string CourseId, int LessonId, int PreviousLessonId) : IRequest;
+    public record UpdatePositionLessonCommand(string CourseId, int LessonId, int? PreviousLessonId) : IRequest;
 }

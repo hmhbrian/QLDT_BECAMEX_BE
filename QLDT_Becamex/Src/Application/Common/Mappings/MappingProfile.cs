@@ -41,6 +41,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             .ForMember(dest => dest.ManagerBy,
                 opt => opt.MapFrom(src => src.ManagerU != null
                     ? new ByUser { Id = src.ManagerU.Id, Name = src.ManagerU.FullName }
+                    : null))
+            .ForMember(dest => dest.Department,
+                    opt => opt.MapFrom(src => src.Department != null
+                    ? new DepartmentShortenDto { DepartmentId = src.Department.DepartmentId, DepartmentName = src.Department.DepartmentName }
                     : null));
 
             //UserStatus
@@ -60,7 +64,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId))
                 .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null));
             CreateMap<Department, DepartmentDto>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.ParentName, opt => opt.MapFrom(src => src.Parent != null ? src.Parent.DepartmentName : null))
+                .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.Children));
 
             //DepartmentStatus
             CreateMap<DepartmentStatus, StatusDto>().ReverseMap();
@@ -84,7 +90,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null));
 
             CreateMap<Course, CourseDto>()
-                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentDto
+                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentShortenDto
                 {
                     DepartmentId = cd.DepartmentId,
                     DepartmentName = cd.Department.DepartmentName,

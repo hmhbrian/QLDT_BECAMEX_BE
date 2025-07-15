@@ -45,11 +45,15 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                 predicate: c => c.UserId == userId && c.LessonId == request.Request.LessonId);
             
             if(lessonprogress != null) {
-                // Nếu đã có LessonProgress, cập nhật nó
-                var updatedLessonProgress = new LessonProgress();
-                updatedLessonProgress.Update(request.Request, isCompleted);
-                // Cập nhật vào repository
-                _unitOfWork.LessonProgressRepository.Update(lessonprogress, updatedLessonProgress);
+                if (lessonprogress.CurrentPage < request.Request.CurrentPage || lessonprogress.CurrentTimeSeconds < request.Request.CurrentTimeSecond)
+                {
+                    // Nếu đã có LessonProgress, cập nhật nó
+                    var updatedLessonProgress = new LessonProgress();
+                    updatedLessonProgress.UserId = userId;
+                    updatedLessonProgress.Update(request.Request, isCompleted);
+                    // Cập nhật vào repository
+                    _unitOfWork.LessonProgressRepository.Update(lessonprogress, updatedLessonProgress);
+                }
             }
             else
             {

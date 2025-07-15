@@ -50,7 +50,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             try
             {
                 int newPosition;
-                if (request?.PreviousLessonId == 0)
+                if (!request.PreviousLessonId.HasValue || request.PreviousLessonId == 0)
                 {
                     //Nếu không có PreviousLessonId thì đặt vị trí là 1
                     newPosition = 1;

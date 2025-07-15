@@ -94,7 +94,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPut("reorder")]
-        public async Task<IActionResult> UpdatePositionLesson([FromRoute] string courseId, [FromForm] int LessonId, [FromForm] int PreviousLessonId)
+        public async Task<IActionResult> UpdatePositionLesson([FromRoute] string courseId, [FromForm] int LessonId, [FromForm] int? PreviousLessonId)
         {
 
             await _mediator.Send(new UpdatePositionLessonCommand(courseId, LessonId, PreviousLessonId));

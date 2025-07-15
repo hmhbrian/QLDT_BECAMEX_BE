@@ -19,4 +19,10 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Dtos
         public DateTime UpdatedAt { get; set; }
         public List<DepartmentDto>? Children { get; set; }
     }
+
+    public class DepartmentShortenDto
+    {
+        public int DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
+    }
 }

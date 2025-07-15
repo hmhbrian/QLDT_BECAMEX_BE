@@ -21,7 +21,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
         public ByUser? UpdatedBy { get; set; }
         public ByUser? ManagerBy { get; set; }
         public PositionDto? Position { get; set; }
-        public DepartmentDto? Department { get; set; } // Navigation property
+        public DepartmentShortenDto? Department { get; set; } // Navigation property
         public StatusDto? UserStatus { get; set; }
         public DateTime? StartWork { get; set; }
         public DateTime? EndWork { get; set; }

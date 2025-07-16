@@ -75,7 +75,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             modelBuilder.Entity<TestResult>(entity =>
             {
                 // Đặt tên bảng
-                entity.ToTable("test_results");
+                entity.ToTable("TestResults");
 
                 // --- Cấu hình các cột ---
                 entity.HasKey(e => e.Id);
@@ -108,7 +108,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             modelBuilder.Entity<UserAnswer>(entity =>
             {
-                entity.ToTable("user_answers");
+                entity.ToTable("UserAnswers");
 
                 // --- Cấu hình các cột ---
                 entity.HasKey(e => e.Id);
@@ -1113,7 +1113,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             modelBuilder.Entity<AuditLog>(entity =>
             {
-                entity.ToTable("audit_logs");
+                entity.ToTable("AuditLogs");
 
                 entity.HasKey(e => e.Id);
 
@@ -1152,7 +1152,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         {
             var auditEntries = OnBeforeSaveChanges();
             var result = await base.SaveChangesAsync(cancellationToken);
-            if(auditEntries.Any())
+            if (auditEntries.Any())
             {
                 await OnAfterSaveChanges(auditEntries);
             }
@@ -1172,7 +1172,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
                     continue;
 
-                if(userId != null)
+                if (userId != null)
                 {
                     var audit = new AuditEntry(entry)
                     {
@@ -1208,7 +1208,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                     auditEntries.Add(audit);
                 }
-                
+
             }
 
             return auditEntries;

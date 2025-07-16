@@ -53,6 +53,7 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         // Tạo đối tượng "Phiếu kết quả" chính. Đây là bản ghi cha sẽ được lưu vào CSDL.
         var newTestResult = new TestResult
         {
+            Id = Guid.NewGuid().ToString(),
             TestId = request.TestId,
             UserId = currentUserId,
             StartedAt = request.StartedAt // Có thể thay bằng thời gian bắt đầu thực tế nếu được gửi từ client.
@@ -84,13 +85,13 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
             // Tạo bản ghi chi tiết cho từng câu trả lời.
             var userAnswer = new UserAnswer
             {
+                TestResultId = newTestResult.Id,
                 QuestionId = userAnswerDto.QuestionId,
                 SelectedOptions = userSelectionsString,
-                IsCorrect = isCorrect,
-                // Đây là bước quan trọng: Gán quan hệ cha-con.
-                // Entity Framework sẽ tự động nhận biết và thêm các bản ghi `UserAnswer` này khi `TestResult` được thêm vào context.
-                TestResult = newTestResult
+                IsCorrect = isCorrect
             };
+
+            await _unitOfWork.UserAnswerRepository.AddAsync(userAnswer);
         }
 
 

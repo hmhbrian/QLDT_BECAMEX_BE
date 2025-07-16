@@ -334,7 +334,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("audit_logs", (string)null);
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
@@ -1088,12 +1088,9 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TestResult", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsPassed")
                         .HasColumnType("bit")
@@ -1126,7 +1123,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("test_results", (string)null);
+                    b.ToTable("TestResults", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TypeDocument", b =>
@@ -1181,8 +1178,8 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("selected_options");
 
-                    b.Property<int>("TestResultId")
-                        .HasColumnType("int")
+                    b.Property<string>("TestResultId")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnName("test_result_id");
 
                     b.HasKey("Id");
@@ -1191,7 +1188,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("TestResultId");
 
-                    b.ToTable("user_answers", (string)null);
+                    b.ToTable("UserAnswers", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
@@ -1651,8 +1648,7 @@ namespace QLDT_Becamex.Migrations
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.TestResult", "TestResult")
                         .WithMany("UserAnswers")
                         .HasForeignKey("TestResultId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Question");
 

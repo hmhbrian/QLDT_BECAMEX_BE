@@ -4,7 +4,7 @@
 
     public class TestResult
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = null!;
 
         // Khóa ngoại tới bài test đã được làm
         public int TestId { get; set; }

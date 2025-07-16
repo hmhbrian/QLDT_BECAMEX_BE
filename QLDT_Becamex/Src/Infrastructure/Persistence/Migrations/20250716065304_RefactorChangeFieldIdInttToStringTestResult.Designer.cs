@@ -12,8 +12,8 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250716014820_AddFieldIsPrivateToCourse")]
-    partial class AddFieldIsPrivateToCourse
+    [Migration("20250716065304_RefactorChangeFieldIdInttToStringTestResult")]
+    partial class RefactorChangeFieldIdInttToStringTestResult
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -300,6 +300,46 @@ namespace QLDT_Becamex.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("action");
+
+                    b.Property<string>("Changes")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("changes");
+
+                    b.Property<string>("EntityId")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("entity_name");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("time_stamp");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuditLogs", (string)null);
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
                 {
                     b.Property<string>("Id")
@@ -578,6 +618,11 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Key")
+                        .HasMaxLength(255)
+                        .HasColumnType("int")
+                        .HasColumnName("key");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1044,6 +1089,46 @@ namespace QLDT_Becamex.Migrations
                     b.ToTable("Tests", (string)null);
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TestResult", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsPassed")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_passed");
+
+                    b.Property<float>("Score")
+                        .HasColumnType("real")
+                        .HasColumnName("score");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("started_at");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("submitted_at");
+
+                    b.Property<int>("TestId")
+                        .HasColumnType("int")
+                        .HasColumnName("test_id");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TestId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TestResults", (string)null);
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TypeDocument", b =>
                 {
                     b.Property<int>("Id")
@@ -1068,6 +1153,41 @@ namespace QLDT_Becamex.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TypeDocument", (string)null);
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_correct");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int")
+                        .HasColumnName("question_id");
+
+                    b.Property<string>("SelectedOptions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("selected_options");
+
+                    b.Property<string>("TestResultId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("test_result_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("TestResultId");
+
+                    b.ToTable("UserAnswers", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
@@ -1232,6 +1352,16 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("UpdateBy");
 
                     b.Navigation("UserStatus");
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.AuditLog", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
@@ -1487,6 +1617,43 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TestResult", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Test", "Test")
+                        .WithMany()
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Test");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserAnswer", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.TestResult", "TestResult")
+                        .WithMany("UserAnswers")
+                        .HasForeignKey("TestResultId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Question");
+
+                    b.Navigation("TestResult");
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
@@ -1569,6 +1736,11 @@ namespace QLDT_Becamex.Migrations
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Test", b =>
                 {
                     b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TestResult", b =>
+                {
+                    b.Navigation("UserAnswers");
                 });
 #pragma warning restore 612, 618
         }

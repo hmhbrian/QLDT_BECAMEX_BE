@@ -6,7 +6,7 @@
         public int Id { get; set; }
 
         // Khóa ngoại tới phiếu kết quả tổng quan
-        public int TestResultId { get; set; }
+        public string? TestResultId { get; set; }
         public TestResult? TestResult { get; set; }
 
         // Khóa ngoại tới câu hỏi đã được trả lời
@@ -14,9 +14,9 @@
         public Question? Question { get; set; }
 
         // Đáp án mà người dùng đã chọn (ví dụ: "A", "B", "C", hoặc "D")
-        public string SelectedOptions { get; set; }
+        public string? SelectedOptions { get; set; }
 
         // Lưu lại đáp án này là đúng hay sai để tiện truy vấn sau này
-        public bool IsCorrect { get; set; }
+        public bool IsCorrect { get; set; } = false;
     }
 }

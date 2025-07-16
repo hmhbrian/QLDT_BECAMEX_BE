@@ -225,7 +225,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             modelBuilder.Entity<DepartmentStatus>(entity =>
             {
                 entity.ToTable("DepartmentStatus"); // 👉 Đặt tên bảng ở đây
-                                              // Định nghĩa khóa chính
+                                                    // Định nghĩa khóa chính
                 entity.HasKey(p => p.Id);
                 entity.Property(p => p.Id)
                       .HasColumnName("id")
@@ -353,6 +353,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.Property(p => p.IsDeleted)
                       .HasColumnName("is_deleted")
+                      .HasDefaultValue(false);
+
+                entity.Property(p => p.IsPrivate)
+                      .HasColumnName("is_private")
                       .HasDefaultValue(false);
 
                 entity.Property(p => p.CreateById)

@@ -29,6 +29,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public int? LecturerId { get; set; }
         public Lecturer? Lecturer { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public bool IsPrivate { get; set; } = false;
         public string? CreateById { get; set; }
         public ApplicationUser? CreateBy { get; set; }
         public string? UpdateById { get; set; }

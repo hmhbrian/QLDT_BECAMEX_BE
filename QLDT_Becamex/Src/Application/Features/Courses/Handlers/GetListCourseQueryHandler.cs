@@ -7,6 +7,8 @@ using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services;
+using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -14,18 +16,39 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public GetCoursesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IUserService _userService;
+        public GetCoursesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userService = userService;
         }
 
         public async Task<PagedResult<CourseDto>> Handle(GetListCourseQuery request, CancellationToken cancellationToken)
         {
             var queryParam = request.QueryParam;
+            var (currentUserId, role) = _userService.GetCurrentUserAuthenticationInfo();
 
-            int totalItems = await _unitOfWork.CourseRepository.CountAsync(c => c.IsDeleted == false);
+            // Define the base predicate for all roles
+            Expression<Func<Course, bool>> basePredicate = c => true;
+
+            // Adjust the predicate based on the user's role
+            if (role == "ADMIN" || role == "HR")
+            {
+                basePredicate = c => c.IsDeleted == false;
+            }
+            else if (role == "USER")
+            {
+                // USER can only see courses that are not deleted and not private
+                basePredicate = c => c.IsDeleted == false && c.IsPrivate == false;
+            }
+            else
+            {
+                // Default for unknown roles or no role: same as USER (or stricter if needed)
+                basePredicate = c => c.IsDeleted == false && c.IsPrivate == false;
+            }
+
+            int totalItems = await _unitOfWork.CourseRepository.CountAsync(basePredicate);
 
             Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderBy = query =>
             {
@@ -40,7 +63,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             };
 
             var courseEntities = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                predicate: c => c.IsDeleted == false,
+                predicate: basePredicate, // Use the adjusted predicate here
                 orderBy: orderBy,
                 page: queryParam.Page,
                 pageSize: queryParam.Limit,
@@ -75,7 +98,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             // 4. Trả về
             return pagedResult;
-
         }
     }
 }

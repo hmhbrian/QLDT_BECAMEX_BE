@@ -1,14 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Shared.Helpers;
+using System.Security.Claims;
 
 namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có thể đặt nó trong thư mục Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
         : base(options)
         {
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // Định nghĩa các DbSet cho các Model của bạn
@@ -32,13 +37,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
-
-
-
-
-
+        public DbSet<AuditLog> AuditLogs { get; set; }
         // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
@@ -67,7 +67,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureDepartmentStatus(modelBuilder);
             ConfigureTestResult(modelBuilder);
             ConfigureUserAnswer(modelBuilder);
-        }
+            ConfigureAuditLog(modelBuilder);
 
         private void ConfigureTestResult(ModelBuilder modelBuilder)
         {
@@ -131,8 +131,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasForeignKey(ua => ua.TestResultId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
-        }
-
         private void ConfigureApplicationUser(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ApplicationUser>(entity =>
@@ -1105,6 +1103,141 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasConstraintName("fk_student_lesson_progress_lesson")
                       .OnDelete(DeleteBehavior.Cascade);
             });
+        }
+
+        private void ConfigureAuditLog(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AuditLog>(entity =>
+            {
+                entity.ToTable("audit_logs");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .IsRequired()
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id");
+
+                entity.Property(e => e.EntityName)
+                      .HasColumnName("entity_name");
+
+                entity.Property(e => e.EntityId)
+                      .HasColumnName("entity_id");
+
+                entity.Property(e => e.Action)
+                      .HasColumnName("action");
+
+                entity.Property(e => e.Changes)
+                      .HasColumnName("changes");
+
+                entity.Property(e => e.Timestamp)
+                      .HasColumnName("time_stamp");
+
+                entity.Property(e => e.UserId)
+                      .HasColumnName("user_id");
+
+                entity.HasOne(u => u.User)
+                     .WithMany()
+                     .HasForeignKey(u => u.UserId)
+                     .IsRequired(false)
+                     .OnDelete(DeleteBehavior.NoAction);
+            });
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var auditEntries = OnBeforeSaveChanges();
+            var result = await base.SaveChangesAsync(cancellationToken);
+            if(auditEntries.Any())
+            {
+                await OnAfterSaveChanges(auditEntries);
+            }
+            return result;
+        }
+
+        private List<AuditEntry> OnBeforeSaveChanges()
+        {
+            ChangeTracker.DetectChanges();
+            var auditEntries = new List<AuditEntry>();
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
+            Console.WriteLine($"Current User ID: {userId}");
+
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                    continue;
+
+                if(userId != null)
+                {
+                    var audit = new AuditEntry(entry)
+                    {
+                        TableName = entry.Metadata.GetTableName() ?? "Unknown",
+                        Action = entry.State.ToString(),
+                        UserId = userId
+                    };
+
+                    foreach (var prop in entry.Properties)
+                    {
+                        var propName = prop.Metadata.Name;
+
+                        if (prop.Metadata.IsPrimaryKey() && prop.IsTemporary)
+                        {
+                            audit.TemporaryProperties.Add(prop);  // lưu lại prop cần lấy sau
+                        }
+
+                        if (entry.State == EntityState.Added)
+                        {
+                            audit.NewValues[propName] = prop.CurrentValue ?? "Unknown";
+                        }
+                        else if (entry.State == EntityState.Deleted)
+                        {
+                            audit.OldValues[propName] = prop.OriginalValue ?? "Unknown";
+                        }
+                        else if (entry.State == EntityState.Modified && prop.IsModified)
+                        {
+                            audit.OldValues[propName] = prop.OriginalValue ?? "Unknown";
+                            audit.NewValues[propName] = prop.CurrentValue ?? "Unknown";
+                        }
+                        Console.WriteLine($"{prop.Metadata.Name}: IsModified = {prop.IsModified}");
+                    }
+
+                    auditEntries.Add(audit);
+                }
+                
+            }
+
+            return auditEntries;
+        }
+
+        private async Task OnAfterSaveChanges(List<AuditEntry> auditEntries)
+        {
+            foreach (var audit in auditEntries)
+            {
+                foreach (var prop in audit.TemporaryProperties)
+                {
+                    if (prop.Metadata.IsPrimaryKey())
+                    {
+                        audit.NewValues[prop.Metadata.Name] = prop.CurrentValue!;
+                    }
+                }
+                AuditLogs.Add(new AuditLog
+                {
+                    EntityName = audit.TableName,
+                    Action = audit.Action,
+                    EntityId = audit.GetPrimaryKeyAsString(),
+                    UserId = audit.UserId,
+                    Changes = audit.ToJsonChanges(),
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+
+            await SaveChangesWithoutAuditAsync();
+        }
+
+        private async Task SaveChangesWithoutAuditAsync(CancellationToken cancellationToken = default)
+        {
+            await base.SaveChangesAsync(cancellationToken);
         }
     }
 }

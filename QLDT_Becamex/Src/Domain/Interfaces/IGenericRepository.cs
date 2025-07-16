@@ -23,7 +23,8 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
         public Task AddRangeAsync(IEnumerable<T> entities);
 
         // Cập nhật một thực thể
-        public void Update(T entity); // Update thường không cần async vì EF Core theo dõi trạng thái
+        public void UpdateEntity(T entity); // Update thường không cần async vì EF Core theo dõi trạng thái
+        public void Update(T entity, T updatedEntity);// Cập nhật thực thể với thực thể mới
 
         // Xóa một thực thể
         public void Remove(T entity);

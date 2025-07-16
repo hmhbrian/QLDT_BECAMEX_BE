@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Questions.Commands;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 
 
@@ -49,9 +50,8 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
             int position = 1;
             foreach (var q in remainingQuestions.OrderBy(q => q.Position))
             {
-                q.Position = position++;
-                q.UpdatedAt = DateTime.UtcNow;
-                _unitOfWork.QuestionRepository.Update(q);
+                q.UpdatePosition(position); // Cập nhật lại vị trí của các câu hỏi còn lại
+                position++;
             }
 
             await _unitOfWork.CompleteAsync();

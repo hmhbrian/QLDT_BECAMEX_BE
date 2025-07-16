@@ -90,12 +90,15 @@ namespace QLDT_Becamex.Src.Application.Features.Lecturer.Handlers
                 if (PhoneExisting != null)
                     throw new AppException("Số điện thoại giảng viên đã tồn tại", 409);
             }
-
-            entity.FullName = request.Request.FullName;
-            entity.Email = request.Request.Email;
-            entity.PhoneNumber = request.Request.PhoneNumber;
-            entity.ProfileImageUrl = request.Request.ProfileImageUrl;
-            _unitOfWork.LecturerRepository.Update(entity);
+            var updateLecturer = new Domain.Entities.Lecturer
+            {
+                Id = request.id,
+                FullName = request.Request.FullName?.Trim()!,
+                Email = request.Request.Email?.Trim(),
+                PhoneNumber = request.Request.PhoneNumber?.Trim(),
+                ProfileImageUrl = request.Request.ProfileImageUrl?.Trim()
+            };
+            _unitOfWork.LecturerRepository.Update(entity, updateLecturer);
             await _unitOfWork.CompleteAsync();
             return Unit.Value;
         }

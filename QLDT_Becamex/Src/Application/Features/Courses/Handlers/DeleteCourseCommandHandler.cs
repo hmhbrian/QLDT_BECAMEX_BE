@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
@@ -26,7 +27,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             course.IsDeleted = true;
             course.ModifiedAt = DateTime.Now;
 
-            _unitOfWork.CourseRepository.Update(course);
             await _unitOfWork.CompleteAsync();
 
             return course.Id;

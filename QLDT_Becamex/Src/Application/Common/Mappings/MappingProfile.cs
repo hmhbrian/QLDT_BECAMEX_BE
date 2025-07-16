@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
+using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Feedbacks.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
@@ -41,6 +42,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             .ForMember(dest => dest.ManagerBy,
                 opt => opt.MapFrom(src => src.ManagerU != null
                     ? new ByUser { Id = src.ManagerU.Id, Name = src.ManagerU.FullName }
+                    : null))
+            .ForMember(dest => dest.Department,
+                    opt => opt.MapFrom(src => src.Department != null
+                    ? new DepartmentShortenDto { DepartmentId = src.Department.DepartmentId, DepartmentName = src.Department.DepartmentName }
                     : null));
 
             //UserStatus
@@ -60,7 +65,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId == 0 ? null : src.ParentId))
                 .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null));
             CreateMap<Department, DepartmentDto>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.ParentName, opt => opt.MapFrom(src => src.Parent != null ? src.Parent.DepartmentName : null))
+                .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.Children));
 
             //DepartmentStatus
             CreateMap<DepartmentStatus, StatusDto>().ReverseMap();
@@ -84,7 +91,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null));
 
             CreateMap<Course, CourseDto>()
-                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentDto
+                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentShortenDto
                 {
                     DepartmentId = cd.DepartmentId,
                     DepartmentName = cd.Department.DepartmentName,
@@ -142,6 +149,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Test, DetailTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold * 100.0))
                     .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()))
                       .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
@@ -156,11 +164,13 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedById, opt => opt.Ignore())
+                .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => Math.Round((src.PassThreshold / 100.0), 1)))
                 .AfterMap(ignoreNavigation);
 
             CreateMap<Test, AllTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                     .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0))
+                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold*100.0))
                     .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
                     ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }

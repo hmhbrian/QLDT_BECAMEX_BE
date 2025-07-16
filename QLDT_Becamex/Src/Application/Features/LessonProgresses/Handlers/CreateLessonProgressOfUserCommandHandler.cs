@@ -33,7 +33,7 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
 
                 if (currentPage > 0 && currentPage == existingLesson.TotalPages)
                     isCompleted = true; // Nếu CurrentPage bằng tổng số trang thì đánh dấu là hoàn thành
-                else if (currentTime > 0 && currentTime >= existingLesson.TotalDurationSeconds)
+                else if (currentTime > 0 && Math.Abs((existingLesson.TotalDurationSeconds ?? 0) - (currentTime ?? 0)) < 3)
                     isCompleted = true; // Nếu CurrentTimeSecond lớn hơn hoặc bằng tổng thời gian thì đánh dấu là hoàn thành
             }
             else
@@ -45,10 +45,15 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                 predicate: c => c.UserId == userId && c.LessonId == request.Request.LessonId);
             
             if(lessonprogress != null) {
-                // Nếu đã có LessonProgress, cập nhật nó
-                lessonprogress.Update(request.Request, isCompleted);
-                // Cập nhật vào repository
-                _unitOfWork.LessonProgressRepository.Update(lessonprogress);
+                if (lessonprogress.CurrentPage < request.Request.CurrentPage || lessonprogress.CurrentTimeSeconds < request.Request.CurrentTimeSecond)
+                {
+                    // Nếu đã có LessonProgress, cập nhật nó
+                    var updatedLessonProgress = new LessonProgress();
+                    updatedLessonProgress.UserId = userId;
+                    updatedLessonProgress.Update(request.Request, isCompleted);
+                    // Cập nhật vào repository
+                    _unitOfWork.LessonProgressRepository.Update(lessonprogress, updatedLessonProgress);
+                }
             }
             else
             {

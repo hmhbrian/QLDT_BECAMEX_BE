@@ -56,8 +56,13 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
             if (conflict != null)
                 throw new AppException("Tên trạng thái đã tồn tại", 409);
 
-            entity.Name = request.Request.Name;
-            _unitOfWork.UserStatusRepository.Update(entity);
+            var updateUserStatus = new UserStatus
+            {
+                Id = request.Id,
+                Name = request.Request.Name?.Trim()!
+            };
+            //entity.Name = request.Request.Name;
+            _unitOfWork.UserStatusRepository.Update(entity, updateUserStatus);
             await _unitOfWork.CompleteAsync();
             return Unit.Value;
         }

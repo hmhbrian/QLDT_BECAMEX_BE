@@ -32,10 +32,8 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
             }
 
             // Cập nhật câu hỏi từ DTO
-            existingQuestion.Update(request.Request);  // Gọi phương thức Update trên entity
-
-            // Lưu thay đổi vào cơ sở dữ liệu
-            _unitOfWork.QuestionRepository.Update(existingQuestion);
+            //existingQuestion.Update(request.Request);  // Gọi phương thức Update trên entity
+            existingQuestion.Update(request.Request);  // Cập nhật các trường từ DTO vào entity
             await _unitOfWork.CompleteAsync();
 
             // Trả về thông báo thành công

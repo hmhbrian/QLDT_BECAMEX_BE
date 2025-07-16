@@ -52,8 +52,14 @@ namespace QLDT_Becamex.Src.Domain.Entities
             if (!string.IsNullOrEmpty(request.C)) C = request.C;
             if (!string.IsNullOrEmpty(request.D)) D = request.D;
             // Cập nhật thời gian sửa đổi
-            UpdatedAt = DateTime.Now;
+            UpdatedAt = DateTime.UtcNow;
         }
 
+        public void UpdatePosition(int position)
+        {
+            Position = position;
+            UpdatedAt = DateTime.UtcNow; // Cập nhật thời gian sửa đổi
+
+        }
     }
 }

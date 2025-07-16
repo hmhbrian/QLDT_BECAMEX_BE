@@ -50,13 +50,8 @@ namespace QLDT_Becamex.Src.Application.Features.Questions.Handlers
             int position = 1;
             foreach (var q in remainingQuestions.OrderBy(q => q.Position))
             {
-                var updateQuestion = new Question
-                {
-                    Position = position++,
-                    UpdatedAt = DateTime.UtcNow
-                };
-
-                _unitOfWork.QuestionRepository.Update(q, updateQuestion);
+                q.UpdatePosition(position); // Cập nhật lại vị trí của các câu hỏi còn lại
+                position++;
             }
 
             await _unitOfWork.CompleteAsync();

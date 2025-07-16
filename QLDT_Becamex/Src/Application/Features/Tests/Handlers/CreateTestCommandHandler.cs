@@ -46,15 +46,9 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 throw new AppException("User tạo bài không tồn tại", 404);
             }
             // Map TestCreateDto to Test
-            var test = _mapper.Map<Test>(request);
+            var test = new Test();
+            test.Create(courseId, userId!, request, maxPosition + 1);
 
-            // Set navigation properties
-            test.CourseId = courseId;
-            test.CreatedById = userId;
-            test.UpdatedById = userId;
-            test.CreatedAt = DateTime.UtcNow;
-            test.UpdatedAt = DateTime.UtcNow;
-            test.Position = maxPosition + 1;
             // Set test_id for each Question in Tests
             if (test.Questions != null)
             {

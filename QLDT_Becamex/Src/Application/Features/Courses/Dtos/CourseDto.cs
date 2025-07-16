@@ -30,6 +30,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public DateTime? RegistrationStartDate { get; set; }
         public DateTime? RegistrationClosingDate { get; set; }
         public string? Location { get; set; }
+        public bool? IsPrivate { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public StatusDto? Status { get; set; }

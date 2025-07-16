@@ -361,6 +361,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasColumnName("is_deleted")
                       .HasDefaultValue(false);
 
+                entity.Property(p => p.IsPrivate)
+                      .HasColumnName("is_private")
+                      .HasDefaultValue(false);
+
                 entity.Property(p => p.CreateById)
                     .HasColumnName("created_by_id")
                     .HasMaxLength(450);

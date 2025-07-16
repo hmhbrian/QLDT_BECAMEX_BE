@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716014820_AddFieldIsPrivateToCourse")]
+    partial class AddFieldIsPrivateToCourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,46 +298,6 @@ namespace QLDT_Becamex.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.AuditLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Action")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("action");
-
-                    b.Property<string>("Changes")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("changes");
-
-                    b.Property<string>("EntityId")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("entity_id");
-
-                    b.Property<string>("EntityName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("entity_name");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("time_stamp");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("audit_logs", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
@@ -1269,16 +1232,6 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("UpdateBy");
 
                     b.Navigation("UserStatus");
-                });
-
-            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.AuditLog", b =>
-                {
-                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>

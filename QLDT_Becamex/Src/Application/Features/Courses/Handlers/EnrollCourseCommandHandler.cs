@@ -34,11 +34,11 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
 
             // 2. Check if the course exists
-            var course = await _unitOfWork.CourseRepository.GetByIdAsync(request.CourseId);
+            var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(c => c.Id == request.CourseId && c.IsPrivate == false && c.IsDeleted == false);
 
             if (course == null)
             {
-                throw new AppException("Khóa học không tồn tại.", 404);
+                throw new AppException("Khóa học không tồn tại hoặc không được phép.", 404);
             }
 
             // 3. Check if the user is already enrolled in this course

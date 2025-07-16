@@ -28,6 +28,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? StatusId { get; set; }
         public int? CategoryId { get; set; }
         public int? LecturerId { get; set; }
+        public bool? IsPrivate { get; set; }
         public List<int>? DepartmentIds { get; set; }
         public List<int>? PositionIds { get; set; }
         public List<string>? StudentIds { get; set; }

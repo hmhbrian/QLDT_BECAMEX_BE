@@ -35,12 +35,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<LessonProgress> LessonProgresses { get; set; }
         public DbSet<TypeDocument> TypeDocuments { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
-
-
-
         // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
@@ -67,9 +65,72 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             ConfigureLessonProgress(modelBuilder);
             ConfigureFeedback(modelBuilder);
             ConfigureDepartmentStatus(modelBuilder);
+            ConfigureTestResult(modelBuilder);
+            ConfigureUserAnswer(modelBuilder);
             ConfigureAuditLog(modelBuilder);
+
+        private void ConfigureTestResult(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TestResult>(entity =>
+            {
+                // Đặt tên bảng
+                entity.ToTable("test_results");
+
+                // --- Cấu hình các cột ---
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id"); // Khóa chính
+
+                // Map các thuộc tính trong class C# sang tên cột snake_case
+                entity.Property(e => e.Score).HasColumnName("score").IsRequired();
+                entity.Property(e => e.IsPassed).HasColumnName("is_passed");
+                entity.Property(e => e.StartedAt).HasColumnName("started_at");
+                entity.Property(e => e.SubmittedAt).HasColumnName("submitted_at");
+
+                // Khóa ngoại cũng cần được map
+                entity.Property(e => e.TestId).HasColumnName("test_id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+
+                // --- Cấu hình các quan hệ ---
+                entity.HasOne(tr => tr.Test)
+                      .WithMany()
+                      .HasForeignKey(tr => tr.TestId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(tr => tr.User)
+                      .WithMany()
+                      .HasForeignKey(tr => tr.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
         }
 
+        private void ConfigureUserAnswer(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserAnswer>(entity =>
+            {
+                entity.ToTable("user_answers");
+
+                // --- Cấu hình các cột ---
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.SelectedOptions).HasColumnName("selected_options").IsRequired();
+                entity.Property(e => e.IsCorrect).HasColumnName("is_correct");
+
+                // Khóa ngoại
+                entity.Property(e => e.TestResultId).HasColumnName("test_result_id");
+                entity.Property(e => e.QuestionId).HasColumnName("question_id");
+
+                // --- Cấu hình quan hệ ---
+                entity.HasOne(ua => ua.Question)
+                      .WithMany()
+                      .HasForeignKey(ua => ua.QuestionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ua => ua.TestResult)                // <‑‑ thiếu cái này
+                      .WithMany(tr => tr.UserAnswers)
+                      .HasForeignKey(ua => ua.TestResultId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
         private void ConfigureApplicationUser(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ApplicationUser>(entity =>
@@ -450,10 +511,18 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasColumnName("id")
                       .IsRequired().ValueGeneratedOnAdd();
 
+                entity.Property(s => s.Key)
+                      .HasColumnName("key")
+                      .IsRequired()
+                      .HasMaxLength(255);
+
                 entity.Property(s => s.Name)
                       .HasColumnName("name")
                       .IsRequired()
                       .HasMaxLength(255);
+
+
+
 
                 entity.HasMany(s => s.Courses)
                       .WithOne(c => c.Status)

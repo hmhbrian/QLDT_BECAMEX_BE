@@ -6,6 +6,7 @@ using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
+using System.Security.Claims;
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {
@@ -73,6 +74,24 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             await _mediator.Send(new UpdatePositionTestCommand(courseId, TestId, PreviousTestId));
             return Ok(ApiResponse.Ok("Position updated successfully."));
+        }
+
+        // Trong API Controller
+        [HttpPost("submit/{testId}")]
+        public async Task<IActionResult> SubmitTest([FromBody] List<UserAnswerDto> submittedAnswers, [FromRoute] string courseId, [FromRoute] int testId, [FromQuery] DateTime StartedAt)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            // Cách khởi tạo vẫn y hệt
+            var command = new SaveTestResultCommand(testId, courseId, StartedAt, submittedAnswers);
+
+            var result = await _mediator.Send(command);
+
+            return Ok(ApiResponse.Ok(result));
         }
     }
 }

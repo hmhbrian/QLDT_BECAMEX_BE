@@ -17,7 +17,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CourseServices
 
             if (currentDate < course.RegistrationStartDate)
                 course.StatusId = 1; //Lưu nháp
-            else if(currentDate >= course.RegistrationStartDate && currentDate <= course.RegistrationClosingDate)
+            else if (currentDate >= course.RegistrationStartDate && currentDate <= course.RegistrationClosingDate)
                 course.StatusId = 2; //Sắp khai giảng
             else if (currentDate > course.RegistrationClosingDate && currentDate <= course.EndDate)
                 course.StatusId = 3; //Đang mở

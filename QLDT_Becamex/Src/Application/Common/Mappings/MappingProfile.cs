@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Identity;
-using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
+using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.Feedbacks.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
@@ -148,6 +149,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Test, DetailTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold * 100.0))
                     .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()))
                       .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
@@ -162,11 +164,13 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedById, opt => opt.Ignore())
+                .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => Math.Round((src.PassThreshold / 100.0), 1)))
                 .AfterMap(ignoreNavigation);
 
             CreateMap<Test, AllTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                     .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0))
+                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold*100.0))
                     .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
                     ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }

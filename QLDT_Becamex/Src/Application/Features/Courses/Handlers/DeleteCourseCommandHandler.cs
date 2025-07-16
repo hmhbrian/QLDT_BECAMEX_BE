@@ -24,14 +24,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (course.RegistrationStartDate.HasValue && DateTime.Now > course.RegistrationStartDate.Value)
                 throw new AppException("Ngày xóa phải trước ngày bắt đầu đăng ký", 400);
 
-            var deleteCourse = new Course
-            {
-                Id = course.Id,
-                IsDeleted = true,
-                ModifiedAt = DateTime.Now
-            };
+            course.IsDeleted = true;
+            course.ModifiedAt = DateTime.Now;
 
-            _unitOfWork.CourseRepository.Update(course, deleteCourse);
             await _unitOfWork.CompleteAsync();
 
             return course.Id;

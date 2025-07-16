@@ -4,6 +4,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
+using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
 // Thêm các namespace cần thiết khác như repository, service, etc.
@@ -24,7 +25,9 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Commands
         public async Task<string> Handle(DeleteCourseAttachedFileCommand request, CancellationToken cancellationToken)
         {
             var attachedFile = await _unitOfWork.CourseAttachedFileRepository
-                                                .GetByIdAsync(request.CourseAttachedFileId);
+                                                .GetFirstOrDefaultAsync(
+                                                    predicate: a => a.Id == request.CourseAttachedFileId,
+                                                    includes: a => a.Include(i => i.TypeDoc));
 
             if (attachedFile == null || attachedFile.CourseId != request.CourseId)
             {
@@ -39,7 +42,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Commands
             }
 
             // Nếu đây là một file được tải lên (không phải link) và có URL
-            if (attachedFile.TypeDoc.NameType != "Link" && !string.IsNullOrEmpty(attachedFile.Link))
+            if (attachedFile.TypeDoc?.Key == 0 && !string.IsNullOrEmpty(attachedFile.Link))
             {
                 
                 if (!string.IsNullOrEmpty(attachedFile.PublicIdUrlPdf))

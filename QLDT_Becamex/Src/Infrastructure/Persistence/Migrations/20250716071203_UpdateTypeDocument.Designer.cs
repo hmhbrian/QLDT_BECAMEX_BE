@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716071203_UpdateTypeDocument")]
+    partial class UpdateTypeDocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -334,7 +337,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.ToTable("audit_logs", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Course", b =>
@@ -1088,9 +1091,12 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TestResult", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsPassed")
                         .HasColumnType("bit")
@@ -1123,7 +1129,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TestResults", (string)null);
+                    b.ToTable("test_results", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TypeDocument", b =>
@@ -1178,8 +1184,8 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("selected_options");
 
-                    b.Property<string>("TestResultId")
-                        .HasColumnType("nvarchar(450)")
+                    b.Property<int>("TestResultId")
+                        .HasColumnType("int")
                         .HasColumnName("test_result_id");
 
                     b.HasKey("Id");
@@ -1188,7 +1194,7 @@ namespace QLDT_Becamex.Migrations
 
                     b.HasIndex("TestResultId");
 
-                    b.ToTable("UserAnswers", (string)null);
+                    b.ToTable("user_answers", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserCourse", b =>
@@ -1648,7 +1654,8 @@ namespace QLDT_Becamex.Migrations
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.TestResult", "TestResult")
                         .WithMany("UserAnswers")
                         .HasForeignKey("TestResultId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Question");
 

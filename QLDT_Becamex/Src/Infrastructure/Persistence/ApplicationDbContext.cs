@@ -123,16 +123,17 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                         // --- Cấu hình quan hệ ---
                         entity.HasOne(ua => ua.Question)
-                  .WithMany()
-                  .HasForeignKey(ua => ua.QuestionId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                          .WithMany()
+                          .HasForeignKey(ua => ua.QuestionId)
+                          .OnDelete(DeleteBehavior.Restrict);
 
                         entity.HasOne(ua => ua.TestResult)                // <‑‑ thiếu cái này
-                        .WithMany(tr => tr.UserAnswers)
-                        .HasForeignKey(ua => ua.TestResultId)
-                        .OnDelete(DeleteBehavior.Cascade);
+                          .WithMany(tr => tr.UserAnswers)
+                          .HasForeignKey(ua => ua.TestResultId)
+                          .OnDelete(DeleteBehavior.Cascade);
                   });
             }
+
         private void ConfigureApplicationUser(ModelBuilder modelBuilder)
             {
                   modelBuilder.Entity<ApplicationUser>(entity =>
@@ -500,7 +501,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             });
         }
 
-
         private void ConfigureCourseStatus(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CourseStatus>(entity =>
@@ -593,7 +593,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .OnDelete(DeleteBehavior.Restrict);
             });
         }
-
 
         private void ConfigureCourseDepartment(ModelBuilder modelBuilder)
         {
@@ -699,7 +698,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             });
         }
 
-
         private void ConfigureCourseCategory(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CourseCategory>(entity =>
@@ -771,6 +769,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .IsRequired()
                       .ValueGeneratedOnAdd()
                       .HasColumnName("id");
+
+                entity.Property(e => e.Key)
+                      .IsRequired()
+                      .HasColumnName("key");
 
                 entity.Property(e => e.NameType)
                       .IsRequired()

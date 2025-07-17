@@ -40,6 +40,7 @@ namespace QLDT_Becamex.Src.Application.Features.TypeDocument.Handlers
             var TypeDocument = _mapper.Map<Domain.Entities.TypeDocument>(request.Request);
 
             TypeDocument.NameType = request.Request.NameType?.Trim()!;
+            TypeDocument.Key = request.Request.Key;
 
             await _unitOfWork.TypeDocumentRepository.AddAsync(TypeDocument);
             await _unitOfWork.CompleteAsync();
@@ -68,7 +69,8 @@ namespace QLDT_Becamex.Src.Application.Features.TypeDocument.Handlers
             var updateTypeDocument = new Domain.Entities.TypeDocument
             {
                 Id = request.id,
-                NameType = request.Request.NameType?.Trim()!
+                NameType = request.Request.NameType?.Trim()!,
+                Key = request.Request.Key
             };
             //entity.NameType = request.Request.NameType?.Trim()!;
             _unitOfWork.TypeDocumentRepository.Update(entity, updateTypeDocument);

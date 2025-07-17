@@ -12,20 +12,20 @@ using Xunit.Sdk;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
-    public class GetTestResultQueryHandler : IRequestHandler<GetTestResultQuery, TestResultDto>
+    public class GetDetailTestResultQueryHandler : IRequestHandler<GetDetailTestResultQuery, DetailTestResultDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
 
-        public GetTestResultQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
+        public GetDetailTestResultQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userService = userService;
         }
 
-        public async Task<TestResultDto> Handle(GetTestResultQuery request, CancellationToken cancellationToken)
+        public async Task<DetailTestResultDto> Handle(GetDetailTestResultQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -62,14 +62,41 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 {
                     throw new AppException("Bạn chưa làm bài kiểm tra này", 404);
                 }
-                var testResultDto = new TestResultDto
+                var userAnswers = await _unitOfWork.UserAnswerRepository.GetFlexibleAsync(
+                    predicate: ua => ua.TestResultId == testResultEntity.Id,
+                    orderBy: null,
+                    page: null,
+                    pageSize: null,
+                    asNoTracking: true,
+                    includes: ua => ua.Include(ua => ua.Question)
+                );
+                var userAnswerAndCorrectAnswerDtos = new List<UserAnswerAndCorrectAnswerDto >();
+                foreach (var answer in userAnswers)
+                {
+                    var question = testEntity.Questions != null
+                        ? testEntity.Questions.FirstOrDefault(q => q.Id == answer.QuestionId)
+                        : null;
+                    if (question == null)
+                    {
+                        continue;
+                    }
+                    userAnswerAndCorrectAnswerDtos.Add(new UserAnswerAndCorrectAnswerDto
+                    {
+                        Question = answer.Question,
+                        SelectedOptions = answer.SelectedOptions,
+                        CorrectAnswer = question.CorrectOption,
+                        IsCorrect = answer.IsCorrect
+                    });
+                }
+                var detailTestResultDto = new DetailTestResultDto
                 {
                     Score = testResultEntity.Score,
                     IsPassed = testResultEntity.IsPassed,
                     StartedAt = testResultEntity.StartedAt,
                     SubmittedAt = testResultEntity.SubmittedAt,
+                    UserAnswers = userAnswerAndCorrectAnswerDtos
                 };
-                return testResultDto;
+                return detailTestResultDto;
             }
             catch (Exception ex)
             {

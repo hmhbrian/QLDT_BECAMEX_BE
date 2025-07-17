@@ -101,7 +101,16 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             var result = await _mediator.Send(command);
 
-            return Ok(ApiResponse<List<UserAnswer>>.Ok(result));
+            return Ok(ApiResponse<TestResultDto>.Ok(result));
+        }
+        [HttpGet("detail-test-result/{id}")]
+        public async Task<IActionResult> GetDetailTestResult([FromRoute] string courseId, int id)
+        {
+            var command = new GetDetailTestResultQuery(id, courseId);
+
+            var result = await _mediator.Send(command);
+
+            return Ok(ApiResponse<DetailTestResultDto>.Ok(result));
         }
     }
 }

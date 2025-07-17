@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
+using QLDT_Becamex.Src.Application.Features.AuditLogs.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
@@ -16,6 +17,8 @@ using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.TypeDocument.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
+using System.Globalization;
+using System.Text.Json;
 
 namespace QLDT_Becamex.Src.Application.Common.Mappings
 {
@@ -218,6 +221,16 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
                 .ForMember(dest => dest.SubmissionDate, opt => opt.Ignore())
                 .AfterMap(ignoreNavigation);
+
+            //AuditLog
+            //CreateMap<AuditLog, AuditLogDto>()
+            //    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName ?? "Unknown"))
+            //    .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Timestamp.ToString("dddd, dd MMMM, yyyy, HH:mm", new CultureInfo("vi-VN"))));
+            CreateMap<AuditLog, AuditLogDto>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User!.UserName ?? "Unknown"))
+            .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Timestamp.ToString("dddd, dd MMMM, yyyy, HH:mm", new CultureInfo("vi-VN"))))
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Action, opt => opt.MapFrom(src => src.Action));
         }
     }
 }

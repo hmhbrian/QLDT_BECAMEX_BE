@@ -25,6 +25,7 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
         public IDepartmentStatusRepository DepartmentStatusRepository { get; }
         public ITestResultRepository TestResultRepository { get; }
         public IUserAnswerRepository UserAnswerRepository { get; }
+        public IAuditLogRepository AuditLogRepository { get; }
 
         public Task<int> CompleteAsync();
         Task<DbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

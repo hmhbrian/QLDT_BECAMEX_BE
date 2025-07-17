@@ -129,6 +129,7 @@ builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<IDepartmentStatusRepository, DepartmentStatusRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 // Services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();

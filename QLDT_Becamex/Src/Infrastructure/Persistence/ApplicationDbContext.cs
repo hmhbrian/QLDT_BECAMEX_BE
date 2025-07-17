@@ -523,9 +523,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .IsRequired()
                       .HasMaxLength(255);
 
-
-
-
                 entity.HasMany(s => s.Courses)
                       .WithOne(c => c.Status)
                       .HasForeignKey(c => c.StatusId)

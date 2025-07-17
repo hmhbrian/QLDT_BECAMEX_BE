@@ -100,5 +100,11 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             await _mediator.Send(new UpdatePositionLessonCommand(courseId, LessonId, PreviousLessonId));
             return Ok(ApiResponse.Ok("Position updated successfully."));
         }
+        [HttpGet("count-completed")]
+        public async Task<IActionResult> GetCountCompletedLessonOfCourse([FromRoute] string courseId)
+        {
+            var result = await _mediator.Send(new GetCountCompletedLessonOfCourseQuery(courseId));
+            return Ok(ApiResponse<int>.Ok(result));
+        }
     }
 }

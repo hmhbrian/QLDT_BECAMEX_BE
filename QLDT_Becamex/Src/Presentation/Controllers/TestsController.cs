@@ -6,6 +6,7 @@ using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
+using QLDT_Becamex.Src.Domain.Entities;
 using System.Security.Claims;
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
@@ -92,6 +93,15 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             var result = await _mediator.Send(command);
 
             return Ok(ApiResponse.Ok(result));
+        }
+        [HttpGet("test-result/{id}")]
+        public async Task<IActionResult> GetTestResult([FromRoute] string courseId, int id)
+        {
+            var command = new GetTestResultQuery(id, courseId);
+
+            var result = await _mediator.Send(command);
+
+            return Ok(ApiResponse<List<UserAnswer>>.Ok(result));
         }
     }
 }

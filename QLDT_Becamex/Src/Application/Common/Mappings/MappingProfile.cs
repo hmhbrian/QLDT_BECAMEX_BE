@@ -140,6 +140,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     .ForMember(dest => dest.TestId, opt => opt.Ignore())
                     .ForMember(dest => dest.Test, opt => opt.Ignore());
             CreateMap<Question, QuestionDto>();
+            CreateMap<QuestionNoAnswerDto, Question>()
+                    .ForMember(dest => dest.Id, opt => opt.Ignore())
+                    .ForMember(dest => dest.TestId, opt => opt.Ignore())
+                    .ForMember(dest => dest.Test, opt => opt.Ignore());
+            CreateMap<Question, QuestionNoAnswerDto>();
 
             // Test
             CreateMap<TestCreateDto, Test>()
@@ -158,7 +163,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     .ForMember(dest => dest.UpdatedBy,
                     opt => opt.MapFrom(src => src.UpdatedBy != null
                     ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
-                    : null)); ;
+                    : null));
 
             CreateMap<TestUpdateDto, Test>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -179,12 +184,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     opt => opt.MapFrom(src => src.UpdatedBy != null
                     ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
                     : null));
-
             CreateMap<CreateQuestionDto, Question>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TestId, opt => opt.Ignore())
                 .ForMember(dest => dest.Test, opt => opt.Ignore());
-
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>()
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc != null ? src.TypeDoc.NameType : "Unknown"));

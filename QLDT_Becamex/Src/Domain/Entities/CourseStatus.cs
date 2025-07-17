@@ -10,7 +10,5 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string Name { get; set; } = null!;
         [JsonIgnore]
         public ICollection<Course>? Courses { get; set; } = new List<Course>();
-
-
     }
 }

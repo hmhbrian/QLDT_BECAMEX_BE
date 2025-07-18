@@ -80,7 +80,7 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         // --- B3: HOÀN TẤT VÀ TÍNH ĐIỂM TỔNG KẾT ---
         newTestResult.SubmittedAt = DateTime.UtcNow;
         newTestResult.Score = totalQuestions > 0 ? (float)correctAnswerCount / totalQuestions * 100 : 0;
-        newTestResult.IsPassed = newTestResult.Score >= test.PassThreshold;
+        newTestResult.IsPassed = newTestResult.Score >= test.PassThreshold * 100;
 
         // --- BỔ SUNG: TÍNH TOÁN VÀ GÁN SỐ CÂU ĐÚNG/SAI ---
         newTestResult.CorrectAnswerCount = correctAnswerCount;

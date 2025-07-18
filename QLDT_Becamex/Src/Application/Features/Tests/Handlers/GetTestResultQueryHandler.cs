@@ -9,6 +9,7 @@ using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Domain.Entities;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Xunit.Sdk;
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
@@ -30,6 +31,10 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             try
             {
                 var (userId, __) = _userService.GetCurrentUserAuthenticationInfo();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new AppException("Người dùng không hợp lệ", 400);
+                }
                 var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == request.CourseId);
                 if (!courseExists)
                 {
@@ -62,13 +67,22 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 {
                     throw new AppException("Bạn chưa làm bài kiểm tra này", 404);
                 }
-                var testResultDto = new TestResultDto
+                // var testResultDto = new TestResultDto
+                // {
+                //     Score = testResultEntity.Score,
+                //     IsPassed = testResultEntity.IsPassed,
+                //     StartedAt = testResultEntity.StartedAt,
+                //     CorrectAnswerCount = testResultEntity.CorrectAnswerCount,
+                //     IncorrectAnswerCount = testResultEntity.IncorrectAnswerCount,
+                //     SubmittedAt = testResultEntity.SubmittedAt,
+                // };
+                var testResultDto = _mapper.Map<TestResultDto>(testResultEntity);
+                var userSumaryDto = new UserSumaryDto
                 {
-                    Score = testResultEntity.Score,
-                    IsPassed = testResultEntity.IsPassed,
-                    StartedAt = testResultEntity.StartedAt,
-                    SubmittedAt = testResultEntity.SubmittedAt,
+                    Id = userId,
+                    Name = _unitOfWork.UserRepository.GetByIdAsync(userId).Result?.UserName,
                 };
+                testResultDto.User = userSumaryDto;
                 return testResultDto;
             }
             catch (Exception ex)

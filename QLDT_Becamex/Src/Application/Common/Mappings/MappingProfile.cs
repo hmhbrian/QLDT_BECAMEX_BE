@@ -26,7 +26,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
     {
         public MappingProfile()
         {
-            // Define ignoreNavigation as a no-op action for AfterMap
+            //User
             Action<object, object, ResolutionContext> ignoreNavigation = (src, dest, context) => { };
 
             CreateMap<UserStatus, StatusDto>()
@@ -36,20 +36,23 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<ApplicationUser, UserDto>()
             .ForMember(dest => dest.CreatedBy,
                 opt => opt.MapFrom(src => src.CreateBy != null
-                    ? new ByUser { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
                     : null))
             .ForMember(dest => dest.UpdatedBy,
                 opt => opt.MapFrom(src => src.UpdateBy != null
-                    ? new ByUser { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
+                    ? new UserSumaryDto { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
                     : null))
             .ForMember(dest => dest.ManagerBy,
                 opt => opt.MapFrom(src => src.ManagerU != null
-                    ? new ByUser { Id = src.ManagerU.Id, Name = src.ManagerU.FullName }
+                    ? new UserSumaryDto { Id = src.ManagerU.Id, Name = src.ManagerU.FullName }
                     : null))
             .ForMember(dest => dest.Department,
                     opt => opt.MapFrom(src => src.Department != null
                     ? new DepartmentShortenDto { DepartmentId = src.Department.DepartmentId, DepartmentName = src.Department.DepartmentName }
                     : null));
+
+
+            CreateMap<ApplicationUser, UserSumaryDto>();
 
             //UserStatus
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();
@@ -109,7 +112,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.Students, opt => opt.MapFrom(src =>
                     (src.UserCourses ?? Enumerable.Empty<UserCourse>())
                     .Where(cp => cp.User != null)
-                    .Select(cp => new ByUser
+                    .Select(cp => new UserSumaryDto
                     {
                         Id = cp.UserId,
                         Name = cp.User!.FullName ?? null
@@ -118,11 +121,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
                 .ForMember(dest => dest.CreatedBy,
                 opt => opt.MapFrom(src => src.CreateBy != null
-                    ? new ByUser { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
                     : null))
                 .ForMember(dest => dest.UpdatedBy,
                 opt => opt.MapFrom(src => src.UpdateBy != null
-                    ? new ByUser { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
+                    ? new UserSumaryDto { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
                     : null));
 
             CreateMap<CourseDto, Course>();
@@ -161,11 +164,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()))
                       .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
-                    ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
                     : null))
                     .ForMember(dest => dest.UpdatedBy,
                     opt => opt.MapFrom(src => src.UpdatedBy != null
-                    ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
+                    ? new UserSumaryDto { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
                     : null));
 
             CreateMap<TestUpdateDto, Test>()
@@ -178,19 +181,26 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Test, AllTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                     .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0))
-                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold*100.0))
+                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold * 100.0))
                     .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
-                    ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
                     : null))
                     .ForMember(dest => dest.UpdatedBy,
                     opt => opt.MapFrom(src => src.UpdatedBy != null
-                    ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
+                    ? new UserSumaryDto { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
                     : null));
+
+            CreateMap<TestResult, TestResultDto>();
+            CreateMap<Test, TestSummaryDto>(); // 👈 Map từ entity Test → DTO TestSummaryDto
+
+            //Question
             CreateMap<CreateQuestionDto, Question>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TestId, opt => opt.Ignore())
                 .ForMember(dest => dest.Test, opt => opt.Ignore());
+
+
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>()
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc != null ? src.TypeDoc.NameType : "Unknown"));

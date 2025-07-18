@@ -19,6 +19,8 @@
 
         // Cho biết người dùng đã vượt qua bài test hay chưa
         public bool IsPassed { get; set; } = false;
+        public int CorrectAnswerCount { get; set; }
+        public int IncorrectAnswerCount { get; set; }
 
         // Thời gian bắt đầu và kết thúc làm bài
         public DateTime? StartedAt { get; set; }

@@ -1,35 +1,37 @@
-using QLDT_Becamex.Src.Domain.Entities;
+﻿using QLDT_Becamex.Src.Domain.Entities;
+
+
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
+using Newtonsoft.Json;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
 {
     public class UserAnswerAndCorrectAnswerDto
     {
         public Question? Question { get; set; }
-        // đáp án user chọn
         public string? SelectedOptions { get; set; }
-        // đáp án đúng
         public string? CorrectAnswer { get; set; }
-
-        // Lưu lại đáp án này là đúng hay sai để tiện truy vấn sau này
         public bool IsCorrect { get; set; } = false;
     }
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+
     public class TestResultDto
     {
-        // Khóa ngoại tới bài test đã được làm
-        public Test? Test { get; set; }
-
-        // Điểm số người dùng đạt được
+        public string? Id { get; set; }
+        public TestSummaryDto? Test { get; set; }
         public float? Score { get; set; }
-
-        // Cho biết người dùng đã vượt qua bài test hay chưa
+        public UserSumaryDto? User { get; set; }
         public bool IsPassed { get; set; } = false;
-
-        // Thời gian bắt đầu và kết thúc làm bài
+        public int CorrectAnswerCount { get; set; }
+        public int IncorrectAnswerCount { get; set; }
         public DateTime? StartedAt { get; set; }
         public DateTime? SubmittedAt { get; set; }
     }
+
     public class DetailTestResultDto : TestResultDto
     {
         public ICollection<UserAnswerAndCorrectAnswerDto> UserAnswers { get; set; } = new List<UserAnswerAndCorrectAnswerDto>();
     }
+
+
 }

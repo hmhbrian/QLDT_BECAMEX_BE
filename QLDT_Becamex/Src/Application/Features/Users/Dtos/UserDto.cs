@@ -17,9 +17,9 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
         public string? PhoneNumber { get; set; }
         public bool IsDeleted { get; set; } = false;
         public string? Role { get; set; }
-        public ByUser? CreatedBy { get; set; }
-        public ByUser? UpdatedBy { get; set; }
-        public ByUser? ManagerBy { get; set; }
+        public UserSumaryDto? CreatedBy { get; set; }
+        public UserSumaryDto? UpdatedBy { get; set; }
+        public UserSumaryDto? ManagerBy { get; set; }
         public PositionDto? Position { get; set; }
         public DepartmentShortenDto? Department { get; set; } // Navigation property
         public StatusDto? UserStatus { get; set; }
@@ -30,11 +30,6 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
         public string? AccessToken { get; set; } = null;
     }
 
-    public class ByUser
-    {
-        public string? Id { get; set; }
-        public string? Name { get; set; }
-    }
 
     public class UserStatusDto
     {

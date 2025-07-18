@@ -6,9 +6,7 @@ using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
 using QLDT_Becamex.Src.Infrastructure.Services;
-using QLDT_Becamex.Src.Domain.Entities;
-using Microsoft.Extensions.Configuration.UserSecrets;
-using Xunit.Sdk;
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
@@ -30,6 +28,10 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             try
             {
                 var (userId, __) = _userService.GetCurrentUserAuthenticationInfo();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new AppException("Người dùng không hợp lệ", 400);
+                }
                 var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == request.CourseId);
                 if (!courseExists)
                 {
@@ -88,14 +90,24 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                         IsCorrect = answer.IsCorrect
                     });
                 }
-                var detailTestResultDto = new DetailTestResultDto
+                // var detailTestResultDto = new DetailTestResultDto
+                // {
+                //     Score = testResultEntity.Score,
+                //     IsPassed = testResultEntity.IsPassed,
+                //     StartedAt = testResultEntity.StartedAt,
+                //     CorrectAnswerCount = testResultEntity.CorrectAnswerCount,
+                //     IncorrectAnswerCount = testResultEntity.IncorrectAnswerCount,
+                //     SubmittedAt = testResultEntity.SubmittedAt,
+                //     UserAnswers = userAnswerAndCorrectAnswerDtos
+                // };
+                var detailTestResultDto = _mapper.Map<DetailTestResultDto>(testResultEntity);
+                detailTestResultDto.UserAnswers = userAnswerAndCorrectAnswerDtos;
+                var userSumaryDto = new UserSumaryDto
                 {
-                    Score = testResultEntity.Score,
-                    IsPassed = testResultEntity.IsPassed,
-                    StartedAt = testResultEntity.StartedAt,
-                    SubmittedAt = testResultEntity.SubmittedAt,
-                    UserAnswers = userAnswerAndCorrectAnswerDtos
+                    Id = userId,
+                    Name = _unitOfWork.UserRepository.GetByIdAsync(userId).Result?.UserName,
                 };
+                detailTestResultDto.User = userSumaryDto;
                 return detailTestResultDto;
             }
             catch (Exception ex)

@@ -192,6 +192,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     : null));
 
             CreateMap<TestResult, TestResultDto>();
+            CreateMap<TestResult, DetailTestResultDto>();
             CreateMap<Test, TestSummaryDto>(); // 👈 Map từ entity Test → DTO TestSummaryDto
 
             //Question

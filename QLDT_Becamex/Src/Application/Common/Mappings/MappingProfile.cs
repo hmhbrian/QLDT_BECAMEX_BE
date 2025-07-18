@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
+using QLDT_Becamex.Src.Application.Features.AuditLogs.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
@@ -16,6 +17,8 @@ using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.TypeDocument.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
+using System.Globalization;
+using System.Text.Json;
 
 namespace QLDT_Becamex.Src.Application.Common.Mappings
 {
@@ -23,7 +26,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
     {
         public MappingProfile()
         {
-            // Define ignoreNavigation as a no-op action for AfterMap
+            //User
             Action<object, object, ResolutionContext> ignoreNavigation = (src, dest, context) => { };
 
             CreateMap<UserStatus, StatusDto>()
@@ -33,20 +36,23 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<ApplicationUser, UserDto>()
             .ForMember(dest => dest.CreatedBy,
                 opt => opt.MapFrom(src => src.CreateBy != null
-                    ? new ByUser { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
                     : null))
             .ForMember(dest => dest.UpdatedBy,
                 opt => opt.MapFrom(src => src.UpdateBy != null
-                    ? new ByUser { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
+                    ? new UserSumaryDto { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
                     : null))
             .ForMember(dest => dest.ManagerBy,
                 opt => opt.MapFrom(src => src.ManagerU != null
-                    ? new ByUser { Id = src.ManagerU.Id, Name = src.ManagerU.FullName }
+                    ? new UserSumaryDto { Id = src.ManagerU.Id, Name = src.ManagerU.FullName }
                     : null))
             .ForMember(dest => dest.Department,
                     opt => opt.MapFrom(src => src.Department != null
                     ? new DepartmentShortenDto { DepartmentId = src.Department.DepartmentId, DepartmentName = src.Department.DepartmentName }
                     : null));
+
+
+            CreateMap<ApplicationUser, UserSumaryDto>();
 
             //UserStatus
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();
@@ -106,7 +112,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.Students, opt => opt.MapFrom(src =>
                     (src.UserCourses ?? Enumerable.Empty<UserCourse>())
                     .Where(cp => cp.User != null)
-                    .Select(cp => new ByUser
+                    .Select(cp => new UserSumaryDto
                     {
                         Id = cp.UserId,
                         Name = cp.User!.FullName ?? null
@@ -115,11 +121,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
                 .ForMember(dest => dest.CreatedBy,
                 opt => opt.MapFrom(src => src.CreateBy != null
-                    ? new ByUser { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreateBy.Id, Name = src.CreateBy.FullName }
                     : null))
                 .ForMember(dest => dest.UpdatedBy,
                 opt => opt.MapFrom(src => src.UpdateBy != null
-                    ? new ByUser { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
+                    ? new UserSumaryDto { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
                     : null));
 
             CreateMap<CourseDto, Course>();
@@ -140,6 +146,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     .ForMember(dest => dest.TestId, opt => opt.Ignore())
                     .ForMember(dest => dest.Test, opt => opt.Ignore());
             CreateMap<Question, QuestionDto>();
+            CreateMap<QuestionNoAnswerDto, Question>()
+                    .ForMember(dest => dest.Id, opt => opt.Ignore())
+                    .ForMember(dest => dest.TestId, opt => opt.Ignore())
+                    .ForMember(dest => dest.Test, opt => opt.Ignore());
+            CreateMap<Question, QuestionNoAnswerDto>();
 
             // Test
             CreateMap<TestCreateDto, Test>()
@@ -153,12 +164,12 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()))
                       .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
-                    ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
                     : null))
                     .ForMember(dest => dest.UpdatedBy,
                     opt => opt.MapFrom(src => src.UpdatedBy != null
-                    ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
-                    : null)); ;
+                    ? new UserSumaryDto { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
+                    : null));
 
             CreateMap<TestUpdateDto, Test>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -173,14 +184,15 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold * 100.0))
                     .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
-                    ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
+                    ? new UserSumaryDto { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
                     : null))
                     .ForMember(dest => dest.UpdatedBy,
                     opt => opt.MapFrom(src => src.UpdatedBy != null
-                    ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
+                    ? new UserSumaryDto { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
                     : null));
 
             CreateMap<TestResult, TestResultDto>();
+            CreateMap<Test, TestSummaryDto>(); // 👈 Map từ entity Test → DTO TestSummaryDto
 
             //Question
             CreateMap<CreateQuestionDto, Question>()
@@ -222,6 +234,16 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
                 .ForMember(dest => dest.SubmissionDate, opt => opt.Ignore())
                 .AfterMap(ignoreNavigation);
+
+            //AuditLog
+            //CreateMap<AuditLog, AuditLogDto>()
+            //    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName ?? "Unknown"))
+            //    .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Timestamp.ToString("dddd, dd MMMM, yyyy, HH:mm", new CultureInfo("vi-VN"))));
+            CreateMap<AuditLog, AuditLogDto>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User!.UserName ?? "Unknown"))
+            .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Timestamp.ToString("dddd, dd MMMM, yyyy, HH:mm", new CultureInfo("vi-VN"))))
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Action, opt => opt.MapFrom(src => src.Action));
         }
     }
 }

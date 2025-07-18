@@ -2,6 +2,7 @@ using AutoMapper;
 using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
+using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
@@ -46,7 +47,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 throw new AppException("User tạo bài không tồn tại", 404);
             }
             // Map TestCreateDto to Test
-            var test = new Test();
+            var test = _mapper.Map<Test>(request);
             test.Create(courseId, userId!, request, maxPosition + 1);
 
             // Set test_id for each Question in Tests

@@ -28,20 +28,20 @@ namespace QLDT_Becamex.Migrations
                 table: "AuditLogs",
                 newName: "IX_AuditLogs_user_id");
 
-            migrationBuilder.AddColumn<int>(
-                name: "key",
-                table: "CourseStatus",
-                type: "int",
-                maxLength: 255,
-                nullable: false,
-                defaultValue: 0);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "key",
+            //    table: "CourseStatus",
+            //    type: "int",
+            //    maxLength: 255,
+            //    nullable: false,
+            //    defaultValue: 0);
 
-            migrationBuilder.AddColumn<bool>(
-                name: "is_private",
-                table: "Courses",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+            //migrationBuilder.AddColumn<bool>(
+            //    name: "is_private",
+            //    table: "Courses",
+            //    type: "bit",
+            //    nullable: false,
+            //    defaultValue: false);
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_AuditLogs",

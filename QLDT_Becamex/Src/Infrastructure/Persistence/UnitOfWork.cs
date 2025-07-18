@@ -31,6 +31,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public IDepartmentStatusRepository DepartmentStatusRepository { get; }
         public ITestResultRepository TestResultRepository { get; }
         public IUserAnswerRepository UserAnswerRepository { get; }
+        public IAuditLogRepository AuditLogRepository { get; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -56,6 +57,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             DepartmentStatusRepository = new DepartmentStatusRepository(dbContext);
             TestResultRepository = new TestResultRepository(dbContext);
             UserAnswerRepository = new UserAnswerRepository(dbContext);
+            AuditLogRepository = new AuditLogRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

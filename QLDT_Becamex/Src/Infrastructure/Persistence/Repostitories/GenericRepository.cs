@@ -43,7 +43,15 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
 
             return await _dbContext.Set<T>().Where(predicate).ToListAsync();
         }
-
+        public async Task<List<TResult>> FindAndSelectAsync<TResult>(
+            Expression<Func<T, bool>> predicate,
+            Expression<Func<T, TResult>> selector)
+        {
+            return await _dbContext.Set<T>()
+                .Where(predicate)
+                .Select(selector)
+                .ToListAsync();
+        }
 
         public async Task AddAsync(T entity)
         {

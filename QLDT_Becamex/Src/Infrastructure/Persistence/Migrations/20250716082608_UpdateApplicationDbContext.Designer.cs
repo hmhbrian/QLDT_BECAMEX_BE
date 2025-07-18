@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716082608_UpdateApplicationDbContext")]
+    partial class UpdateApplicationDbContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1092,14 +1095,6 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasColumnName("id");
 
-                    b.Property<int>("CorrectAnswerCount")
-                        .HasColumnType("int")
-                        .HasColumnName("correct_answer_count");
-
-                    b.Property<int>("IncorrectAnswerCount")
-                        .HasColumnType("int")
-                        .HasColumnName("incorrect_answer_count");
-
                     b.Property<bool>("IsPassed")
                         .HasColumnType("bit")
                         .HasColumnName("is_passed");
@@ -1148,10 +1143,6 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<int>("Key")
-                        .HasColumnType("int")
-                        .HasColumnName("key");
 
                     b.Property<string>("NameType")
                         .IsRequired()

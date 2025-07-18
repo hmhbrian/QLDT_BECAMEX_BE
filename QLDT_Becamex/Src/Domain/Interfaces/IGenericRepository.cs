@@ -48,5 +48,9 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
 
         // Lấy một IQueryable để thực hiện các truy vấn phức tạp hơn
         public IQueryable<T> GetQueryable();
+
+        public Task<List<TResult>> FindAndSelectAsync<TResult>(
+            Expression<Func<T, bool>> predicate,
+            Expression<Func<T, TResult>> selector);
     }
 }

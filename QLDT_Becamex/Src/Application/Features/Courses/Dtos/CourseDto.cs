@@ -23,8 +23,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? HoursPerSessions { get; set; }
         public string? Optional { get; set; }
         public int? MaxParticipant { get; set; }
-        public ByUser? CreatedBy { get; set; }
-        public ByUser? UpdatedBy { get; set; }
+        public UserSumaryDto? CreatedBy { get; set; }
+        public UserSumaryDto? UpdatedBy { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime? RegistrationStartDate { get; set; }
@@ -36,7 +36,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public StatusDto? Status { get; set; }
         public CourseCategoryDto? Category { get; set; }
         public LecturerDto? Lecturer { get; set; }
-        public ICollection<ByUser>? Students { get; set; } = new List<ByUser>();
+        public ICollection<UserSumaryDto>? Students { get; set; } = new List<UserSumaryDto>();
         public ICollection<DepartmentShortenDto>? Departments { get; set; } = new List<DepartmentShortenDto>();
         public ICollection<PositionDto>? Positions { get; set; } = new List<PositionDto>();
     }

@@ -67,5 +67,11 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             var result = await _mediator.Send(command);
             return Ok(ApiResponse<string>.Ok(result));
         }
+        [HttpGet("no-answer")]
+        public async Task<IActionResult> GetListQuestionNoAnswer([FromRoute] int testId, [FromQuery] BaseQueryParam queryParams)
+        {
+            var result = await _mediator.Send(new GetListQuestionNoAnswerQuery(testId, queryParams));
+            return Ok(ApiResponse<PagedResult<QuestionNoAnswerDto>>.Ok(result));
+        }
     }
 }

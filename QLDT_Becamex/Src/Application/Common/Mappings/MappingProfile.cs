@@ -170,7 +170,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Test, AllTestDto>()
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
                     .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0))
-                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold*100.0))
+                    .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold * 100.0))
                     .ForMember(dest => dest.CreatedBy,
                      opt => opt.MapFrom(src => src.CreatedBy != null
                     ? new ByUser { Id = src.CreatedBy.Id, Name = src.CreatedBy.FullName }
@@ -180,10 +180,14 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     ? new ByUser { Id = src.UpdatedBy.Id, Name = src.UpdatedBy.FullName }
                     : null));
 
+            CreateMap<TestResult, TestResultDto>();
+
+            //Question
             CreateMap<CreateQuestionDto, Question>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TestId, opt => opt.Ignore())
                 .ForMember(dest => dest.Test, opt => opt.Ignore());
+
 
             //CourseAttachedFile
             CreateMap<CourseAttachedFile, CourseAttachedFileDto>()

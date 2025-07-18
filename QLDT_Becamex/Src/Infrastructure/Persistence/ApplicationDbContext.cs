@@ -86,6 +86,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(e => e.IsPassed).HasColumnName("is_passed");
                 entity.Property(e => e.StartedAt).HasColumnName("started_at");
                 entity.Property(e => e.SubmittedAt).HasColumnName("submitted_at");
+                entity.Property(e => e.CorrectAnswerCount).HasColumnName("correct_answer_count");
+                entity.Property(e => e.IncorrectAnswerCount).HasColumnName("incorrect_answer_count");
+
+
 
                 // Khóa ngoại cũng cần được map
                 entity.Property(e => e.TestId).HasColumnName("test_id");

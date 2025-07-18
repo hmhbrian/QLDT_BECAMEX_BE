@@ -1,22 +1,27 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
+using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 
-public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultCommand, string>
+public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultCommand, TestResultDto>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserService _userService;
+    private readonly IMapper _mapper;
 
 
-    public SaveTestResultCommandHandler(IUnitOfWork unitOfWork, IUserService userService)
+
+    public SaveTestResultCommandHandler(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _userService = userService;
+        _mapper = mapper;
     }
 
-    public async Task<string> Handle(SaveTestResultCommand request, CancellationToken cancellationToken)
+    public async Task<TestResultDto> Handle(SaveTestResultCommand request, CancellationToken cancellationToken)
     {
         // --- B1: LẤY DỮ LIỆU VÀ VALIDATE ---
 
@@ -105,6 +110,7 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         newTestResult.IsPassed = newTestResult.Score >= test.PassThreshold;
 
 
+        TestResultDto testResultDto = _mapper.Map<TestResultDto>(newTestResult);
         // --- B4: LƯU VÀO CƠ SỞ DỮ LIỆU ---
 
         // Đánh dấu đối tượng `newTestResult` (và tất cả các `UserAnswer` con của nó) để thêm vào CSDL.
@@ -119,7 +125,7 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
 
         // Trả về ID của bản ghi `TestResult` vừa được tạo.
         // Client có thể dùng ID này để chuyển hướng người dùng đến trang xem kết quả.
-        return "Lưu kết quả thành công";
+        return testResultDto;
     }
 
     /// <summary>

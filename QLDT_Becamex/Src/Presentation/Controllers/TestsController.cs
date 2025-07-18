@@ -91,7 +91,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             var result = await _mediator.Send(command);
 
-            return Ok(ApiResponse.Ok(result));
+            return Ok(ApiResponse<TestResultDto>.Ok(result, "Làm bài kiểm tra thành công!"));
         }
     }
 }

@@ -18,5 +18,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public DateTime? RegistrationStartDate { get; set; }
         public DateTime? RegistrationClosingDate { get; set; }
         public string? Location { get; set; }
+        public float progressPercentange { get; set; }
     }
 }

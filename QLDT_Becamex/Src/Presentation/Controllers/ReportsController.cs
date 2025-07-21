@@ -33,6 +33,13 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             return Ok(ApiResponse<AvgFeedbackDto>.Ok(result));
         }
 
+        [HttpGet("data-report/{month}")]
+        public async Task<IActionResult> GetDataReport(int month)
+        {
+            var result = await _mediator.Send(new GetDataReportQuery(month));
+            return Ok(ApiResponse<DataReportDto>.Ok(result));
+        }
+
         [HttpGet("students-of-course")]
         public async Task<IActionResult> GetStudentsOfCourse()
         {

@@ -25,11 +25,19 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             var result = await _mediator.Send(new GetListCourseAndAvgFeedbackQuery());
             return Ok(ApiResponse<List<CourseAndAvgFeedbackDto>>.Ok(result));
         }
+
         [HttpGet("avg-feedback")]
         public async Task<IActionResult> GetAvgFeedback()
         {
             var result = await _mediator.Send(new GetAvgFeedbackQuery());
             return Ok(ApiResponse<AvgFeedbackDto>.Ok(result));
+        }
+
+        [HttpGet("students-of-course")]
+        public async Task<IActionResult> GetStudentsOfCourse()
+        {
+            var result = await _mediator.Send(new GetListStudentOfCourseQuery());
+            return Ok(ApiResponse<List<StudentOfCourseDto>>.Ok(result));
         }
     }
 }

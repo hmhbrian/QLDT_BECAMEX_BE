@@ -30,7 +30,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseCategory.Handlers
             }
             var normalizedName = request.Request.Name.Trim().ToLower();
 
-            var existingCategory = await _unitOfWork.CourseCategoryRepository.GetFirstOrDefaultAsync(c => c.Name!.ToLower() == normalizedName);
+            var existingCategory = await _unitOfWork.CourseCategoryRepository.GetFirstOrDefaultAsync(c => c.CategoryName!.ToLower() == normalizedName);
             if (existingCategory != null)
             {
                 throw new AppException("Danh mục khóa học đã tồn tại", 409);
@@ -38,7 +38,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseCategory.Handlers
 
             var courseCategory = _mapper.Map<Domain.Entities.CourseCategory>(request.Request);
 
-            courseCategory.Name = request.Request.Name?.Trim();
+            courseCategory.CategoryName = request.Request.Name?.Trim();
             courseCategory.Description = request.Request.Description?.Trim();
 
             await _unitOfWork.CourseCategoryRepository.AddAsync(courseCategory);
@@ -60,7 +60,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseCategory.Handlers
 
             var normalizedName = request.Request.Name.Trim().ToLower();
 
-            var existingCategory = await _unitOfWork.CourseCategoryRepository.GetFirstOrDefaultAsync(c => c.Name!.ToLower() == normalizedName && c.Id != request.id);
+            var existingCategory = await _unitOfWork.CourseCategoryRepository.GetFirstOrDefaultAsync(c => c.CategoryName!.ToLower() == normalizedName && c.Id != request.id);
             if (existingCategory != null)
             {
                 throw new AppException("Danh mục khóa học đã tồn tại", 409);
@@ -69,7 +69,7 @@ namespace QLDT_Becamex.Src.Application.Features.CourseCategory.Handlers
             var updateCategory = new Domain.Entities.CourseCategory
             {
                 Id = request.id,
-                Name = request.Request.Name?.Trim(),
+                CategoryName = request.Request.Name?.Trim(),
                 Description = request.Request.Description?.Trim()
             };
 

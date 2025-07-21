@@ -21,7 +21,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime? RegistrationClosingDate { get; set; }
         public string? Location { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public DateTime? ModifiedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public int? StatusId { get; set; }
         public CourseStatus? Status { get; set; }
         public int? CategoryId { get; set; }
@@ -30,9 +30,9 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public Lecturer? Lecturer { get; set; }
         public bool IsDeleted { get; set; } = false;
         public bool IsPrivate { get; set; } = false;
-        public string? CreateById { get; set; }
+        public string? CreatedById { get; set; }
         public ApplicationUser? CreateBy { get; set; }
-        public string? UpdateById { get; set; }
+        public string? UpdatedById { get; set; }
         public ApplicationUser? UpdateBy { get; set; }
         public ICollection<CourseDepartment>? CourseDepartments { get; set; } = new List<CourseDepartment>();
         public ICollection<CoursePosition>? CoursePositions { get; set; } = new List<CoursePosition>();

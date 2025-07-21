@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 throw new AppException("Ngày xóa phải trước ngày bắt đầu đăng ký", 400);
 
             course.IsDeleted = true;
-            course.ModifiedAt = DateTime.UtcNow;
+            course.UpdatedAt = DateTime.UtcNow;
 
             await _unitOfWork.CompleteAsync();
 

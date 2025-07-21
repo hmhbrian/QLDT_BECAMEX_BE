@@ -46,5 +46,12 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             var result = await _mediator.Send(new GetListStudentOfCourseQuery());
             return Ok(ApiResponse<List<StudentOfCourseDto>>.Ok(result));
         }
+
+        [HttpGet("top-department")]
+        public async Task<IActionResult> GetTopDepartment()
+        {
+            var result = await _mediator.Send(new GetDepartmentCourseReportQuery());
+            return Ok(ApiResponse<List<DepartmentCourseReportDto>>.Ok(result));
+        }
     }
 }

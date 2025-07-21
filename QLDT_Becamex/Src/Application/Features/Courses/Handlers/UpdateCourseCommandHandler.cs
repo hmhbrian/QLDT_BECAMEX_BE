@@ -113,8 +113,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 updateCourse.ThumbUrl = imageUrl;
             }
 
-            updateCourse.ModifiedAt = DateTime.Now;
-            updateCourse.UpdateById = currentUserId;
+            updateCourse.UpdatedAt = DateTime.Now;
+            updateCourse.UpdatedById = currentUserId;
 
             _unitOfWork.CourseRepository.Update(course, updateCourse);
 

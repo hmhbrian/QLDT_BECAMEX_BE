@@ -94,7 +94,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                     {
                         referenceData.AddedFields.Add(new AddedField
                         {
-                            FieldName = "Position",
+                            FieldName = "EmploymentPosition",
                             Value = string.Join(", ", positionNames)
                         });
                     }
@@ -202,7 +202,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 {
                     referenceData.ChangedFields.Add(new ChangedField
                     {
-                        FieldName = "Position",
+                        FieldName = "EmploymentPosition",
                         OldValue = string.Join(", ", previousPositionIds),
                         NewValue = string.Join(", ", currentPositionNames)
                     });

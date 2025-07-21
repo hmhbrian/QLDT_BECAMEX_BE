@@ -105,7 +105,7 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
         private async Task<float> GetAveragePositiveFeedbackAsync(int month)
         {
             var feedBacks = await _unitOfWork.FeedbackRepository.GetFlexibleAsync(
-                f => f.CreatedAt.HasValue && f.CreatedAt.Value.Month == month,
+                f => f.SubmissionDate.HasValue && f.SubmissionDate.Value.Month == month,
                 orderBy: null
             );
             if (feedBacks == null || !feedBacks.Any())

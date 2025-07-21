@@ -8,24 +8,23 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
 {
     public class AuditLogMapper : IAuditLogMapper
     {
-        private readonly string[] _fieldsToExclude = {"Id", "CourseId","CreatedAt", "UpdatedAt", "CreatedById", "ModifiedAt", "UpdatedById" };
+        // Danh sách các trường cần loại bỏ (sử dụng HashSet để so sánh không phân biệt chữ hoa/thường)
+        private readonly HashSet<string> _fieldsToExclude = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Id", "CourseId","CreatedAt", "UpdatedAt", "CreatedById", "CreateById", "ModifiedAt", "UpdatedById", "UpdateById","StatusId","CategoryId","LecturerId","TypeDocId" };
 
         // Từ điển ánh xạ tên trường 
         private static readonly Dictionary<string, string> FieldNameMappings = new Dictionary<string, string>
         {
             { "Title", "Tiêu đề" },
             { "Department", "Phòng ban" },
-            { "Position", "Chức vụ" },
+            { "EmploymentPosition", "Cấp bậc" },
             { "FileUrl", "Đường dẫn tệp" },
             { "PublicIdUrlPdf", "ID công khai PDF" },
-            { "TotalDurationSeconds", "Thời lượng (giây)" },
-            { "TotalPages", "Tổng số trang" },
-            { "NameType", "Loại tài liệu" },
             { "EndDate", "Ngày kết thúc" },
             { "RegistrationClosingDate", "Ngày đóng đăng ký" },
             { "RegistrationStartDate", "Ngày mở đăng ký" },
             { "StartDate", "Ngày bắt đầu" },
             { "CategoryName", "Danh mục" },
+            { "LecturerName", "Giảng viên" },
             { "Code", "Mã khóa học" },
             { "Description", "Mô tả" },
             { "Format", "Hình thức" },
@@ -33,7 +32,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
             { "IsDeleted", "Trạng thái xóa" },
             { "IsPrivate", "Riêng tư" },
             { "FullName", "Giảng viên" },
-            { "Location", "Địa điểm" },
+            { "Location", "Địa điểm/Link" },
             { "MaxParticipant", "Số lượng tối đa" },
             { "Name", "Tên khóa học" },
             { "Objectives", "Mục tiêu" },
@@ -41,7 +40,13 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
             { "Sessions", "Số buổi" },
             { "StatusName", "Trạng thái" },
             { "ThumbUrl", "Ảnh đại diện" },
-            { "CourseName", "Tên khóa học" }
+            { "Position", "Thứ tự" },
+            { "TotalDurationSeconds", "Thời lượng (giây)" },
+            { "TotalPages", "Tổng số trang" },
+            { "NameType", "Loại tài liệu" },
+            { "CourseName", "Tên khóa học" },
+            { "TimeTest", "Thời gian làm bài" },
+            { "PassThreshold", "Ngưỡng cần đạt" }
         };
 
         public class AuditLogChanges
@@ -52,6 +57,12 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
 
         public AuditLogDto MapToDto(AuditLog auditLog, Dictionary<string, ApplicationUser> userDict, Dictionary<string, IEntityReferenceDataProvider> referenceDataProviders)
         {
+            // Lấy múi giờ Việt Nam (UTC+7)
+            TimeZoneInfo vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+
+            // Chuyển đổi thời gian UTC sang múi giờ Việt Nam
+            DateTime vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(auditLog.Timestamp, vietnamTimeZone);
+
             var dto = new AuditLogDto
             {
                 Id = auditLog.Id,
@@ -59,7 +70,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
                 EntityName = auditLog.EntityName ?? "Unknown",
                 EntityId = auditLog.EntityId,
                 UserName = auditLog.UserId != null && userDict.ContainsKey(auditLog.UserId) ? userDict[auditLog.UserId].FullName ?? "Unknown" : "Unknown",
-                Timestamp = auditLog.Timestamp.ToString("dddd, dd MMMM, yyyy, HH:mm", new CultureInfo("vi-VN")),
+                Timestamp = vietnamTime.ToString("dddd, dd MMMM, yyyy, HH:mm", new CultureInfo("vi-VN")),
                 ChangedFields = new List<ChangedField>(),
                 AddedFields = new List<AddedField>(),
                 DeletedFields = new List<DeletedField>()

@@ -24,6 +24,10 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
     {
         // --- B1: LẤY DỮ LIỆU VÀ VALIDATE ---
         var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
+        if (currentUserId == null)
+        {
+            throw new Exception("Không xác định được người dùng hiện tại.");
+        }
 
         var test = await _unitOfWork.TestRepository.GetByIdAsync(request.TestId);
         if (test == null)
@@ -33,12 +37,11 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
 
         var questionIds = request.SubmittedAnswers.Select(a => a.QuestionId).ToList();
         var questionsEnumerable = await _unitOfWork.QuestionRepository.GetFlexibleAsync(
-            predicate: q => questionIds.Contains(q.Id),
+            predicate: q => questionIds.Contains(q.Id) || q.TestId == test.Id, // đảm bảo lấy đủ các câu trong bài test
             asNoTracking: true
         );
         var questions = questionsEnumerable.ToDictionary(q => q.Id, q => q);
 
-        // Tổng số câu hỏi trong bài làm
         int totalQuestions = questions.Count;
 
         // --- B2: TẠO KẾT QUẢ VÀ CHẤM ĐIỂM ---
@@ -52,28 +55,41 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
 
         int correctAnswerCount = 0;
 
-        foreach (var userAnswerDto in request.SubmittedAnswers)
+        // Chuyển submittedAnswers thành Dictionary để tra cứu nhanh
+        var submittedDict = request.SubmittedAnswers.ToDictionary(a => a.QuestionId, a => a);
+
+        foreach (var question in questions.Values)
         {
-            if (!questions.TryGetValue(userAnswerDto.QuestionId, out var question))
+            UserAnswer userAnswer;
+
+            if (submittedDict.TryGetValue(question.Id, out var userAnswerDto))
             {
-                continue;
+                var userSelectionsString = string.Join(",", userAnswerDto.SelectedOptions.OrderBy(s => s));
+                bool isCorrect = AreSelectionsCorrect(userSelectionsString, question.CorrectOption);
+
+                if (isCorrect)
+                    correctAnswerCount++;
+
+                userAnswer = new UserAnswer
+                {
+                    TestResultId = newTestResult.Id,
+                    QuestionId = question.Id,
+                    SelectedOptions = userSelectionsString,
+                    IsCorrect = isCorrect
+                };
+            }
+            else
+            {
+                // Người dùng bỏ qua câu hỏi này
+                userAnswer = new UserAnswer
+                {
+                    TestResultId = newTestResult.Id,
+                    QuestionId = question.Id,
+                    SelectedOptions = "",
+                    IsCorrect = false
+                };
             }
 
-            var userSelectionsString = string.Join(",", userAnswerDto.SelectedOptions.OrderBy(s => s));
-            bool isCorrect = AreSelectionsCorrect(userSelectionsString, question.CorrectOption);
-
-            if (isCorrect)
-            {
-                correctAnswerCount++;
-            }
-
-            var userAnswer = new UserAnswer
-            {
-                TestResultId = newTestResult.Id,
-                QuestionId = userAnswerDto.QuestionId,
-                SelectedOptions = userSelectionsString,
-                IsCorrect = isCorrect
-            };
             await _unitOfWork.UserAnswerRepository.AddAsync(userAnswer);
         }
 
@@ -85,29 +101,28 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         // --- BỔ SUNG: TÍNH TOÁN VÀ GÁN SỐ CÂU ĐÚNG/SAI ---
         newTestResult.CorrectAnswerCount = correctAnswerCount;
         newTestResult.IncorrectAnswerCount = totalQuestions - correctAnswerCount;
-        // --- KẾT THÚC BỔ SUNG ---
 
         // --- B4: LƯU VÀO CƠ SỞ DỮ LIỆU ---
         await _unitOfWork.TestResultRepository.AddAsync(newTestResult);
         await _unitOfWork.CompleteAsync();
 
         // --- B5: TRẢ KẾT QUẢ VỀ ---
-        // Map entity sang DTO. AutoMapper sẽ tự động map các trường mới nếu tên trùng khớp.
         TestResultDto testResultDto = _mapper.Map<TestResultDto>(newTestResult);
         var user = await _unitOfWork.UserRepository.GetByIdAsync(currentUserId);
-        testResultDto.User = new UserSumaryDto() { Id = user.Id, Name = user.FullName };
-
+        testResultDto.User = user != null
+            ? new UserSumaryDto() { Id = user.Id, Name = user.FullName }
+            : null;
 
         return testResultDto;
     }
 
-    // (Hàm AreSelectionsCorrect không thay đổi)
     private bool AreSelectionsCorrect(string userSelections, string? correctAnswers)
     {
         if (string.IsNullOrEmpty(userSelections) || string.IsNullOrEmpty(correctAnswers))
         {
             return string.IsNullOrEmpty(userSelections) && string.IsNullOrEmpty(correctAnswers);
         }
+
         var userSet = new HashSet<string>(userSelections.Split(','));
         var correctSet = new HashSet<string>(correctAnswers.Split(','));
         return userSet.SetEquals(correctSet);

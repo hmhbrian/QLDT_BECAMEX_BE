@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using QLDT_Becamex.Src.Application.Features.Reports.Dtos;
 using QLDT_Becamex.Src.Application.Features.Reports.Queries;
+using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 {
@@ -16,48 +18,36 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 
         public async Task<List<DepartmentCourseReportDto>> Handle(GetDepartmentCourseReportQuery request, CancellationToken cancellationToken)
         {
-            var department = await _unitOfWork.DepartmentRepository.GetFlexibleAsync(asNoTracking: true);
-            var user = await _unitOfWork.UserRepository.GetFlexibleAsync(
-                predicate: u => !u.IsDeleted,
-                asNoTracking: true
-            );
-            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(asNoTracking: true);
+            // Lấy danh sách phòng ban cùng với Users và UserCourses
+            var department = await _unitOfWork.DepartmentRepository.GetFlexibleAsync(
+                includes: q => q
+                    .Include(a => a.Users.Where(u => !u.IsDeleted))
+                    .ThenInclude(t => t.UserCourse),
+                asNoTracking: true) ?? new List<Department>();
 
             if (!department.Any())
                 return new List<DepartmentCourseReportDto>();
 
             var result = department
-                .GroupJoin(user,
-                    d => d.DepartmentId,
-                    u => u.DepartmentId,
-                    (d, userGroup) => new
-                    {
-                        Department = d,
-                        Users = userGroup
-                    })
-                .SelectMany(
-                    d => d.Users.DefaultIfEmpty(),
-                    (d, u) => new
-                    {
-                        d.Department,
-                        User = u
-                    })
-                .GroupJoin(userCourses,
-                    d => d.User != null ? d.User.Id : null,
-                    uc => uc.UserId,
-                    (d, ucGroup) => new
-                    {
-                        d.Department,
-                        UserCourse = ucGroup
-                    })
-                .GroupBy(x => x.Department.DepartmentId)
-                .Select(g => new DepartmentCourseReportDto
+                .Where(d => (d.Users?.Count() ?? 0) >= 1) // Lọc các phòng ban có ít nhất 2 nhân viên
+                .Select(d => new DepartmentCourseReportDto
                 {
-                    DepartmentName = g.First().Department.DepartmentName ?? "Unknown",
-                    NumberOfCourseParticipated = g.SelectMany(x => x.UserCourse).Select(uc => uc.CourseId).Distinct().Count(),
-                    NumberOfLearnersCompleted = g.SelectMany(x => x.UserCourse).Where(uc => uc.Status == "Assigned").Select(uc => uc.UserId).Distinct().Count()
+                    DepartmentName = d.DepartmentName ?? "Unknown",
+                    TotalUsers = d.Users?.Count() ?? 0, // Tổng số nhân viên trong phòng ban
+                    NumberOfUsersParticipated = d.Users
+                        ?.SelectMany(u => u.UserCourse ?? Enumerable.Empty<UserCourse>())
+                        .Select(uc => uc.UserId)
+                        .Distinct()
+                        .Count() ?? 0, // Số người tham gia khóa học
+                    ParticipationRate = (d.Users?.Count() ?? 0) > 0
+                        ? (double)(d.Users?.SelectMany(u => u.UserCourse ?? Enumerable.Empty<UserCourse>())
+                            .Select(uc => uc.UserId)
+                            .Distinct()
+                            .Count() ?? 0) / (d.Users?.Count() ?? 1)
+                        : 0 // Tỷ lệ tham gia
                 })
-                .OrderByDescending(dto => dto.NumberOfLearnersCompleted)
+                .OrderByDescending(dto => dto.ParticipationRate) // Sắp xếp theo tỷ lệ tham gia
+                .ThenByDescending(dto => dto.NumberOfUsersParticipated) // Sau đó theo số người tham gia
                 .ToList();
 
             return result;

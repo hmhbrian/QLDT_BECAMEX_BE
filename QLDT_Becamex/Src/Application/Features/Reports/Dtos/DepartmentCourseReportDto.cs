@@ -2,8 +2,9 @@
 {
     public class DepartmentCourseReportDto
     {
-        public string DepartmentName { get; set; }
-        public int NumberOfCourseParticipated { get; set; }
-        public int NumberOfLearnersCompleted { get; set; }
+        public string? DepartmentName { get; set; }
+        public int NumberOfUsersParticipated { get; set; }
+        public int TotalUsers { get; set; }
+        public double ParticipationRate { get; set; }
     }
 }

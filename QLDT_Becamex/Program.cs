@@ -20,6 +20,7 @@ using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
 using QLDT_Becamex.Src.Infrastructure.Services.BackgroundServices;
+using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -136,6 +137,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IAuditLogMapper, AuditLogMapper>();
 builder.Services.AddHostedService<CourseStatusUpdateBackgroundService>();
 
 builder.Services.AddHttpContextAccessor();

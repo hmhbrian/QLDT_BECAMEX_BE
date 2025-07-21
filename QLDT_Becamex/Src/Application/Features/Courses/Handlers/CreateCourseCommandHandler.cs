@@ -111,9 +111,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var course = _mapper.Map<Course>(dto);
             course.Id = Guid.NewGuid().ToString();
             course.CreatedAt = DateTime.Now;
-            course.ModifiedAt = DateTime.Now;
+            course.UpdatedAt = DateTime.Now;
             course.ThumbUrl = imageUrl;
-            course.CreateById = currentUserId;
+            course.CreatedById = currentUserId;
             await _unitOfWork.CourseRepository.AddAsync(course);
 
             if (dto.DepartmentIds != null && dto.DepartmentIds.Any())

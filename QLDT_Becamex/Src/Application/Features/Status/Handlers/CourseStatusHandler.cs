@@ -33,11 +33,11 @@ namespace QLDT_Becamex.Src.Application.Features.Status.Handlers
         public async Task<Unit> Handle(CreateCourseStatusCommand request, CancellationToken cancellationToken)
         {
             var existing = await _unitOfWork.CourseStatusRepository.GetFirstOrDefaultAsync(
-                us => us.Name.ToLower() == request.Request.Name.ToLower());
+                us => us.StatusName.ToLower() == request.Request.Name.ToLower());
             if (existing != null)
                 throw new AppException("Trạng thái đã tồn tại", 409);
 
-            var entity = new CourseStatus { Name = request.Request.Name };
+            var entity = new CourseStatus { StatusName = request.Request.Name };
             await _unitOfWork.CourseStatusRepository.AddAsync(entity);
             await _unitOfWork.CompleteAsync();
             return Unit.Value;
@@ -50,14 +50,14 @@ namespace QLDT_Becamex.Src.Application.Features.Status.Handlers
                 throw new AppException("Không tìm thấy trạng thái", 404);
 
             var conflict = await _unitOfWork.CourseStatusRepository.GetFirstOrDefaultAsync(
-                cs => cs.Name.ToLower() == request.Request.Name.ToLower() && cs.Id != request.Id);
+                cs => cs.StatusName.ToLower() == request.Request.Name.ToLower() && cs.Id != request.Id);
             if (conflict != null)
                 throw new AppException("Tên trạng thái đã tồn tại", 409);
 
             var updateStatus = new CourseStatus
             {
                 Id = request.Id,
-                Name = request.Request.Name?.Trim()!
+                StatusName = request.Request.Name?.Trim()!
             };
             _unitOfWork.CourseStatusRepository.Update(entity, updateStatus);
             await _unitOfWork.CompleteAsync();

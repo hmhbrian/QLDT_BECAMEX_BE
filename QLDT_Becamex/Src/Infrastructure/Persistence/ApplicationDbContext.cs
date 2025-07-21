@@ -418,7 +418,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(p => p.CreatedAt)
                       .HasColumnName("created_at");
 
-                entity.Property(p => p.ModifiedAt)
+                entity.Property(p => p.UpdatedAt)
                       .HasColumnName("modified_at");
 
                 entity.Property(p => p.IsDeleted)
@@ -429,11 +429,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasColumnName("is_private")
                       .HasDefaultValue(false);
 
-                entity.Property(p => p.CreateById)
+                entity.Property(p => p.CreatedById)
                     .HasColumnName("created_by_id")
                     .HasMaxLength(450);
 
-                entity.Property(p => p.UpdateById)
+                entity.Property(p => p.UpdatedById)
                    .HasColumnName("update_by_id")
                    .HasMaxLength(450);
 
@@ -447,13 +447,13 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
                 entity.HasOne(u => u.CreateBy)
                      .WithMany()
-                     .HasForeignKey(u => u.CreateById)
+                     .HasForeignKey(u => u.CreatedById)
                      .IsRequired(false)
                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(u => u.UpdateBy)
                     .WithMany()
-                    .HasForeignKey(u => u.UpdateById)
+                    .HasForeignKey(u => u.UpdatedById)
                     .IsRequired(false)
                     .OnDelete(DeleteBehavior.NoAction);
 
@@ -518,7 +518,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .IsRequired()
                       .HasMaxLength(255);
 
-                entity.Property(s => s.Name)
+                entity.Property(s => s.StatusName)
                       .HasColumnName("name")
                       .IsRequired()
                       .HasMaxLength(255);
@@ -703,7 +703,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.HasKey(p => p.Id);
                 entity.Property(p => p.Id).HasColumnName("id").ValueGeneratedOnAdd();
 
-                entity.Property(p => p.Name)
+                entity.Property(p => p.CategoryName)
                       .HasColumnName("name")
                       .IsRequired()
                       .HasMaxLength(255);

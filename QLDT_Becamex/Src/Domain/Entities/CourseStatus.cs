@@ -7,7 +7,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
     {
         public int Id { get; set; }
         public int Key { get; set; }
-        public string Name { get; set; } = null!;
+        public string StatusName { get; set; } = null!;
         [JsonIgnore]
         public ICollection<Course>? Courses { get; set; } = new List<Course>();
 

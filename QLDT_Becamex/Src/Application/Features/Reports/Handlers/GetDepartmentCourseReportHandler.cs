@@ -21,7 +21,7 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
             // Lấy danh sách phòng ban cùng với Users và UserCourses
             var department = await _unitOfWork.DepartmentRepository.GetFlexibleAsync(
                 includes: q => q
-                    .Include(a => a.Users.Where(u => !u.IsDeleted))
+                    .Include(a => (a.Users ?? new List<ApplicationUser>()).Where(u => !u.IsDeleted))
                     .ThenInclude(t => t.UserCourse),
                 asNoTracking: true) ?? new List<Department>();
 

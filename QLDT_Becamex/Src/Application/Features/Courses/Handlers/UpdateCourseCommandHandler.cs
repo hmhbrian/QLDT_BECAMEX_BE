@@ -145,7 +145,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var allCurrentUserCourses = await _unitOfWork.UserCourseRepository.FindAsync(uc => uc.CourseId == id);
             _unitOfWork.UserCourseRepository.RemoveRange(allCurrentUserCourses);
 
-            var newUserCoursesToAssign = new List<UserCourse>();
+            var newUserCoursesToAssign = new List< UserCourse>();
             var assignedUserIds = new HashSet<string>();
 
             if (request.Optional == ConstantCourse.OPTIONAL_BATBUOC)

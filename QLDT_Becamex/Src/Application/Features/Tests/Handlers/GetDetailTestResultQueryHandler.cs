@@ -45,7 +45,6 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                     asNoTracking: true,
                     includes: t => t.Include(t => t.Questions).Include(d => d.CreatedBy).Include(d => d.UpdatedBy)
                 );
-
                 var testEntity = test.FirstOrDefault();
                 if (testEntity == null)
                 {
@@ -53,7 +52,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 }
                 var testResult = await _unitOfWork.TestResultRepository.GetFlexibleAsync(
                     predicate: tr => tr.TestId == testEntity.Id && tr.UserId == userId,
-                    orderBy: null,
+                    orderBy: q => q.OrderByDescending(tr => tr.Score),
                     page: null,
                     pageSize: 1,
                     asNoTracking: true,

@@ -33,6 +33,13 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 
             var dto = _mapper.Map<List<FeedbacksDto>>(feedbacks);
 
+            foreach (var feedback in dto)
+            {
+                // Calculate average score
+                feedback.averageScore = (feedback.Q1_relevance + feedback.Q2_clarity + feedback.Q3_structure +
+                                          feedback.Q4_duration + feedback.Q5_material) / 5.0f;
+            }
+
             return dto;
         }
     }

@@ -17,6 +17,7 @@ using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.TypeDocument.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Shared.Helpers;
 using System.Globalization;
 using System.Text.Json;
 
@@ -94,7 +95,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             //Course
             CreateMap<CreateCourseDto, Course>()
                 .ForMember(dest => dest.ThumbUrl, opt => opt.Condition(src => src.ThumbUrl != null))
-                .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null));
+                .ForMember(dest => dest.StatusId, opt => opt.Condition(src => src.StatusId != null))
+                .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom(src => src.RegistrationStartDate.HasValue ? DateTimeHelper.ToVietnamTime(src.RegistrationStartDate!.Value) : (DateTime?)null))
+                .ForMember(dest => dest.RegistrationClosingDate, opt => opt.MapFrom(src => src.RegistrationClosingDate.HasValue ? DateTimeHelper.ToVietnamTime(src.RegistrationClosingDate!.Value) : (DateTime?)null))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate.HasValue ? DateTimeHelper.ToVietnamTime(src.StartDate!.Value) : (DateTime?)null))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate.HasValue ? DateTimeHelper.ToVietnamTime(src.EndDate!.Value) : (DateTime?)null));
 
             CreateMap<Course, CourseDto>()
                 .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => (src.CourseDepartments ?? Enumerable.Empty<CourseDepartment>()).Select(cd => new DepartmentShortenDto
@@ -130,10 +135,23 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             CreateMap<CourseDto, Course>();
             CreateMap<UpdateCourseDto, Course>()
-                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember, destMember) =>
-                 {
-                     return srcMember != null && !Equals(srcMember, destMember);
-                 }));
+             .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>
+                 src.RegistrationStartDate.HasValue && !Equals(src.RegistrationStartDate.Value, dest.RegistrationStartDate)
+                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationStartDate.Value, DateTimeKind.Utc))
+                     : dest.RegistrationStartDate))
+             .ForMember(dest => dest.RegistrationClosingDate, opt => opt.MapFrom((src, dest) =>
+                 src.RegistrationClosingDate.HasValue && !Equals(src.RegistrationClosingDate.Value, dest.RegistrationClosingDate)
+                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationClosingDate.Value, DateTimeKind.Utc))
+                     : dest.RegistrationClosingDate))
+             .ForMember(dest => dest.StartDate, opt => opt.MapFrom((src, dest) =>
+                 src.StartDate.HasValue && !Equals(src.StartDate.Value, dest.StartDate)
+                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.StartDate.Value, DateTimeKind.Utc))
+                     : dest.StartDate))
+             .ForMember(dest => dest.EndDate, opt => opt.MapFrom((src, dest) =>
+                 src.EndDate.HasValue && !Equals(src.EndDate.Value, dest.EndDate)
+                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.EndDate.Value, DateTimeKind.Utc))
+                     : dest.EndDate));
+
 
 
             //EnrollCourse

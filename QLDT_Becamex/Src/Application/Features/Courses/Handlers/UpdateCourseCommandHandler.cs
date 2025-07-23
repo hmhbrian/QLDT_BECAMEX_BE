@@ -10,6 +10,7 @@ using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
+using QLDT_Becamex.Src.Shared.Helpers;
 using System.Linq;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
@@ -151,7 +152,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
 
             // Ghi nhận lại thông tin về lần cập nhật này
-            updateCourse.UpdatedAt = DateTime.Now;
+            updateCourse.UpdatedAt = DateTimeHelper.GetVietnamTimeNow();
             updateCourse.UpdatedById = currentUserId;
 
             // Đánh dấu đối tượng course cần được cập nhật trong Unit of Work

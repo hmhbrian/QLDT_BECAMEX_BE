@@ -26,13 +26,14 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 
         public async Task<DataReportDto> Handle(GetDataReportQuery request, CancellationToken cancellationToken)
         {
-            int month = request.month;
+            var (startDate, endDate) = GetDateRange(request.month, request.quarter, request.year);
 
-            var numberOfCourses = await GetNumberOfCoursesAsync(month);
-            var numberOfStudents = await GetNumberOfStudentsAsync(month);
-            var averageCompletedPercentage = await GetAverageCompletedPercentageAsync(month);
-            var averageTime = await GetAverageTimeAsync(month);
-            var averagePositiveFeedback = await GetAveragePositiveFeedbackAsync(month);
+            var numberOfCourses = await GetNumberOfCoursesAsync(startDate, endDate);
+            var numberOfStudents = await GetNumberOfStudentsAsync(startDate, endDate);
+            var averageCompletedPercentage = await GetAverageCompletedPercentageAsync(startDate, endDate);
+            var averageTime = await GetAverageTimeAsync(startDate, endDate);
+            var averagePositiveFeedback = await GetAveragePositiveFeedbackAsync(startDate, endDate);
+
             return new DataReportDto
             {
                 NumberOfCourses = numberOfCourses,
@@ -43,84 +44,126 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
             };
         }
 
-        private async Task<int> GetNumberOfCoursesAsync(int month)
+        private (DateTime? start, DateTime? end) GetDateRange(int? month, int? quarter, int? year)
         {
-            var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                c => c.StartDate.HasValue && c.StartDate.Value.Month == month && c.StatusId != 1,
-                orderBy: null
-            );
-            return courses?.Count() ?? 0;
+            if (year == null) return (null, null);
+
+            if (quarter != null)
+            {
+                int startMonth = (quarter.Value - 1) * 3 + 1;
+                DateTime start = new DateTime(year.Value, startMonth, 1);
+                DateTime end = start.AddMonths(3).AddDays(-1);
+                return (start, end);
+            }
+
+            if (month != null)
+            {
+                DateTime start = new DateTime(year.Value, month.Value, 1);
+                DateTime end = start.AddMonths(1).AddDays(-1);
+                return (start, end);
+            }
+
+            return (null, null);
         }
 
-        private async Task<int> GetNumberOfStudentsAsync(int month)
+        private async Task<int> GetNumberOfCoursesAsync(DateTime? start, DateTime? end)
+        {
+            var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
+                c => c.StatusId != 1,
+                orderBy: null
+            );
+
+            if (start != null && end != null)
+            {
+                courses = courses.Where(c => c.CreatedAt.HasValue && c.CreatedAt.Value >= start && c.CreatedAt.Value <= end).ToList();
+            }
+
+            return courses.Count();
+        }
+
+        private async Task<int> GetNumberOfStudentsAsync(DateTime? start, DateTime? end)
         {
             const string roleName = "HOCVIEN";
-
             var query = from user in _context.Users
                         join userRole in _context.UserRoles on user.Id equals userRole.UserId
                         join role in _context.Roles on userRole.RoleId equals role.Id
-                        where role.Name == roleName
-                              && user.CreatedAt.HasValue
-                              && user.CreatedAt.Value.Month == month
-                              && !user.IsDeleted
+                        where role.Name == roleName && user.CreatedAt.HasValue && !user.IsDeleted
                         select user;
+
+            if (start != null && end != null)
+            {
+                query = query.Where(u => u.CreatedAt >= start && u.CreatedAt <= end);
+            }
 
             return await query.CountAsync();
         }
-        private async Task<float> GetAverageCompletedPercentageAsync(int month)
+
+        private async Task<float> GetAverageCompletedPercentageAsync(DateTime? start, DateTime? end)
         {
-            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
-                uc => uc.ModifiedAt.Month == month,
+            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(orderBy: null);
+            var completedCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
+                uc => uc.Status == "Completed",
                 orderBy: null
             );
-            var completeUserCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
-                uc => uc.ModifiedAt.Month == month && uc.Status == "Completed",
-                orderBy: null
-            );
-            if (userCourses == null || !userCourses.Any())
+
+            if (start != null && end != null)
+            {
+                userCourses = userCourses.Where(uc => uc.ModifiedAt >= start && uc.ModifiedAt <= end).ToList();
+                completedCourses = completedCourses.Where(uc => uc.ModifiedAt >= start && uc.ModifiedAt <= end).ToList();
+            }
+
+            if (!userCourses.Any() || !completedCourses.Any())
                 return 0;
-            if (completeUserCourses == null || !completeUserCourses.Any())
-                return 0;
-            float averangeCompletedPercentage = (float)completeUserCourses.Count() / userCourses.Count() * 100;
-            return averangeCompletedPercentage;
+
+            float percent = (float)completedCourses.Count() / userCourses.Count() * 100;
+            return percent;
         }
 
-        private async Task<float> GetAverageTimeAsync(int month)
+        private async Task<float> GetAverageTimeAsync(DateTime? start, DateTime? end)
         {
-            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
-                uc => uc.ModifiedAt.Month == month,
-                orderBy: null
-            );
-            if (userCourses == null || !userCourses.Any())
-                return 0;
-            float totalTime = 0;
-            foreach (var userCourse in userCourses)
+            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(orderBy: null);
+
+            if (start != null && end != null)
             {
-                var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(c => c.Id == userCourse.CourseId);
-                float time = ((float?)(course?.Sessions) ?? 0) * ((float?)(course?.HoursPerSessions) ?? 0);
+                userCourses = userCourses.Where(uc => uc.ModifiedAt >= start && uc.ModifiedAt <= end).ToList();
+            }
+
+            if (!userCourses.Any())
+                return 0;
+
+            float totalTime = 0;
+
+            foreach (var uc in userCourses)
+            {
+                var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(c => c.Id == uc.CourseId);
+                float time = ((float?)course?.Sessions ?? 0) * ((float?)course?.HoursPerSessions ?? 0);
                 totalTime += time;
             }
+
             return totalTime / userCourses.Count();
         }
-        private async Task<float> GetAveragePositiveFeedbackAsync(int month)
+
+        private async Task<float> GetAveragePositiveFeedbackAsync(DateTime? start, DateTime? end)
         {
-            var feedBacks = await _unitOfWork.FeedbackRepository.GetFlexibleAsync(
-                f => f.SubmissionDate.HasValue && f.SubmissionDate.Value.Month == month,
-                orderBy: null
-            );
-            if (feedBacks == null || !feedBacks.Any())
-                return 0;
-            int positiveFeedbackCount = 0;
-            foreach (var feedback in feedBacks)
+            var feedbacks = await _unitOfWork.FeedbackRepository.GetFlexibleAsync(orderBy: null);
+
+            if (start != null && end != null)
             {
-                float totalFeedback = feedback.Q1_relevance + feedback.Q2_clarity + feedback.Q3_structure + feedback.Q4_duration + feedback.Q5_material;
-                float averageFeedback = totalFeedback / 5;
-                if (averageFeedback >= 4)
-                {
-                    positiveFeedbackCount++;
-                }
+                feedbacks = feedbacks.Where(f => f.CreatedAt.HasValue && f.CreatedAt.Value >= start && f.CreatedAt.Value <= end).ToList();
             }
-            return (float)positiveFeedbackCount / feedBacks.Count() * 100;
+
+            if (!feedbacks.Any())
+                return 0;
+
+            int positiveCount = 0;
+
+            foreach (var f in feedbacks)
+            {
+                float avg = (f.Q1_relevance + f.Q2_clarity + f.Q3_structure + f.Q4_duration + f.Q5_material) / 5;
+                if (avg >= 4) positiveCount++;
+            }
+
+            return (float)positiveCount / feedbacks.Count() * 100;
         }
     }
 }

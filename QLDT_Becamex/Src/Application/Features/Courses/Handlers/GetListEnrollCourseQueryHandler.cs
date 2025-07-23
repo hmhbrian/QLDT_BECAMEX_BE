@@ -7,6 +7,7 @@ using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
+using System.Drawing.Printing;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -156,14 +157,20 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var lessonsProgress = await CalculateLessonsProgressAsync(courseId, userId);
             // Tính toán tiến độ bài kiểm tra
             var testsProgress = await CalculateTestsProgressAsync(courseId, userId);
+            var courses = await _unitOfWork.CourseRepository
+                .GetFlexibleAsync(c => c.Id == courseId);
+            var tests = await _unitOfWork.TestRepository
+                .GetFlexibleAsync(t => t.CourseId == courseId);
+            float count = (float)courses.Count() + (float)tests.Count();
+            Console.WriteLine($"Lessons Progress: {lessonsProgress}, Tests Progress: {testsProgress}, Count: {count}");
             // Tính toán tổng tiến độ
             float overallProgress = 0.0f;
             if (lessonsProgress == 0.0f) 
-                overallProgress = testsProgress;
+                overallProgress = testsProgress / count;
             else if (testsProgress == 0.0f)
-                overallProgress = lessonsProgress;
+                overallProgress = lessonsProgress / count;
             else
-                overallProgress = (lessonsProgress + testsProgress) / 2.0f;
+                overallProgress = (lessonsProgress + testsProgress) / count;
             if (float.IsNaN(overallProgress) || float.IsInfinity(overallProgress))
             {
                 return 0.0f; // Trả về 0 nếu tiến độ không hợp lệ

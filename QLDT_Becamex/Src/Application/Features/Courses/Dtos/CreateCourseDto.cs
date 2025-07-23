@@ -33,15 +33,15 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         [Required]
         [Range(1, 200, ErrorMessage = "Số lượng học viên phải lớn hơn không và nhỏ hon 200")]
         public int? MaxParticipant { get; set; }
-        public DateTime? StartDate { get; set; } = DateTime.Now;
-        public DateTime? EndDate { get; set; } = DateTime.Now;
-        public DateTime? RegistrationStartDate { get; set; } = DateTime.Now;
-        public DateTime? RegistrationClosingDate { get; set; } = DateTime.Now;
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public DateTime? RegistrationStartDate { get; set; }
+        public DateTime? RegistrationClosingDate { get; set; }
         public string? Location { get; set; }
         public int? StatusId { get; set; }
         public int? CategoryId { get; set; }
         public int? LecturerId { get; set; }
-        public bool? IsPrivate { get; set; }  = false;
+        public bool? IsPrivate { get; set; } = false;
         public List<int>? DepartmentIds { get; set; }
         public List<int>? PositionIds { get; set; }
         public List<string>? StudentIds { get; set; }

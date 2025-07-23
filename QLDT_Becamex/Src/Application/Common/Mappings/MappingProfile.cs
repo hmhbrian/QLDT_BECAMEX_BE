@@ -130,7 +130,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             CreateMap<CourseDto, Course>();
             CreateMap<UpdateCourseDto, Course>()
-                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember, destMember) =>
+                 {
+                     return srcMember != null && !Equals(srcMember, destMember);
+                 }));
+
 
             //EnrollCourse
             CreateMap<UserEnrollCourseDto, Course>();

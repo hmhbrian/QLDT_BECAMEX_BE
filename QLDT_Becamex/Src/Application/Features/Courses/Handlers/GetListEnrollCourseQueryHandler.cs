@@ -180,9 +180,16 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 userCourse.Status = "Completed";
                 await _unitOfWork.CompleteAsync();
             }
-            else
+            else if (overallProgress > 0.0f && overallProgress < 100.0f)
             {
+                // Nếu tiến độ từ 0 đến 100, đánh dấu khóa học là đang tiến hành
                 userCourse.Status = "In Progress";
+                await _unitOfWork.CompleteAsync();
+            }
+            else if (overallProgress == 0.0f)
+            {
+                // Nếu tiến độ là 0, đánh dấu khóa học là chưa bắt đầu
+                userCourse.Status = "Assigned";
                 await _unitOfWork.CompleteAsync();
             }
             return overallProgress;

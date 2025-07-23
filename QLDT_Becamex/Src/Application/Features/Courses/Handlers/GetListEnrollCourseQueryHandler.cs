@@ -8,6 +8,7 @@ using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using System.Drawing.Printing;
+using System.Data.SqlClient;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -134,8 +135,10 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             int totalTests = tests.Count();
 
             // Lấy kết quả bài kiểm tra của người dùng
-            var testResults = await _unitOfWork.TestResultRepository
-                .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test != null && tr.Test.CourseId == courseId);
+            var testResults = await _unitOfWork.TestResultRepository.GetFlexibleAsync(
+                tr => tr.UserId == userId && tr.Test != null && tr.Test.CourseId == courseId,
+                orderBy: tr => tr.OrderByDescending(r => r.Score)
+            );
 
             float totalProgress = 0;
 

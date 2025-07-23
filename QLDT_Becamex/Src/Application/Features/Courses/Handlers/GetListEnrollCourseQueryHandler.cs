@@ -167,13 +167,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             float count = (float)courses.Count() + (float)tests.Count();
             Console.WriteLine($"Lessons Progress: {lessonsProgress}, Tests Progress: {testsProgress}, Count: {count}");
             // Tính toán tổng tiến độ
-            float overallProgress = 0.0f;
-            if (lessonsProgress == 0.0f) 
-                overallProgress = testsProgress / count;
-            else if (testsProgress == 0.0f)
-                overallProgress = lessonsProgress / count;
-            else
-                overallProgress = (lessonsProgress + testsProgress) / count;
+            float overallProgress = (lessonsProgress * (float)courses.Count() + testsProgress * (float)tests.Count()) / count;
             if (float.IsNaN(overallProgress) || float.IsInfinity(overallProgress))
             {
                 return 0.0f; // Trả về 0 nếu tiến độ không hợp lệ

@@ -4,6 +4,6 @@ namespace QLDT_Becamex.Src.Application.Common
 {
     public interface IEntityReferenceDataProvider
     {
-        ReferenceData GetReferenceData(AuditLog auditLog);
+        Task<ReferenceData> GetReferenceData(AuditLog auditLog);
     }
 }

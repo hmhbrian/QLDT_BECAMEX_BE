@@ -2,6 +2,7 @@
 using QLDT_Becamex.Src.Application.Features.AuditLogs.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using System.Threading.Tasks;
 
 namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
 {
@@ -16,14 +17,14 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             _allAuditLogs = allAuditLogs;
         }
 
-        public ReferenceData GetReferenceData(AuditLog auditLog)
+        public async Task<ReferenceData> GetReferenceData(AuditLog auditLog)
         {
             var referenceData = new ReferenceData();
             var testId = auditLog.EntityId;
 
             if (auditLog.Action == "Added")
             {
-                var test = _unitOfWork.TestRepository.GetFirstOrDefaultAsync(predicate: q => q.Id.ToString() == testId).Result;
+                var test = await _unitOfWork.TestRepository.GetFirstOrDefaultAsync(predicate: q => q.Id.ToString() == testId);
                 if (test != null)
                 {
                     var course = _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(predicate: c => c.Id.ToString() == test.CourseId).Result;
@@ -37,6 +38,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                     }
                 }
             }
+
             // Thêm logic cho Modified
             return referenceData;
         }

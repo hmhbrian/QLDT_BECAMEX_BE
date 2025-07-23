@@ -7,12 +7,12 @@ using System.Text.Json;
 
 namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
 {
-    public class LessonReferenceDataProvider : IEntityReferenceDataProvider
+    public class AttachFileReferenceDataProvider : IEntityReferenceDataProvider
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly List<AuditLog> _allAuditLogs;
 
-        public LessonReferenceDataProvider(IUnitOfWork unitOfWork, List<AuditLog> allAuditLogs)
+        public AttachFileReferenceDataProvider(IUnitOfWork unitOfWork, List<AuditLog> allAuditLogs)
         {
             _unitOfWork = unitOfWork;
             _allAuditLogs = allAuditLogs;
@@ -21,15 +21,15 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
         public async Task<ReferenceData> GetReferenceData(AuditLog auditLog)
         {
             var referenceData = new ReferenceData();
-            var lessonId = auditLog.EntityId;
+            var attachFileId = auditLog.EntityId;
 
             // Lấy thông tin Lesson
-            var lesson = await _unitOfWork.LessonRepository.GetFirstOrDefaultAsync(predicate: q => q.Id.ToString() == lessonId);
+            var attachFile =await _unitOfWork.CourseAttachedFileRepository.GetFirstOrDefaultAsync(predicate: q => q.Id.ToString() == attachFileId);
             string documentTypeName = "Unknown";
 
-            if (lesson != null)
+            if (attachFile != null)
             {
-                var documentType = await _unitOfWork.TypeDocumentRepository.GetFirstOrDefaultAsync(dt => dt.Id == lesson.TypeDocId);
+                var documentType = await _unitOfWork.TypeDocumentRepository.GetFirstOrDefaultAsync(dt => dt.Id == attachFile.TypeDocId);
                 documentTypeName = documentType?.NameType ?? "Unknown";
             }
 
@@ -46,7 +46,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             {
                 // Lấy audit log trước đó để so sánh
                 var previousAuditLog = _allAuditLogs
-                    .Where(p => p.EntityName == "Lessons" && p.EntityId == auditLog.EntityId && p.Timestamp < auditLog.Timestamp)
+                    .Where(p => p.EntityName == "CourseAttachedFile" && p.EntityId == auditLog.EntityId && p.Timestamp < auditLog.Timestamp)
                     .OrderByDescending(p => p.Timestamp)
                     .FirstOrDefault();
 

@@ -34,13 +34,17 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.Handlers
             var testIds = (await _unitOfWork.TestRepository.FindAndSelectAsync(
                 t => t.CourseId == courseId,
                 t => t.Id.ToString()))?.ToList() ?? new List<string>();
+            var attachFileIds = (await _unitOfWork.CourseAttachedFileRepository.FindAndSelectAsync(
+                    a => a.CourseId == courseId,
+                    a => a.Id.ToString()))?.ToList() ?? new List<string>();
 
             // Lấy audit logs
             var auditLogs = (await _unitOfWork.AuditLogRepository.GetFlexibleAsync(
                 predicate: a =>
                     (a.EntityName == "Courses" && a.EntityId == courseId) ||
                     (a.EntityName == "Lessons" && lessonIds.Contains(a.EntityId)) ||
-                    (a.EntityName == "Tests" && testIds.Contains(a.EntityId)),
+                    (a.EntityName == "Tests" && testIds.Contains(a.EntityId)) ||
+                    (a.EntityName == "CourseAttachedFile" && attachFileIds.Contains(a.EntityId)),
                 orderBy: q => q.OrderByDescending(l => l.Timestamp),
                 includes: q => q.Include(a => a.User).AsNoTracking()
             )).ToList();
@@ -60,13 +64,22 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.Handlers
             {
                 { "Courses", new CourseReferenceDataProvider(_unitOfWork, auditLogs) },
                 { "Lessons", new LessonReferenceDataProvider(_unitOfWork, auditLogs) },
-                { "Tests", new TestReferenceDataProvider(_unitOfWork, auditLogs) }
+                { "Tests", new TestReferenceDataProvider(_unitOfWork, auditLogs) },
+                { "CourseAttachedFile", new TestReferenceDataProvider(_unitOfWork, auditLogs) }
             };
 
             // Ánh xạ sang DTO
-            var auditLogDtos = auditLogs.Select(al =>
-                _auditLogMapper.MapToDto(al, userDict, referenceDataProviders)
-            ).ToList();
+            //var auditLogDtos = auditLogs.Select(al =>
+            //    _auditLogMapper.MapToDto(al, userDict, referenceDataProviders)
+            //).ToList();
+            var auditLogDtos = new List<AuditLogDto>();
+            foreach (var al in auditLogs)
+            {
+                var referenceData = referenceDataProviders.ContainsKey(al.EntityName)
+                    ? await referenceDataProviders[al.EntityName].GetReferenceData(al) // Sử dụng await
+                    : new ReferenceData();
+                auditLogDtos.Add(_auditLogMapper.MapToDto(al, userDict, referenceDataProviders).Result);
+            }
             return auditLogDtos;
         }
     }

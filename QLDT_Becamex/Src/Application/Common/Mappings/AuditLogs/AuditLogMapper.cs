@@ -9,7 +9,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
     public class AuditLogMapper : IAuditLogMapper
     {
         // Danh sách các trường cần loại bỏ (sử dụng HashSet để so sánh không phân biệt chữ hoa/thường)
-        private readonly HashSet<string> _fieldsToExclude = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Id", "CourseId","CreatedAt", "UpdatedAt", "CreatedById", "CreateById", "ModifiedAt", "UpdatedById", "UpdateById","StatusId","CategoryId","LecturerId","TypeDocId" };
+        private readonly HashSet<string> _fieldsToExclude = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Id", "CourseId","CreatedAt", "UpdatedAt", "CreatedById", "CreateById", "ModifiedAt", "UpdatedById", "UpdateById","StatusId","CategoryId","LecturerId","TypeDocId", "ModifiedTime", "UserId" };
 
         // Từ điển ánh xạ tên trường 
         private static readonly Dictionary<string, string> FieldNameMappings = new Dictionary<string, string>
@@ -46,7 +46,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
             { "NameType", "Loại tài liệu" },
             { "CourseName", "Tên khóa học" },
             { "TimeTest", "Thời gian làm bài" },
-            { "PassThreshold", "Ngưỡng cần đạt" }
+            { "PassThreshold", "Ngưỡng cần đạt" },
+            { "UserName", "Người tham gia" }
         };
 
         public class AuditLogChanges
@@ -55,7 +56,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
             public Dictionary<string, object>? NewValues { get; set; }
         }
 
-        public AuditLogDto MapToDto(AuditLog auditLog, Dictionary<string, ApplicationUser> userDict, Dictionary<string, IEntityReferenceDataProvider> referenceDataProviders)
+        public async Task<AuditLogDto> MapToDto(AuditLog auditLog, Dictionary<string, ApplicationUser> userDict, Dictionary<string, IEntityReferenceDataProvider> referenceDataProviders)
         {
             // Lấy múi giờ Việt Nam (UTC+7)
             TimeZoneInfo vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -80,7 +81,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
             if (referenceDataProviders.ContainsKey(auditLog.EntityName))
             {
                 var provider = referenceDataProviders[auditLog.EntityName];
-                var referenceData = provider.GetReferenceData(auditLog);
+                //var referenceData = provider.GetReferenceData(auditLog);
+                var referenceData = await referenceDataProviders[auditLog.EntityName].GetReferenceData(auditLog);
 
                 // Ánh xạ tên trường từ ReferenceData
                 dto.AddedFields.AddRange(referenceData.AddedFields.Select(f => new AddedField

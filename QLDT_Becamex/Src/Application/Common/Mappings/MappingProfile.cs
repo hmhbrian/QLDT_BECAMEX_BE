@@ -141,7 +141,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Course, UserEnrollCourseDto>();
 
             //CourseStatus
-            CreateMap<CourseStatus, StatusDto>().ReverseMap();
+            CreateMap<CourseStatus, StatusDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.StatusName));
             CreateMap<CreateStatusDto, CourseStatus>().ReverseMap();
 
             // Question

@@ -46,23 +46,33 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 
         private (DateTime? start, DateTime? end) GetDateRange(int? month, int? quarter, int? year)
         {
-            if (year == null) return (null, null);
+            int currentYear = DateTime.Now.Year;
 
             if (quarter != null)
             {
+                int useYear = year ?? currentYear;
                 int startMonth = (quarter.Value - 1) * 3 + 1;
-                DateTime start = new DateTime(year.Value, startMonth, 1);
+                DateTime start = new DateTime(useYear, startMonth, 1);
                 DateTime end = start.AddMonths(3).AddDays(-1);
                 return (start, end);
             }
 
             if (month != null)
             {
-                DateTime start = new DateTime(year.Value, month.Value, 1);
+                int useYear = year ?? currentYear;
+                DateTime start = new DateTime(useYear, month.Value, 1);
                 DateTime end = start.AddMonths(1).AddDays(-1);
                 return (start, end);
             }
 
+            if (year != null)
+            {
+                DateTime start = new DateTime(year.Value, 1, 1);
+                DateTime end = new DateTime(year.Value, 12, 31);
+                return (start, end);
+            }
+
+            // Không có month, quarter, hay year nào → không lọc
             return (null, null);
         }
 

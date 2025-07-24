@@ -134,23 +134,29 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     : null));
 
             CreateMap<CourseDto, Course>();
+
             CreateMap<UpdateCourseDto, Course>()
-             .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>
-                 src.RegistrationStartDate.HasValue && !Equals(src.RegistrationStartDate.Value, dest.RegistrationStartDate)
-                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationStartDate.Value, DateTimeKind.Utc))
-                     : dest.RegistrationStartDate))
-             .ForMember(dest => dest.RegistrationClosingDate, opt => opt.MapFrom((src, dest) =>
-                 src.RegistrationClosingDate.HasValue && !Equals(src.RegistrationClosingDate.Value, dest.RegistrationClosingDate)
-                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationClosingDate.Value, DateTimeKind.Utc))
-                     : dest.RegistrationClosingDate))
-             .ForMember(dest => dest.StartDate, opt => opt.MapFrom((src, dest) =>
-                 src.StartDate.HasValue && !Equals(src.StartDate.Value, dest.StartDate)
-                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.StartDate.Value, DateTimeKind.Utc))
-                     : dest.StartDate))
-             .ForMember(dest => dest.EndDate, opt => opt.MapFrom((src, dest) =>
-                 src.EndDate.HasValue && !Equals(src.EndDate.Value, dest.EndDate)
-                     ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.EndDate.Value, DateTimeKind.Utc))
-                     : dest.EndDate));
+              .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>
+                  src.RegistrationStartDate.HasValue && !Equals(src.RegistrationStartDate.Value, dest.RegistrationStartDate)
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationStartDate.Value, DateTimeKind.Utc))
+                      : dest.RegistrationStartDate))
+
+              .ForMember(dest => dest.RegistrationClosingDate, opt => opt.MapFrom((src, dest) =>
+                  src.RegistrationClosingDate.HasValue && !Equals(src.RegistrationClosingDate.Value, dest.RegistrationClosingDate)
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationClosingDate.Value, DateTimeKind.Utc))
+                      : dest.RegistrationClosingDate))
+
+              .ForMember(dest => dest.StartDate, opt => opt.MapFrom((src, dest) =>
+                  src.StartDate.HasValue && !Equals(src.StartDate.Value, dest.StartDate)
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.StartDate.Value, DateTimeKind.Utc))
+                      : dest.StartDate))
+
+              .ForMember(dest => dest.EndDate, opt => opt.MapFrom((src, dest) =>
+                  src.EndDate.HasValue && !Equals(src.EndDate.Value, dest.EndDate)
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.EndDate.Value, DateTimeKind.Utc))
+                      : dest.EndDate)) // Áp dụng điều kiện chung: chỉ map nếu khác null và khác giá trị cũ
+              .ForAllMembers(opt => opt.Condition((src, dest, srcMember, destMember) =>
+                  srcMember != null && !Equals(srcMember, destMember)));
 
 
 

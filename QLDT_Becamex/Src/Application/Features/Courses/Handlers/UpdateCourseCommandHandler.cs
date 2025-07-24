@@ -141,15 +141,28 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             // === BƯỚC 4: CẬP NHẬT THÔNG TIN CHÍNH CỦA KHÓA HỌC ===
 
             // Sử dụng AutoMapper để ánh xạ dữ liệu từ request DTO sang đối tượng Course entity
-            var updateCourse = _mapper.Map(request, course);
+
 
             // Xử lý việc upload ảnh thumbnail (nếu có)
             string? imageUrl = null;
+
             if (request.ThumbUrl != null)
             {
+                // Lấy public id từ ảnh cũ
+                if (course.ThumbUrl != null)
+                {
+                    var oldPublicId = ExtractPublicId(course.ThumbUrl);
+                    if (!string.IsNullOrEmpty(oldPublicId))
+                    {
+                        await _cloudinaryService.DeleteImageAsync(oldPublicId);
+                    }
+                }
+
+                // Upload ảnh mới
                 imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
-                updateCourse.ThumbUrl = imageUrl; // Cập nhật URL ảnh mới
             }
+            var updateCourse = _mapper.Map(request, course);
+            updateCourse.ThumbUrl = imageUrl;
 
             // Ghi nhận lại thông tin về lần cập nhật này
             updateCourse.UpdatedAt = DateTimeHelper.GetVietnamTimeNow();
@@ -204,7 +217,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             // === BƯỚC 6: GÁN LẠI KHÓA HỌC CHO HỌC VIÊN ===
 
-            var newUserCoursesToAssign = new List< UserCourse>();
+            var newUserCoursesToAssign = new List<UserCourse>();
             var assignedUserIds = new HashSet<string>();
 
             if (request.Optional == ConstantCourse.OPTIONAL_BATBUOC)
@@ -310,5 +323,48 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             return course.Id;
 
         }
+
+
+        private string? ExtractPublicId(string imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl)) return null;
+
+            // Example: https://res.cloudinary.com/ttdn/image/upload/v1752635597/avatars/lcin0x1qjmmkybabgzc8.jpg
+            try
+            {
+                var uri = new Uri(imageUrl);
+                var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+                // Lấy tất cả phần sau "upload/" và bỏ phần đuôi .jpg
+                var uploadIndex = Array.IndexOf(segments, "upload");
+                if (uploadIndex >= 0 && uploadIndex + 1 < segments.Length)
+                {
+                    var publicIdParts = segments.Skip(uploadIndex + 1).ToArray(); // ["v1752635597", "avatars", "lcin0x1qjmmkybabgzc8.jpg"]
+
+                    // Bỏ version nếu có (v...)
+                    if (publicIdParts[0].StartsWith("v"))
+                    {
+                        publicIdParts = publicIdParts.Skip(1).ToArray();
+                    }
+
+                    // Ghép lại path, rồi bỏ đuôi
+                    var fullPath = string.Join('/', publicIdParts);
+                    var lastDot = fullPath.LastIndexOf('.');
+                    if (lastDot > 0)
+                    {
+                        fullPath = fullPath.Substring(0, lastDot); // Bỏ .jpg
+                    }
+
+                    return fullPath; // avatars/lcin0x1qjmmkybabgzc8
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
     }
 }

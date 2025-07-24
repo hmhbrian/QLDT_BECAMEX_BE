@@ -102,6 +102,37 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices
             }
         }
 
+        public async Task<bool> DeleteImageAsync(string publicId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(publicId))
+                {
+                    Console.WriteLine("[Cloudinary] Public ID is null or empty.");
+                    return false;
+                }
+
+                Console.WriteLine($"[Cloudinary] Deleting image: {publicId}");
+
+                var deletionParams = new DeletionParams(publicId)
+                {
+                    ResourceType = ResourceType.Image // Đảm bảo đúng loại
+                };
+
+                var result = await _cloudinary.DestroyAsync(deletionParams);
+
+                Console.WriteLine($"[Cloudinary] Delete result: {result.Result}");
+
+                return result.Result == "ok" || result.Result == "deleted";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Cloudinary DELETE ERROR] {ex.Message}");
+                return false;
+            }
+        }
+
+
 
 
         public async Task<string?> UploadImageAsync(IFormFile file)

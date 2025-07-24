@@ -161,7 +161,10 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 imageUrl = await _cloudinaryService.UploadImageAsync(request.ThumbUrl);
             }
             var updateCourse = _mapper.Map(request, course);
-            updateCourse.ThumbUrl = imageUrl;
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                updateCourse.ThumbUrl = imageUrl;
+            }
 
             // Ghi nhận lại thông tin về lần cập nhật này
             updateCourse.UpdatedAt = DateTime.Now;

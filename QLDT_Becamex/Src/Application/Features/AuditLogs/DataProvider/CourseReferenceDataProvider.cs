@@ -52,23 +52,29 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
 
             var courseUsers = await _unitOfWork.UserCourseRepository.FindAsync(cp => cp.CourseId == courseId);
             var userIds = courseUsers.Select(cp => cp.UserId).ToList();
+            
+            //Loại bỏ mili giây
+            var auditLogTimeWithoutMs = auditLog.Timestamp.AddTicks(-(auditLog.Timestamp.Ticks % TimeSpan.TicksPerSecond));
+            var timeWindow = TimeSpan.FromSeconds(1);
 
-            var timeWindow = TimeSpan.FromSeconds(0.5);
             // Lấy ID từ bản ghi Deleted để đảm bảo ánh xạ đầy đủ
             var deletedDepartmentLogs = _allAuditLogs
-                .Where(p => p.EntityName == "CourseDepartment" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") && p.Timestamp <= auditLog.Timestamp.Add(timeWindow))
+                .Where(p => p.EntityName == "CourseDepartment" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") 
+                        && p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();
             var previousDepartmentIds = ExtractIdsFromDeletedLogs(deletedDepartmentLogs, "DepartmentId");
 
             var deletedPositionLogs = _allAuditLogs
-                .Where(p => p.EntityName == "CoursePosition" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") && p.Timestamp <= auditLog.Timestamp.Add(timeWindow))
+                .Where(p => p.EntityName == "CoursePosition" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") 
+                        && p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();
             var previousPositionIds = ExtractIdsFromDeletedLogs(deletedPositionLogs, "PositionId");
 
             var deletedUserLogs = _allAuditLogs
-                .Where(p => p.EntityName == "UserCourse" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") && p.Timestamp <= auditLog.Timestamp.Add(timeWindow))
+                .Where(p => p.EntityName == "UserCourse" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") 
+                        && p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .ToList();
             var previousUserIds = ExtractIdsFromDeletedLogs(deletedUserLogs, "UserId");
 
@@ -223,12 +229,13 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             List<string> previousPositionIds)
         {
             // Lấy các bản ghi Deleted trong khoảng thời gian gần với auditLog.Timestamp
-            var timeWindow = TimeSpan.FromSeconds(0.5); // Khoảng thời gian 1 giây
+            var auditLogTimeWithoutMs = auditLog.Timestamp.AddTicks(-(auditLog.Timestamp.Ticks % TimeSpan.TicksPerSecond));
+            var timeWindow = TimeSpan.FromSeconds(1);
 
             var deletedUserLogs = _allAuditLogs
                 .Where(p => p.EntityName == "UserCourse" &&
                            p.Action == "Deleted" &&
-                           p.Timestamp <= auditLog.Timestamp.Add(timeWindow) &&
+                           p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs &&
                            p.Changes.Contains($"\"CourseId\":\"{courseId}\""))
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();

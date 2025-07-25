@@ -105,5 +105,18 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new GetCompletedCoursesCountQuery());
             return Ok(ApiResponse<int>.Ok(result));
         }
+        [HttpGet("completed-enroll-courses")]
+        public async Task<IActionResult> GetCompletedEnrollCourses([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetCompletedCoursesQuery(queryParams), cancellationToken);
+            return Ok(ApiResponse<PagedResult<UserEnrollCompletedCourseDto>>.Ok(result));
+        }
+        [HttpGet("progress-list/{courseId}")]
+        [Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> GetListUserCoursesProgress(string courseId, [FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetListUserCoursesProgressQuery(queryParams, courseId), cancellationToken);
+            return Ok(ApiResponse<PagedResult<UserCourseProgressDto>>.Ok(result));
+        }
     }
 }

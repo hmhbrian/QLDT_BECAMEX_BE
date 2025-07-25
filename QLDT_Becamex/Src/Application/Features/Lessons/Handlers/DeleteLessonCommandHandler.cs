@@ -4,7 +4,8 @@ using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces; // Dành cho IBaseService, ICloudinaryService
 
 using QLDT_Becamex.Src.Infrastructure.Services;
-using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices; // Dành cho các thao tác LINQ như FirstOrDefaultAsync hoặc SingleOrDefaultAsync
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
+using System.Data.Entity; // Dành cho các thao tác LINQ như FirstOrDefaultAsync hoặc SingleOrDefaultAsync
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 {
@@ -37,6 +38,20 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
             if (lessons == null || !lessons.Any())
             {
                 throw new AppException("Không tìm thấy bất kỳ bài học nào để xoá.", 404);
+            }
+
+            //Kiểm tra khóa học được phép xóa hay không
+            var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
+                predicate: a => a.Id == request.CourseId,
+                includes: p => p.Include(a => a.Status));
+
+            if (course == null)
+            {
+                throw new AppException("Khóa học không tồn tại", 404);
+            }
+            if (course.Status != null && course.Status.Key > 1)
+            {
+                throw new AppException("Không thể xóa bài học vì đã bắt đầu", 403);
             }
 
             using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -79,9 +94,9 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 await transaction.RollbackAsync(cancellationToken);
                 throw new AppException($"Lỗi khi xóa bài học và cập nhật vị trí: {ex.Message}", 500);
             }
-            
 
-            
+
+
         }
     }
 }

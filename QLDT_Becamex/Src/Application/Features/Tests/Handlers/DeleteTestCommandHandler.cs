@@ -1,9 +1,12 @@
 using AutoMapper;
+using LinqKit;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using System;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
@@ -24,27 +27,42 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             {
                 throw new AppException("Bài kiểm tra không tồn tại", 404);
             }
-            string courseId = test.CourseId!;
-            // Remove Test from repository
-            _unitOfWork.TestRepository.Remove(test);
 
-            // Save changes to database
-            await _unitOfWork.CompleteAsync();
-            var allTest = await _unitOfWork.TestRepository.GetAllAsync();
-            var remainingTests = allTest.Where(t => t.CourseId == courseId).ToList();
-
-            int position = 1;
-            foreach (var t in remainingTests.OrderBy(t => t.Position))
+            if (string.IsNullOrEmpty(test.CourseId))
             {
-                var updateTest = new Test
-                {
-                    Id = t.Id,
-                    Position = position++,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _unitOfWork.TestRepository.Update(t, updateTest);
+                throw new AppException("CourseId không hợp lệ", 400);
+            }
+            string courseId = test.CourseId;
+
+            //Kiểm tra khóa học được phép xóa hay không
+            var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
+                predicate: a => a.Id == courseId,
+                includes: p => p.Include(a => a.Status));
+
+            if (course == null)
+            {
+                throw new AppException("Khóa học không tồn tại", 404);
+            }
+            if (course.Status != null && course.Status.Key > 1)
+            {
+                throw new AppException("Không thể xóa bài kiểm tra vì đã bắt đầu", 403);
             }
 
+            // Remove Test from repository
+            _unitOfWork.TestRepository.Remove(test);
+            await _unitOfWork.CompleteAsync();
+
+            var allTestOfCourse = (await _unitOfWork.TestRepository.GetFlexibleAsync(predicate: t => t.CourseId == courseId)).ToList();
+
+            int position = 1;
+            foreach (var t in allTestOfCourse.OrderBy(t => t.Position))
+            {
+                t.Position = position++;
+                t.UpdatedAt = DateTime.UtcNow;
+                _unitOfWork.TestRepository.UpdateEntity(t);
+            }
+
+            // Save changes to database
             await _unitOfWork.CompleteAsync();
 
             // Return Test Id as string

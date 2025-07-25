@@ -10,14 +10,14 @@ using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
-    public class GetListEnrollCourseQueryHandler : IRequestHandler<GetListEnrollCourseQuery, PagedResult<UserEnrollCourseDto>>
+    public class GetListUserCoursesProgressQueryHandler : IRequestHandler<GetListUserCoursesProgressQuery, PagedResult<UserCourseProgressDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserService _userService;
 
-        public GetListEnrollCourseQueryHandler(
+        public GetListUserCoursesProgressQueryHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
@@ -30,50 +30,36 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             _userService = userService;
         }
 
-        public async Task<PagedResult<UserEnrollCourseDto>> Handle(GetListEnrollCourseQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<UserCourseProgressDto>> Handle(GetListUserCoursesProgressQuery request, CancellationToken cancellationToken)
         {
             var queryParams = request.baseQueryParam;
-            var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
-            if (string.IsNullOrEmpty(userId))
+            string courseId = request.courseId;
+            if (string.IsNullOrEmpty(courseId))
             {
-                throw new AppException("User not authenticated", 401);
+                throw new ArgumentException("Course ID cannot be null or empty.", nameof(courseId));
             }
-            // 1. Tổng số bản ghi
-            int totalItems = await _unitOfWork.CourseRepository.CountAsync(c =>
-                c.UserCourses != null && c.UserCourses.Any(uc => uc.UserId == userId) && !c.IsDeleted);
-
-            // 2. Hàm sắp xếp cho Course
-            Func<IQueryable<Course>, IOrderedQueryable<Course>> courseOrderByFunc = query =>
+            var userCourses = await _unitOfWork.UserCourseRepository
+                .GetFlexibleAsync(uc => uc.CourseId == courseId);
+            var userCoursesProgressDtos = new List<UserCourseProgressDto>();
+            foreach (var userCourse in userCourses)
             {
-                bool isDesc = queryParams.SortType?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true;
-                return queryParams.SortField?.ToLower() switch
+                var user = await _userManager.FindByIdAsync(userCourse.UserId);
+                if (user == null) continue;
+
+                var progress = await GetCourseProgress(courseId, user.Id);
+                var userCourseProgressDto = new UserCourseProgressDto
                 {
-                    "name" => isDesc ? query.OrderByDescending(c => c.Name) : query.OrderBy(c => c.Name),
-                    "createdat" => isDesc ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt),
-                    "status" => isDesc ? query.OrderByDescending(c => c.Status) : query.OrderBy(c => c.Status),
-                    _ => isDesc ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt)
+                    userId = user.Id,
+                    userName = user.FullName != null ? user.FullName : "",
+                    progressPercentage = progress
                 };
-            };
-            // 3. Lấy dữ liệu có phân trang
-            var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                predicate: c => c.UserCourses != null && c.UserCourses.Any(uc => uc.UserId == userId) && !c.IsDeleted,
-                orderBy: courseOrderByFunc,
-                page: queryParams.Page,
-                pageSize: queryParams.Limit,
-                includes: null,
-                asNoTracking: true
-            );
+                userCoursesProgressDtos.Add(userCourseProgressDto);
+            }
             var pagination = new Pagination(queryParams.Page,
                 queryParams.Limit,
-                totalItems);
-            var userEnrollCourseDtos = _mapper.Map<List<UserEnrollCourseDto>>(courses);
-            foreach (var courseDto in userEnrollCourseDtos)
-            {
-                float lessonsProgress = await GetCourseProgress(courseDto.Id, userId);
-                courseDto.progressPercentange = lessonsProgress;
-            }
-            var result = new PagedResult<UserEnrollCourseDto>(userEnrollCourseDtos, pagination);
-            return result;
+                userCoursesProgressDtos.Count());
+            var pagedResult = new PagedResult<UserCourseProgressDto>(userCoursesProgressDtos, pagination);
+            return pagedResult;
         }
         private async Task<float> CalculateLessonsProgressAsync(string courseId, string userId)
         {

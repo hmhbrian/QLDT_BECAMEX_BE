@@ -1,4 +1,5 @@
 ﻿using QLDT_Becamex.Src.Application.Common;
+using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
 using QLDT_Becamex.Src.Application.Features.AuditLogs.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
@@ -25,79 +26,98 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             var referenceData = new ReferenceData();
             var courseId = auditLog.EntityId;
 
+            if (courseId == null)
+                throw new AppException($"Id khóa học không hợp lệ", 400);
+
             // Lấy dữ liệu hiện tại và bao gồm cả ID từ bản ghi Deleted
-            var (departmentDict, positionDict, userDict, previousDepartmentIds, previousPositionIds) = await GetCurrentReferenceDictionariesAsync(courseId, auditLog);
+            var (departmentDict, positionDict, userDict, previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds) = await GetCurrentReferenceDictionariesAsync(courseId, auditLog); 
             var (statusName, categoryName, lecturerName, hasStatusChange) = await GetCurrentCourseDetailsAsync(courseId, auditLog);
+
 
             if (auditLog.Action == "Added")
             {
-                await AddFieldsForAddedActionAsync(referenceData, courseId, departmentDict, positionDict, userDict, statusName, categoryName, lecturerName);
+                await AddFieldsForAddedActionAsync(referenceData, courseId, departmentDict, positionDict, userDict, statusName, categoryName, lecturerName, currentDepartmentIds, currentPositionIds);
             }
             else if (auditLog.Action == "Modified")
             {
-                await AddFieldsForModifiedActionAsync(referenceData, auditLog, courseId, departmentDict, positionDict, userDict, statusName, categoryName, lecturerName, hasStatusChange, previousDepartmentIds, previousPositionIds);
+                await AddFieldsForModifiedActionAsync(referenceData, auditLog, courseId, departmentDict, positionDict, userDict, statusName, categoryName, lecturerName, hasStatusChange, previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds);
             }
 
             return referenceData;
         }
 
-        private async Task<(Dictionary<string, string> departmentDict, Dictionary<string, string> positionDict, Dictionary<string, string> userDict, List<string> previousDepartmentIds, List<string> previousPositionIds)> GetCurrentReferenceDictionariesAsync(string courseId, AuditLog auditLog)
+        private async Task<(Dictionary<string, string> departmentDict, Dictionary<string, string> positionDict, Dictionary<string, string> userDict, List<string> previousDepartmentIds, List<string> currentDepartmentIds, List<string> previousPositionIds, List<string> currentPositionIds)> GetCurrentReferenceDictionariesAsync(string courseId, AuditLog auditLog)
         {
-            // Lấy CourseDepartment, CoursePosition và UserCourse
-            var courseDepartments = await _unitOfWork.CourseDepartmentRepository.FindAsync(cd => cd.CourseId == courseId);
-            var departmentIds = courseDepartments.Select(cd => cd.DepartmentId.ToString()).ToList();
-
-            var coursePositions = await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == courseId);
-            var positionIds = coursePositions.Select(cp => cp.PositionId.ToString()).ToList();
-
-            var courseUsers = await _unitOfWork.UserCourseRepository.FindAsync(cp => cp.CourseId == courseId);
-            var userIds = courseUsers.Select(cp => cp.UserId).ToList();
-            
-            //Loại bỏ mili giây
+            // Loại bỏ mili giây
             var auditLogTimeWithoutMs = auditLog.Timestamp.AddTicks(-(auditLog.Timestamp.Ticks % TimeSpan.TicksPerSecond));
             var timeWindow = TimeSpan.FromSeconds(1);
 
+            // Lấy CourseDepartment, CoursePosition và UserCourse
+            //var courseDepartments = await _unitOfWork.CourseDepartmentRepository.FindAsync(cd => cd.CourseId == courseId);
+            //var departmentIds = courseDepartments.Select(cd => cd.DepartmentId.ToString()).ToList();
+
+            //var coursePositions = await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == courseId);
+            //var positionIds = coursePositions.Select(cp => cp.PositionId.ToString()).ToList();
+
+            var courseUsers = await _unitOfWork.UserCourseRepository.FindAsync(cp => cp.CourseId == courseId);
+            var userIds = courseUsers.Select(cp => cp.UserId).ToList();
+
+            // Lấy ID từ bản ghi Add để đảm bảo ánh xạ đầy đủ
+            var addedDepartmentLogs = _allAuditLogs
+                .Where(p => p.EntityName == "CourseDepartment" && p.Action == "Added" &&
+                    p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") &&
+                    p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
+                .OrderByDescending(p => p.Timestamp)
+                .ToList();
+            var currentDepartmentIds = ExtractIdsFromAddedLogs(addedDepartmentLogs, "DepartmentId");
+
+            var addedPositionLogs = _allAuditLogs
+                .Where(p => p.EntityName == "CoursePosition" && p.Action == "Added" &&
+                    p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") &&
+                    p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
+                .OrderByDescending(p => p.Timestamp)
+                .ToList();
+            var currentPositionIds = ExtractIdsFromAddedLogs(addedPositionLogs, "PositionId");
+
             // Lấy ID từ bản ghi Deleted để đảm bảo ánh xạ đầy đủ
             var deletedDepartmentLogs = _allAuditLogs
-                .Where(p => p.EntityName == "CourseDepartment" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") 
+                .Where(p => p.EntityName == "CourseDepartment" && p.Action == "Deleted" && p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") 
                         && p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();
             var previousDepartmentIds = ExtractIdsFromDeletedLogs(deletedDepartmentLogs, "DepartmentId");
 
             var deletedPositionLogs = _allAuditLogs
-                .Where(p => p.EntityName == "CoursePosition" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") 
+                .Where(p => p.EntityName == "CoursePosition" && p.Action == "Deleted" && p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") 
                         && p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();
             var previousPositionIds = ExtractIdsFromDeletedLogs(deletedPositionLogs, "PositionId");
 
             var deletedUserLogs = _allAuditLogs
-                .Where(p => p.EntityName == "UserCourse" && p.Action == "Deleted" && p.Changes.Contains($"\"CourseId\":\"{courseId}\"") 
+                .Where(p => p.EntityName == "UserCourse" && p.Action == "Deleted" && p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") 
                         && p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .ToList();
             var previousUserIds = ExtractIdsFromDeletedLogs(deletedUserLogs, "UserId");
 
-            departmentIds.AddRange(previousDepartmentIds);
-            positionIds.AddRange(previousPositionIds);
-            userIds.AddRange(previousUserIds);
-
             // Lấy tên Department, Position, User
-            var departments = await _unitOfWork.DepartmentRepository.FindAsync(d => departmentIds.Contains(d.DepartmentId.ToString()));
+            var departments = await _unitOfWork.DepartmentRepository.FindAsync(d => currentDepartmentIds.Concat(previousDepartmentIds).Contains(d.DepartmentId.ToString()));
             var departmentDict = departments.ToDictionary(d => d.DepartmentId.ToString(), d => d.DepartmentName);
 
-            var positions = await _unitOfWork.PositionRepository.FindAsync(p => positionIds.Contains(p.PositionId.ToString()));
+            var positions = await _unitOfWork.PositionRepository.FindAsync(p => currentPositionIds.Concat(previousPositionIds).Contains(p.PositionId.ToString()));
             var positionDict = positions.ToDictionary(p => p.PositionId.ToString(), p => p.PositionName);
 
             var users = await _unitOfWork.UserRepository.FindAsync(p => userIds.Contains(p.Id));
             var userDict = users.ToDictionary(p => p.Id, p => p.FullName);
 
             // Ghi log để debug
-            Console.WriteLine($"CourseId: {courseId}, DepartmentIds: {string.Join(", ", departmentIds)}");
-            Console.WriteLine($"CourseId: {courseId}, PositionIds: {string.Join(", ", positionIds)}");
-            Console.WriteLine($"CourseId: {courseId}, UserIds: {string.Join(", ", userIds)}");
+            Console.WriteLine($"CourseId: {courseId}, AuditLog Timestamp (without ms): {auditLogTimeWithoutMs}, Original: {auditLog.Timestamp}");
+            Console.WriteLine($"Previous Department IDs: {string.Join(", ", previousDepartmentIds)}");
+            Console.WriteLine($"Current Department IDs: {string.Join(", ", currentDepartmentIds)}");
+            Console.WriteLine($"Previous Position IDs: {string.Join(", ", previousPositionIds)}");
+            Console.WriteLine($"Current Position IDs: {string.Join(", ", currentPositionIds)}");
 
-            return (departmentDict, positionDict, userDict, previousDepartmentIds, previousPositionIds);
+            return (departmentDict, positionDict, userDict, previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds);
         }
 
         private async Task<(string statusName, string categoryName, string lecturerName,bool hasStatusChange)> GetCurrentCourseDetailsAsync(string courseId, AuditLog auditLog)
@@ -133,7 +153,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
 
             // Kiểm tra xem Status có thay đổi trong Changes không
             var changes = JsonSerializer.Deserialize<AuditLogMapper.AuditLogChanges>(
-                auditLog.Changes, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                auditLog.Changes!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             bool hasStatusChange = changes?.OldValues?.ContainsKey("StatusId") == true || changes?.NewValues?.ContainsKey("StatusId") == true;
 
             return (statusName, categoryName, lecturerName, hasStatusChange);
@@ -147,14 +167,14 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             Dictionary<string, string> userDict,
             string statusName,
             string categoryName,
-            string lecturerName)
+            string lecturerName,
+            List<string> currentDepartmentIds,
+            List<string> currentPositionIds)
         {
             // Thêm Department vào AddedFields
-            var departmentIds = (await _unitOfWork.CourseDepartmentRepository.FindAsync(cd => cd.CourseId == courseId))
-                .Select(cd => cd.DepartmentId.ToString()).ToList();
-            if (departmentIds.Any())
+            if (currentDepartmentIds.Any())
             {
-                var departmentNames = departmentIds
+                var departmentNames = currentDepartmentIds
                     .Where(id => departmentDict.ContainsKey(id))
                     .Select(id => departmentDict[id])
                     .OrderBy(name => name)
@@ -167,11 +187,9 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             }
 
             // Thêm Position vào AddedFields
-            var positionIds = (await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == courseId))
-                .Select(cp => cp.PositionId.ToString()).ToList();
-            if (positionIds.Any())
+            if (currentPositionIds.Any())
             {
-                var positionNames = positionIds
+                var positionNames = currentPositionIds
                     .Where(id => positionDict.ContainsKey(id))
                     .Select(id => positionDict[id])
                     .OrderBy(name => name)
@@ -226,7 +244,9 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             string categoryName,
             string lecturerName, bool hasStatusChange,
             List<string> previousDepartmentIds,
-            List<string> previousPositionIds)
+            List<string> currentDepartmentIds,
+            List<string> previousPositionIds,
+            List<string> currentPositionIds)
         {
             // Lấy các bản ghi Deleted trong khoảng thời gian gần với auditLog.Timestamp
             var auditLogTimeWithoutMs = auditLog.Timestamp.AddTicks(-(auditLog.Timestamp.Ticks % TimeSpan.TicksPerSecond));
@@ -236,7 +256,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 .Where(p => p.EntityName == "UserCourse" &&
                            p.Action == "Deleted" &&
                            p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs &&
-                           p.Changes.Contains($"\"CourseId\":\"{courseId}\""))
+                           p.Changes!.Contains($"\"CourseId\":\"{courseId}\""))
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();
 
@@ -247,8 +267,34 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
 
             // So sánh và thêm vào ChangedFields
             await AddChangedFieldsAsync(referenceData, courseId, departmentDict, positionDict, userDict,
-                previousDepartmentIds, previousPositionIds, previousUserIds,
+                previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds, previousUserIds,
                 statusName, previousStatusName, categoryName, previousCategoryName, lecturerName, previousLecturerName, hasStatusChange);
+        }
+
+        private List<string> ExtractIdsFromAddedLogs(List<AuditLog> logs, string idFieldName)
+        {
+            var ids = new List<string>();
+            foreach (var log in logs)
+            {
+                if (!string.IsNullOrEmpty(log.Changes))
+                {
+                    try
+                    {
+                        var changes = JsonSerializer.Deserialize<AuditLogMapper.AuditLogChanges>(
+                            log.Changes,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (changes?.NewValues?.ContainsKey(idFieldName) == true)
+                        {
+                            ids.Add(changes.NewValues[idFieldName].ToString()!);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error deserializing Changes for AuditLog ID {log.Id}: {ex.Message}");
+                    }
+                }
+            }
+            return ids;
         }
 
         private List<string> ExtractIdsFromDeletedLogs(List<AuditLog> logs, string idFieldName)
@@ -344,7 +390,9 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             Dictionary<string, string> positionDict,
             Dictionary<string, string> userDict,
             List<string> previousDepartmentIds,
+            List<string> currentDepartmentIds,
             List<string> previousPositionIds,
+            List<string> currentPositionIds,
             List<string> previousUserIds,
             string statusName,
             string previousStatusName,
@@ -355,15 +403,13 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             bool hasStatusChange)
         {
             // Lấy danh sách tên hiện tại
-            var currentDepartmentNames = (await _unitOfWork.CourseDepartmentRepository.FindAsync(cd => cd.CourseId == courseId))
-                .Select(cd => cd.DepartmentId.ToString())
+            var currentDepartmentNames = currentDepartmentIds
                 .Where(id => departmentDict.ContainsKey(id))
                 .Select(id => departmentDict[id])
                 .OrderBy(name => name)
                 .ToList();
 
-            var currentPositionNames = (await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == courseId))
-                .Select(cp => cp.PositionId.ToString())
+            var currentPositionNames = currentPositionIds
                 .Where(id => positionDict.ContainsKey(id))
                 .Select(id => positionDict[id])
                 .OrderBy(name => name)

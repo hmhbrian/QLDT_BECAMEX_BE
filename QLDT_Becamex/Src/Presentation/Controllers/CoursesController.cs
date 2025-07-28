@@ -87,23 +87,33 @@ namespace QLDT_Becamex.Src.Controllers
             return Ok(ApiResponse.Ok(result));
 
         }
+
         [HttpGet("enroll-courses")]
         public async Task<IActionResult> GetListEnrollCourse([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetListEnrollCourseQuery(queryParams), cancellationToken);
             return Ok(ApiResponse<PagedResult<UserEnrollCourseDto>>.Ok(result)); // Bao kết quả tại đây
         }
+
         [HttpGet("progress/{id}")]
         public async Task<IActionResult> GetCourseProgress(string id)
         {
             var result = await _mediator.Send(new GetCourseProgressQuery(id));
             return Ok(ApiResponse<float>.Ok(result));
         }
+
         [HttpGet("completed-count")]
         public async Task<IActionResult> GetCompletedCoursesCount()
         {
             var result = await _mediator.Send(new GetCompletedCoursesCountQuery());
             return Ok(ApiResponse<int>.Ok(result));
+        }
+
+        [HttpGet("upcoming-courses")]
+        public async Task<IActionResult> GetListUpcomingCourse(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetListUpcomingCourseQuery(), cancellationToken);
+            return Ok(ApiResponse<List<UserUpcomingCourseDto>>.Ok(result));
         }
     }
 }

@@ -158,6 +158,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<UserEnrollCourseDto, Course>();
             CreateMap<Course, UserEnrollCourseDto>();
 
+            //UpcomingCourse
+            CreateMap<Course, UserUpcomingCourseDto>();
+
+
             //CourseStatus
             CreateMap<CourseStatus, StatusDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

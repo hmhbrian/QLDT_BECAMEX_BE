@@ -16,7 +16,11 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 
         public async Task<List<CourseAndAvgFeedbackDto>> Handle(GetListCourseAndAvgFeedbackQuery request, CancellationToken cancellationToken)
         {
-            var courses = await _unitOfWork.CourseRepository.GetAllAsync();
+            var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
+                c => !c.IsDeleted,
+                orderBy: null,
+                asNoTracking: true
+            );
 
             var courseAndAvgFeedbackDtos = new List<CourseAndAvgFeedbackDto>();
             foreach (var course in courses)

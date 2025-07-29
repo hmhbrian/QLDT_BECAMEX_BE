@@ -79,7 +79,7 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
         private async Task<int> GetNumberOfCoursesAsync(DateTime? start, DateTime? end)
         {
             var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                c => c.StatusId != 1,
+                c => c.StatusId != 1 && !c.IsDeleted,
                 orderBy: null
             );
 
@@ -110,9 +110,12 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 
         private async Task<float> GetAverageCompletedPercentageAsync(DateTime? start, DateTime? end)
         {
-            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(orderBy: null);
+            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
+                uc => uc.Course != null && !uc.Course.IsDeleted,
+                orderBy: null
+            );
             var completedCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
-                uc => uc.Status == "Completed",
+                uc => uc.Course != null && !uc.Course.IsDeleted && uc.Status == "Completed",
                 orderBy: null
             );
 
@@ -131,7 +134,10 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 
         private async Task<float> GetAverageTimeAsync(DateTime? start, DateTime? end)
         {
-            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(orderBy: null);
+            var userCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
+                uc => uc.Course != null && !uc.Course.IsDeleted,
+                orderBy: null
+            );
 
             if (start != null && end != null)
             {
@@ -155,7 +161,10 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
 
         private async Task<float> GetAveragePositiveFeedbackAsync(DateTime? start, DateTime? end)
         {
-            var feedbacks = await _unitOfWork.FeedbackRepository.GetFlexibleAsync(orderBy: null);
+            var feedbacks = await _unitOfWork.FeedbackRepository.GetFlexibleAsync(
+                f => f.Course != null && !f.Course.IsDeleted,
+                orderBy: null
+            );
 
             if (start != null && end != null)
             {

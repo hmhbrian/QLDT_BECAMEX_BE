@@ -118,5 +118,12 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new GetListUserCoursesProgressQuery(queryParams, courseId), cancellationToken);
             return Ok(ApiResponse<PagedResult<UserCourseProgressDto>>.Ok(result));
         }
+        [HttpGet("progress-detail/{courseId}/{userId}")]
+        [Authorize(Roles = "ADMIN,HR")]
+        public async Task<IActionResult> GetUserCourseProgressDetail(string courseId, string userId)
+        {
+            var result = await _mediator.Send(new GetDetailUserCoursesProgressQuery(userId, courseId));
+            return Ok(ApiResponse<DetailedUserCourseProgressDto>.Ok(result));
+        }
     }
 }

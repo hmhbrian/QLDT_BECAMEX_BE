@@ -14,11 +14,14 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
         }
         public async Task<AvgFeedbackDto> Handle(GetAvgFeedbackQuery request, CancellationToken cancellationToken)
         {
-            var feedbacks = await _unitOfWork.FeedbackRepository.GetAllAsync();
+            var feedbacks = await _unitOfWork.FeedbackRepository.GetFlexibleAsync(
+                f => f.Course != null && !f.Course.IsDeleted,
+                orderBy: null
+            );
             var avgFeedback = new AvgFeedbackDto();
 
             foreach (var feedback in feedbacks)
-            {
+            {   
                 avgFeedback.Q1_relevanceAvg += feedback.Q1_relevance;
                 avgFeedback.Q2_clarityAvg += feedback.Q2_clarity;
                 avgFeedback.Q3_structureAvg += feedback.Q3_structure;

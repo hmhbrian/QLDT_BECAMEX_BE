@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chứng chỉ Becamex</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
@@ -15,7 +15,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f37055, #f2934c);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -28,7 +28,7 @@
             width: 900px;
             height: 640px;
             border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
             display: flex;
@@ -45,7 +45,7 @@
                 left: 0;
                 right: 0;
                 height: 8px;
-                background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+                background: linear-gradient(90deg, #f37055, #f2934c, #ffd194);
             }
 
         .decorative-border {
@@ -55,16 +55,15 @@
             right: 25px;
             bottom: 25px;
             border: 3px solid;
-            border-image: linear-gradient(45deg, #667eea, #764ba2, #667eea) 1;
+            border-image: linear-gradient(45deg, #f37055, #f2934c) 1;
             border-radius: 15px;
-            pointer-events: none;
         }
 
         .decorative-corners {
             position: absolute;
             width: 60px;
             height: 60px;
-            border: 4px solid #667eea;
+            border: 4px solid #f37055;
         }
 
         .corner-tl {
@@ -104,33 +103,25 @@
             margin-bottom: 40px;
         }
 
-        .logo-section {
-            margin-bottom: 20px;
-        }
-
-        .company-name {
-            font-size: 32px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        .logo-section img {
+            height: 60px;
         }
 
         .company-subtitle {
             font-size: 14px;
             color: #7f8c8d;
             font-weight: 300;
-            letter-spacing: 1px;
+            margin-top: 5px;
         }
 
         .certificate-title {
             font-family: 'Playfair Display', serif;
             font-size: 28px;
-            color: #667eea;
-            margin-bottom: 15px;
-            font-weight: 400;
-            letter-spacing: 1px;
+            background: linear-gradient(90deg, #f37055, #f2934c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 20px;
+            font-weight: 700;
         }
 
         .main-content {
@@ -138,10 +129,10 @@
             margin-bottom: 40px;
         }
 
-        .awarded-text {
+        .awarded-text,
+        .completion-text {
             font-size: 16px;
             color: #5d6d7e;
-            margin-bottom: 20px;
             font-weight: 300;
         }
 
@@ -149,10 +140,9 @@
             font-family: 'Playfair Display', serif;
             font-size: 42px;
             color: #2c3e50;
-            margin-bottom: 25px;
             font-weight: 700;
+            margin: 20px 0;
             position: relative;
-            display: inline-block;
         }
 
             .recipient-name::after {
@@ -163,21 +153,14 @@
                 transform: translateX(-50%);
                 width: 80%;
                 height: 2px;
-                background: linear-gradient(90deg, transparent, #667eea, transparent);
+                background: linear-gradient(90deg, transparent, #f37055, transparent);
             }
-
-        .completion-text {
-            font-size: 16px;
-            color: #5d6d7e;
-            margin-bottom: 15px;
-            font-weight: 300;
-        }
 
         .course-name {
             font-size: 24px;
-            color: #764ba2;
+            color: #e67e22;
             font-weight: 600;
-            margin-bottom: 30px;
+            margin-top: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -185,32 +168,33 @@
         .footer {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             width: 100%;
             margin-top: auto;
         }
 
-        .date-section, .signature-section {
+        .date-section,
+        .signature-section {
             text-align: center;
             flex: 1;
         }
 
-        .date-label, .signature-label {
+        .date-label,
+        .signature-label {
             font-size: 12px;
             color: #7f8c8d;
-            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 5px;
         }
 
-        .date-value, .signature-line {
+        .date-value,
+        .signature-line {
             font-size: 14px;
             color: #2c3e50;
-            font-weight: 500;
             border-bottom: 2px solid #bdc3c7;
             padding-bottom: 5px;
-            min-width: 150px;
             display: inline-block;
+            min-width: 150px;
         }
 
         .seal {
@@ -219,78 +203,25 @@
             right: 40px;
             width: 80px;
             height: 80px;
-            border: 3px solid #667eea;
+            border: 3px solid #f37055;
             border-radius: 50%;
+            background: rgba(243, 112, 85, 0.1);
             display: flex;
-            align-items: center;
             justify-content: center;
-            background: rgba(102, 126, 234, 0.1);
+            align-items: center;
             font-size: 10px;
-            color: #667eea;
-            font-weight: 600;
+            color: #f37055;
             text-align: center;
-            line-height: 1.2;
-        }
-
-        .floating-elements {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .floating-element {
-            position: absolute;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite;
-        }
-
-            .floating-element:nth-child(1) {
-                top: 10%;
-                left: 10%;
-                animation-delay: 0s;
-            }
-
-            .floating-element:nth-child(2) {
-                top: 20%;
-                right: 15%;
-                animation-delay: 2s;
-            }
-
-            .floating-element:nth-child(3) {
-                bottom: 20%;
-                left: 20%;
-                animation-delay: 4s;
-            }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
-        }
-
-        .star {
-            width: 20px;
-            height: 20px;
-            background: #667eea;
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            font-weight: 600;
         }
 
         @media print {
             body {
                 background: white;
-                margin: 0;
-                padding: 0;
             }
 
             .certificate-container {
                 box-shadow: none;
-                margin: 0;
             }
         }
     </style>
@@ -303,15 +234,9 @@
         <div class="decorative-corners corner-bl"></div>
         <div class="decorative-corners corner-br"></div>
 
-        <div class="floating-elements">
-            <div class="floating-element star"></div>
-            <div class="floating-element star"></div>
-            <div class="floating-element star"></div>
-        </div>
-
         <div class="header">
             <div class="logo-section">
-                <div class="company-name">BECAMEX</div>
+                <img src="https://forbes.vn/wp-content/uploads/2021/08/Becamex_Logo-01.png" alt="BECAMEX Logo" />
                 <div class="company-subtitle">Educational Excellence Center</div>
             </div>
             <div class="certificate-title">Chứng Nhận Hoàn Thành Khóa Học</div>
@@ -336,9 +261,7 @@
         </div>
 
         <div class="seal">
-            BECAMEX<br>
-            OFFICIAL<br>
-            SEAL
+            BECAMEX<br />OFFICIAL<br />SEAL
         </div>
     </div>
 </body>

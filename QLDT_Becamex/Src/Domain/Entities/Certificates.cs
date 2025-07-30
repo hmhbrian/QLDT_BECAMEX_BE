@@ -1,5 +1,4 @@
-﻿    using Microsoft.AspNet.Identity;
-
+﻿
     namespace QLDT_Becamex.Src.Domain.Entities
     {
         public class Certificates

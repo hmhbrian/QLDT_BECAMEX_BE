@@ -25,6 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
         public async Task<CertDetailDto> Handle(GetDetailCertQuery request, CancellationToken cancellationToken)
         {
             var (currentUserId, role) = _userService.GetCurrentUserAuthenticationInfo();
+           
             // Validate Course
             var course = await _unitOfWork.CourseRepository.GetByIdAsync(request.CourseId);
             if (course == null)
@@ -32,7 +33,7 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
 
             // Lấy list chứng chỉ thuộc course
             var certs = await _unitOfWork.CertificatesRepository.GetFirstOrDefaultAsync(predicate: c => c.CourseId == course.Id && c.UserId == currentUserId,
-                  includes: q => q.Include(d => d.User));
+                  includes: q => q.Include(d => d.User).Include(d => d.Course));
 
             // Map sang DTO
             var dto = _mapper.Map<CertDetailDto>(certs);

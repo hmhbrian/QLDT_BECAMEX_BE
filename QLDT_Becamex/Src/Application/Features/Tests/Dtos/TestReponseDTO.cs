@@ -13,10 +13,10 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
         public float PassThreshold { get; set; }
         public int TimeTest { get; set; }
         public int CountQuestion { get; set; }
+        public bool IsDone { get; set; }
         public UserSumaryDto? CreatedBy { get; set; }
         public UserSumaryDto? UpdatedBy { get; set; }
     }
-
 
     public class DetailTestDto
     {
@@ -25,6 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
         public string? Title { get; set; }
         public float PassThreshold { get; set; }
         public int TimeTest { get; set; }
+        public bool IsDone { get; set; }
         public UserSumaryDto? CreatedBy { get; set; }
         public UserSumaryDto? UpdatedBy { get; set; }
         public DateTime CreatedAt { get; set; }

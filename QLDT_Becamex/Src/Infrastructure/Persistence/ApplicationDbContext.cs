@@ -38,199 +38,199 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<TestResult> TestResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
-            // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
-            protected override void OnModelCreating(ModelBuilder modelBuilder)
-            {
-                  // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
-                  base.OnModelCreating(modelBuilder);
+        public DbSet<Certificates> Certificates { get; set; }
 
-                  // --- Cấu hình Fluent API ở đây ---
-                  // Gọi các phương thức cấu hình riêng biệt để giữ cho OnModelCreating gọn gàng và dễ đọc
-                  ConfigureApplicationUser(modelBuilder);
-                  ConfigureDepartment(modelBuilder);
-                  ConfigurePosition(modelBuilder);
-                  ConfigureUserStatus(modelBuilder);
-                  ConfigureCourse(modelBuilder);
-                  ConfigureCourseStatus(modelBuilder);
-                  ConfigureCourseDepartment(modelBuilder);
-                  ConfigureCoursePosition(modelBuilder);
-                  ConfigureCourseAttachedFile(modelBuilder);
-                  ConfigureUserCourse(modelBuilder);
-                  ConfigureCourseCategory(modelBuilder);
-                  ConfigureLecturer(modelBuilder);
-                  ConfigureLesson(modelBuilder);
-                  ConfigureTest(modelBuilder);
-                  ConfigureQuestion(modelBuilder);
-                  ConfigureTypeDocument(modelBuilder);
-                  ConfigureLessonProgress(modelBuilder);
-                  ConfigureFeedback(modelBuilder);
-                  ConfigureDepartmentStatus(modelBuilder);
-                  ConfigureTestResult(modelBuilder);
-                  ConfigureUserAnswer(modelBuilder);
-                  ConfigureAuditLog(modelBuilder);
-            }
+        // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
+            base.OnModelCreating(modelBuilder);
+
+            // --- Cấu hình Fluent API ở đây ---
+            // Gọi các phương thức cấu hình riêng biệt để giữ cho OnModelCreating gọn gàng và dễ đọc
+            ConfigureApplicationUser(modelBuilder);
+            ConfigureDepartment(modelBuilder);
+            ConfigurePosition(modelBuilder);
+            ConfigureUserStatus(modelBuilder);
+            ConfigureCourse(modelBuilder);
+            ConfigureCourseStatus(modelBuilder);
+            ConfigureCourseDepartment(modelBuilder);
+            ConfigureCoursePosition(modelBuilder);
+            ConfigureCourseAttachedFile(modelBuilder);
+            ConfigureUserCourse(modelBuilder);
+            ConfigureCourseCategory(modelBuilder);
+            ConfigureLecturer(modelBuilder);
+            ConfigureLesson(modelBuilder);
+            ConfigureTest(modelBuilder);
+            ConfigureQuestion(modelBuilder);
+            ConfigureTypeDocument(modelBuilder);
+            ConfigureLessonProgress(modelBuilder);
+            ConfigureFeedback(modelBuilder);
+            ConfigureDepartmentStatus(modelBuilder);
+            ConfigureTestResult(modelBuilder);
+            ConfigureUserAnswer(modelBuilder);
+            ConfigureAuditLog(modelBuilder);
+            ConfigureCertificates(modelBuilder);
+        }
 
         private void ConfigureTestResult(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TestResult>(entity =>
             {
-                  modelBuilder.Entity<TestResult>(entity =>
-                  {
-                        // Đặt tên bảng
-                        entity.ToTable("test_results");
+                // Đặt tên bảng
+                entity.ToTable("TestResults");
 
-                        // --- Cấu hình các cột ---
-                        entity.HasKey(e => e.Id);
-                        entity.Property(e => e.Id).HasColumnName("id"); // Khóa chính
+                // --- Cấu hình các cột ---
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id"); // Khóa chính
 
                 // Map các thuộc tính trong class C# sang tên cột snake_case
                 entity.Property(e => e.Score).HasColumnName("score").IsRequired();
                 entity.Property(e => e.IsPassed).HasColumnName("is_passed");
+                entity.Property(e => e.IsDone).HasColumnName("is_done");
                 entity.Property(e => e.StartedAt).HasColumnName("started_at");
                 entity.Property(e => e.SubmittedAt).HasColumnName("submitted_at");
                 entity.Property(e => e.CorrectAnswerCount).HasColumnName("correct_answer_count");
                 entity.Property(e => e.IncorrectAnswerCount).HasColumnName("incorrect_answer_count");
+                // Khóa ngoại cũng cần được map
+                entity.Property(e => e.TestId).HasColumnName("test_id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                // --- Cấu hình các quan hệ ---
+                entity.HasOne(tr => tr.Test)
+                .WithMany(t => t.TestResults)
+                .HasForeignKey(tr => tr.TestId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+                entity.HasOne(tr => tr.User)
+                .WithMany()
+                .HasForeignKey(tr => tr.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
 
-
-                        // Khóa ngoại cũng cần được map
-                        entity.Property(e => e.TestId).HasColumnName("test_id");
-                        entity.Property(e => e.UserId).HasColumnName("user_id");
-
-                        // --- Cấu hình các quan hệ ---
-                        entity.HasOne(tr => tr.Test)
-                  .WithMany()
-                  .HasForeignKey(tr => tr.TestId)
-                  .OnDelete(DeleteBehavior.Restrict);
-
-                        entity.HasOne(tr => tr.User)
-                  .WithMany()
-                  .HasForeignKey(tr => tr.UserId)
-                  .OnDelete(DeleteBehavior.Cascade);
-                  });
-            }
-
-            private void ConfigureUserAnswer(ModelBuilder modelBuilder)
+        private void ConfigureUserAnswer(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserAnswer>(entity =>
             {
-                  modelBuilder.Entity<UserAnswer>(entity =>
-                  {
-                        entity.ToTable("user_answers");
+                entity.ToTable("UserAnswers");
 
-                        // --- Cấu hình các cột ---
-                        entity.HasKey(e => e.Id);
-                        entity.Property(e => e.Id).HasColumnName("id");
+                // --- Cấu hình các cột ---
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id");
 
-                        entity.Property(e => e.SelectedOptions).HasColumnName("selected_options").IsRequired();
-                        entity.Property(e => e.IsCorrect).HasColumnName("is_correct");
+                entity.Property(e => e.SelectedOptions).HasColumnName("selected_options").IsRequired();
+                entity.Property(e => e.IsCorrect).HasColumnName("is_correct");
 
-                        // Khóa ngoại
-                        entity.Property(e => e.TestResultId).HasColumnName("test_result_id");
-                        entity.Property(e => e.QuestionId).HasColumnName("question_id");
+                // Khóa ngoại
+                entity.Property(e => e.TestResultId).HasColumnName("test_result_id");
+                entity.Property(e => e.QuestionId).HasColumnName("question_id");
 
-                        // --- Cấu hình quan hệ ---
-                        entity.HasOne(ua => ua.Question)
-                          .WithMany()
-                          .HasForeignKey(ua => ua.QuestionId)
-                          .OnDelete(DeleteBehavior.Restrict);
+                // --- Cấu hình quan hệ ---
+                entity.HasOne(ua => ua.Question)
+                        .WithMany()
+                        .HasForeignKey(ua => ua.QuestionId)
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                        entity.HasOne(ua => ua.TestResult)                // <‑‑ thiếu cái này
-                          .WithMany(tr => tr.UserAnswers)
-                          .HasForeignKey(ua => ua.TestResultId)
-                          .OnDelete(DeleteBehavior.Cascade);
-                  });
-            }
+                entity.HasOne(ua => ua.TestResult)                // <‑‑ thiếu cái này
+                        .WithMany(tr => tr.UserAnswers)
+                        .HasForeignKey(ua => ua.TestResultId)
+                        .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
 
         private void ConfigureApplicationUser(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ApplicationUser>(entity =>
             {
-                  modelBuilder.Entity<ApplicationUser>(entity =>
-                  {
-                        entity.Property(u => u.FullName)
-                        .HasColumnName("full_name")
-                        .HasMaxLength(255);
+                entity.Property(u => u.FullName)
+                      .HasColumnName("full_name")
+                      .HasMaxLength(255);
 
-                        entity.Property(u => u.UrlAvatar)
-                        .HasColumnName("url_avatar")
-                        .HasMaxLength(500);
+                entity.Property(u => u.UrlAvatar)
+                      .HasColumnName("url_avatar")
+                      .HasMaxLength(500);
 
-                        entity.Property(u => u.IdCard)
-                        .HasColumnName("id_card")
-                        .HasMaxLength(100);
+                entity.Property(u => u.IdCard)
+                      .HasColumnName("id_card")
+                      .HasMaxLength(100);
 
-                        entity.Property(u => u.Code)
-                        .HasColumnName("code");
+                entity.Property(u => u.Code)
+                      .HasColumnName("code");
 
-                        entity.Property(u => u.StartWork)
-                        .HasColumnName("start_work");
+                entity.Property(u => u.StartWork)
+                      .HasColumnName("start_work");
 
-                        entity.Property(u => u.EndWork)
-                        .HasColumnName("end_work");
+                entity.Property(u => u.EndWork)
+                      .HasColumnName("end_work");
 
-                        entity.Property(u => u.StatusId)
-                        .HasColumnName("status_id");
+                entity.Property(u => u.StatusId)
+                      .HasColumnName("status_id");
 
-                        entity.Property(u => u.CreatedAt)
-                        .HasColumnName("created_at");
+                entity.Property(u => u.CreatedAt)
+                      .HasColumnName("created_at");
 
-                        entity.Property(u => u.ModifiedAt)
-                        .HasColumnName("modified_at");
+                entity.Property(u => u.ModifiedAt)
+                      .HasColumnName("modified_at");
 
-                        entity.Property(u => u.IsDeleted)
-                        .HasColumnName("is_deleted");
+                entity.Property(u => u.IsDeleted)
+                      .HasColumnName("is_deleted");
 
-                        entity.Property(u => u.ManagerUId)
-                        .HasColumnName("manager_u_id");
+                entity.Property(u => u.ManagerUId)
+                      .HasColumnName("manager_u_id");
 
-                        entity.Property(u => u.DepartmentId)
-                        .HasColumnName("department_id");
+                entity.Property(u => u.DepartmentId)
+                      .HasColumnName("department_id");
 
-                        entity.Property(u => u.PositionId)
-                        .HasColumnName("position_id");
+                entity.Property(u => u.PositionId)
+                      .HasColumnName("position_id");
 
-                        entity.Property(p => p.CreateById)
-                     .HasColumnName("created_by_id")
-                     .HasMaxLength(450);
-                        entity.Property(p => p.UpdateById)
-                     .HasColumnName("update_by_id")
-                     .HasMaxLength(450);
+                entity.Property(p => p.CreateById)
+                   .HasColumnName("created_by_id")
+                   .HasMaxLength(450);
+                entity.Property(p => p.UpdateById)
+                   .HasColumnName("update_by_id")
+                   .HasMaxLength(450);
 
-                        // 🔗 Relationships
+                // 🔗 Relationships
 
-                        entity.HasOne(u => u.Department)
-                        .WithMany(d => d.Users)
-                        .HasForeignKey(u => u.DepartmentId)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.SetNull);
+                entity.HasOne(u => u.Department)
+                      .WithMany(d => d.Users)
+                      .HasForeignKey(u => u.DepartmentId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
 
-                        entity.HasOne(u => u.Position)
-                        .WithMany(p => p.Users)
-                        .HasForeignKey(u => u.PositionId)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.SetNull);
+                entity.HasOne(u => u.Position)
+                      .WithMany(p => p.Users)
+                      .HasForeignKey(u => u.PositionId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
 
-                        entity.HasOne(u => u.ManagerU)
-                        .WithMany(p => p.Children)
-                        .HasForeignKey(u => u.ManagerUId)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(u => u.ManagerU)
+                      .WithMany(p => p.Children)
+                      .HasForeignKey(u => u.ManagerUId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.NoAction);
 
-                        entity.HasOne(u => u.CreateBy)
-                       .WithMany()
-                       .HasForeignKey(u => u.CreateById)
-                       .IsRequired(false)
-                       .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(u => u.CreateBy)
+                     .WithMany()
+                     .HasForeignKey(u => u.CreateById)
+                     .IsRequired(false)
+                     .OnDelete(DeleteBehavior.NoAction);
 
-                        entity.HasOne(u => u.UpdateBy)
-                       .WithMany()
-                       .HasForeignKey(u => u.UpdateById)
-                       .IsRequired(false)
-                       .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(u => u.UpdateBy)
+                     .WithMany()
+                     .HasForeignKey(u => u.UpdateById)
+                     .IsRequired(false)
+                     .OnDelete(DeleteBehavior.NoAction);
 
-                        entity.HasOne(u => u.UserStatus)
-                        .WithMany()
-                        .HasForeignKey(u => u.StatusId)
-                        .IsRequired(false)
-                        .OnDelete(DeleteBehavior.SetNull);
-                  });
+                entity.HasOne(u => u.UserStatus)
+                      .WithMany()
+                      .HasForeignKey(u => u.StatusId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
 
-            }
+        }
 
         private void ConfigureDepartment(ModelBuilder modelBuilder)
         {
@@ -906,6 +906,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(e => e.CourseId)
                       .HasColumnName("course_id");
 
+
                 entity.Property(e => e.CreatedById)
                       .HasColumnName("created_by_id");
 
@@ -922,7 +923,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .WithMany()
                       .HasForeignKey(e => e.CreatedById)
                       .OnDelete(DeleteBehavior.NoAction)
-                      .HasConstraintName("fk_tests_user_created");
+                      .HasConstraintName("fk_tests_user_updated");
 
                 entity.HasOne(e => e.UpdatedBy)
                       .WithMany()
@@ -1148,6 +1149,42 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                      .OnDelete(DeleteBehavior.NoAction);
             });
         }
+
+        private void ConfigureCertificates(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Certificates>(entity =>
+            {
+                entity.ToTable("Certificates");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName("user_id");
+
+                entity.Property(e => e.CourseId)
+                    .HasColumnName("course_id");
+
+                entity.Property(e => e.CertificateUrl)
+                    .HasMaxLength(500)
+                    .HasColumnName("certificate_url");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at");
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Course)
+                    .WithMany()
+                    .HasForeignKey(e => e.CourseId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+
+
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

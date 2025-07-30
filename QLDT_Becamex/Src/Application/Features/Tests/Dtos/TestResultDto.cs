@@ -22,6 +22,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
         public float? Score { get; set; }
         public UserSumaryDto? User { get; set; }
         public bool IsPassed { get; set; } = false;
+        public bool IsFinish { get; set; } = false;
         public int CorrectAnswerCount { get; set; }
         public int IncorrectAnswerCount { get; set; }
         public DateTime? StartedAt { get; set; }

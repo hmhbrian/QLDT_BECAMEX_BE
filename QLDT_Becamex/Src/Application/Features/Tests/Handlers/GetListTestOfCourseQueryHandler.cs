@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
         public async Task<List<AllTestDto>> Handle(GetListTestOfCourseQuery request, CancellationToken cancellationToken)
         {
             // Lấy User ID từ BaseService
-            var (userId, role) = _userService.GetCurrentUserAuthenticationInfo();
+            var (currentUserId, role) = _userService.GetCurrentUserAuthenticationInfo();
 
             // Validate CourseId
             var course = await _unitOfWork.CourseRepository.GetByIdAsync(request.CourseId);
@@ -38,7 +38,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             if (role == ConstantRole.HOCVIEN)
             {
                 var courseUser = await _unitOfWork.UserCourseRepository.GetFirstOrDefaultAsync(
-                    predicate: cu => cu.CourseId == request.CourseId && cu.UserId == userId);
+                    predicate: cu => cu.CourseId == request.CourseId && cu.UserId == currentUserId);
                 if (courseUser == null)
                 {
                     throw new AppException("Bạn không có quyền truy cập bài học của khóa học này", 403);
@@ -55,9 +55,16 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 
             );
 
-            // if (tests == null || !tests.Any())
-            //     throw new AppException("Không tìm thấy bài kiểm tra nào cho khóa học này", 200);
             var dto = _mapper.Map<List<AllTestDto>>(tests);
+
+            foreach (var testDto in dto)
+            {
+                bool isExist = await _unitOfWork.TestResultRepository
+                    .AnyAsync(tr => tr.UserId == currentUserId && tr.TestId == testDto.Id);
+
+                testDto.IsDone = isExist; // ✅ Gán thẳng vào DTO
+            }
+
 
             return dto;
         }

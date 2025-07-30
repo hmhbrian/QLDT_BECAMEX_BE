@@ -21,6 +21,8 @@ using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
 using QLDT_Becamex.Src.Infrastructure.Services.BackgroundServices;
 using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
+using QLDT_Becamex.Src.Application.Features.Tests.Events;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,7 +111,8 @@ builder.Services.AddCors(options =>
 
 // 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-// 5. Cấu hình MediatR
+
+// 6. Cấu hình MediatR
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly);

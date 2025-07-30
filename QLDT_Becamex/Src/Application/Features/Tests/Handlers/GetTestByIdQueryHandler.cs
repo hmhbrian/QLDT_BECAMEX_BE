@@ -5,6 +5,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
+using QLDT_Becamex.Src.Infrastructure.Services;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
@@ -12,17 +13,21 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
-        public GetTestByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetTestByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userService = userService;
         }
 
         public async Task<DetailTestDto> Handle(GetTestByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
+                var (currentUserId, role) = _userService.GetCurrentUserAuthenticationInfo();
+
                 var courseExists = await _unitOfWork.CourseRepository.AnyAsync(c => c.Id == request.CourseId);
                 if (!courseExists)
                 {
@@ -37,6 +42,8 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                     includes: t => t.Include(t => t.Questions).Include(d => d.CreatedBy).Include(d => d.UpdatedBy)
                 );
 
+
+
                 var testEntity = test.FirstOrDefault();
                 if (testEntity == null)
                 {
@@ -44,6 +51,12 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 }
 
                 var testDto = _mapper.Map<DetailTestDto>(testEntity);
+
+                bool isDone = await _unitOfWork.TestResultRepository
+                  .AnyAsync(tr => tr.UserId == currentUserId && tr.TestId == testDto.Id);
+
+                testDto.IsDone = isDone;
+
                 return testDto;
             }
             catch (Exception ex)

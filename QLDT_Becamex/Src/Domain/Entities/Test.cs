@@ -1,4 +1,3 @@
-using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 
 namespace QLDT_Becamex.Src.Domain.Entities
@@ -19,6 +18,8 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public ICollection<Question>? Questions { get; set; } = new List<Question>();
+        public ICollection<TestResult>? TestResults { get; set; } = new List<TestResult>();
+
 
         public void Create(string courseId, string userId, TestCreateDto request, int position)
         {

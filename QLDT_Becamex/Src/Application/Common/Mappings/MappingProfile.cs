@@ -288,6 +288,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //Certifiates
             CreateMap<Certificates, CertDetailDto>();
+
             CreateMap<Certificates, CertListDto>();
 
         }

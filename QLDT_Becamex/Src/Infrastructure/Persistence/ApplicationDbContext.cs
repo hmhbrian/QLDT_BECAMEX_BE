@@ -25,7 +25,6 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<CourseDepartment> CourseDepartment { get; set; }
         public DbSet<CoursePosition> CoursePosition { get; set; }
         public DbSet<CourseAttachedFile> CourseAttachedFile { get; set; }
-
         public DbSet<UserCourse> UserCourse { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<CourseCategory> CourseCategories { get; set; }

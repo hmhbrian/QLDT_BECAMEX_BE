@@ -26,9 +26,10 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
         {
             var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
 
-            var certs = await _unitOfWork.CertificatesRepository.GetFlexibleAsync(predicate: c => c.UserId == currentUserId,
-                includes: q => q.Include(d => d.User));
-
+            var certs = await _unitOfWork.CertificatesRepository.GetFlexibleAsync(
+                    predicate: c => c.UserId == currentUserId,
+                    includes: q => q.Include(c => c.User)
+                );
             return _mapper.Map<List<CertListDto>>(certs);
         }
     }

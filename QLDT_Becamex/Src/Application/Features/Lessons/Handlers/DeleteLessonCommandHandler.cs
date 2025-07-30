@@ -1,11 +1,10 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;// Dành cho các thao tác LINQ như FirstOrDefaultAsync hoặc SingleOrDefaultAsync
 using QLDT_Becamex.Src.Application.Common.Dtos; // Dành cho AppException
 using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces; // Dành cho IBaseService, ICloudinaryService
-
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
-using Microsoft.EntityFrameworkCore;// Dành cho các thao tác LINQ như FirstOrDefaultAsync hoặc SingleOrDefaultAsync
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 {
@@ -54,10 +53,25 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 throw new AppException("Không thể xóa bài học vì đã bắt đầu", 403);
             }
 
+            // Kiểm tra bài học có dữ liệu trong LessonProgress
+            var nonDeletableLessonIds = new List<int>();
+            var lessonProgressExists = await _unitOfWork.LessonProgressRepository
+                .FindAsync(tr => request.LessonIds.Contains(tr.LessonId));
+            nonDeletableLessonIds = lessonProgressExists.Select(tr => tr.LessonId).Distinct().ToList();
+
+            // Lọc các bài học có thể xóa
+            var deletableLessons = lessons.Where(l => !nonDeletableLessonIds.Contains(l.Id)).ToList();
+
+            // Nếu tất cả bài học đều không thể xóa, ném ngoại lệ
+            if (!deletableLessons.Any() && nonDeletableLessonIds.Any())
+            {
+                throw new AppException($"Không thể xóa bài học với ID {string.Join(", ", nonDeletableLessonIds)} vì đã có người tham gia", 403);
+            }
+
             using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                foreach (var lesson in lessons)
+                foreach (var lesson in deletableLessons)
                 {
                     // 3. Xoá file PDF nếu có
                     if (!string.IsNullOrEmpty(lesson.PublicIdUrlPdf))
@@ -88,14 +102,16 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 //8.Commit transaction
                 await transaction.CommitAsync(cancellationToken);
             }
+            catch (AppException ex)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw; // Ném lại AppException để client nhận thông báo
+            }
             catch (Exception ex)
             {
-                // Rollback transaction nếu có lỗi xảy ra
                 await transaction.RollbackAsync(cancellationToken);
                 throw new AppException($"Lỗi khi xóa bài học và cập nhật vị trí: {ex.Message}", 500);
             }
-
-
 
         }
     }

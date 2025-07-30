@@ -48,6 +48,13 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 throw new AppException("Không thể xóa bài kiểm tra vì đã bắt đầu", 403);
             }
 
+            //Kiểm tra test đã có ai làm chưa
+            var TestExist = await _unitOfWork.TestResultRepository
+                   .GetFirstOrDefaultAsync(tr => tr.TestId == command.Id);
+            if(TestExist != null) 
+            {
+                throw new AppException("Không thể xóa bài kiểm tra vì đã có người tham gia", 403);
+            }
             // Remove Test from repository
             _unitOfWork.TestRepository.Remove(test);
             await _unitOfWork.CompleteAsync();

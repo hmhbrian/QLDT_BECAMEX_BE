@@ -32,4 +32,11 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
         public DateTime UpdatedAt { get; set; }
         public ICollection<QuestionDto>? Questions { get; set; } = new List<QuestionDto>();
     }
+
+    public class TestCompletedDto
+    {
+        public int? Id { get; set; }
+        public string? Title { get; set; }
+
+    }
 }

@@ -163,7 +163,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //EnrollCourse
             CreateMap<UserEnrollCourseDto, Course>();
-            CreateMap<Course, UserEnrollCourseDto>();
+            CreateMap<Course, UserEnrollCourseDto>(); 
 
             //UpcomingCourse
             CreateMap<Course, UserUpcomingCourseDto>();

@@ -5,7 +5,7 @@ using QLDT_Becamex.Src.Domain.Interfaces; // Dành cho IBaseService, ICloudinary
 
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
-using System.Data.Entity; // Dành cho các thao tác LINQ như FirstOrDefaultAsync hoặc SingleOrDefaultAsync
+using Microsoft.EntityFrameworkCore;// Dành cho các thao tác LINQ như FirstOrDefaultAsync hoặc SingleOrDefaultAsync
 
 namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
 {

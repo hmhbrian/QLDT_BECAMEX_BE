@@ -43,7 +43,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                                 u.Course != null &&
                                 u.Course.StartDate >= now &&
                                 u.Course.StartDate <= nextweek,
-                includes: u => u.Include( p => p.Course));
+                includes: u => u.Include( c => c.Course));
 
             var userUpcomingCourseDtos = UpcomingCourse
                 .Select(uc => _mapper.Map<UserUpcomingCourseDto>(uc.Course))

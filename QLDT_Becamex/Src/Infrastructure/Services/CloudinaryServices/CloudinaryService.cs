@@ -135,7 +135,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices
 
 
 
-        public async Task<string?> UploadImageAsync(IFormFile file)
+        public async Task<string?> UploadImageAsync(IFormFile file, string? nameFolder = "avatars")
         {
             if (file.Length == 0) return null;
 
@@ -146,7 +146,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
-                    Folder = "avatars",
+                    Folder = nameFolder ?? "avatars",
                     Transformation = new Transformation()
                         .Width(500)
                         .Height(500)

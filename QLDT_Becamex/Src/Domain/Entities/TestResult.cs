@@ -19,6 +19,9 @@
 
         // Cho biết người dùng đã vượt qua bài test hay chưa
         public bool IsPassed { get; set; } = false;
+
+        public bool IsDone { get; set; } = false;
+
         public int CorrectAnswerCount { get; set; }
         public int IncorrectAnswerCount { get; set; }
 

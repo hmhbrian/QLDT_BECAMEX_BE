@@ -2,6 +2,7 @@
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using QLDT_Becamex.Src.Application.Features.AuditLogs.Dtos;
+using QLDT_Becamex.Src.Application.Features.Certificates.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
@@ -282,6 +283,13 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Timestamp.ToString("dddd, dd MMMM, yyyy, HH:mm", new CultureInfo("vi-VN"))))
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Action, opt => opt.MapFrom(src => src.Action));
+
+
+
+            //Certifiates
+            CreateMap<Certificates, CertDetailDto>();
+            CreateMap<Certificates, CertListDto>();
+
         }
     }
 }

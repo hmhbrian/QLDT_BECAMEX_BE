@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Reports.Dtos;
 using QLDT_Becamex.Src.Application.Features.Reports.Queries;
-using QLDT_Becamex.Src.Application.Features.TypeDocument.Commands;
-using QLDT_Becamex.Src.Application.Features.TypeDocument.Dtos;
-using QLDT_Becamex.Src.Application.Features.TypeDocument.Queries;
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {

@@ -1,4 +1,5 @@
-﻿using QLDT_Becamex.Src.Application.Features.Users.Dtos;
+﻿using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
+using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Certificates.Dtos
 {
@@ -7,6 +8,7 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Dtos
     {
         public int Id { get; set; }
         public UserSumaryDto? User { get; set; }
+        public CourseSumary? Course { get; set; }
         public string? CertificateUrl { get; set; }
         public DateTime? CreatedAt { get; set; }
     }
@@ -14,6 +16,7 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Dtos
     {
         public int Id { get; set; }
         public UserSumaryDto? User { get; set; }
+        public CourseSumary? Course { get; set; }
         public string? CertificateUrl { get; set; }
         public DateTime? CreatedAt { get; set; }
     }

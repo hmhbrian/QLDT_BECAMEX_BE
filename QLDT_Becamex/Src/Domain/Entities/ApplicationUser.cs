@@ -29,6 +29,8 @@ namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp
         public ICollection<ApplicationUser> Children { get; set; } = new List<ApplicationUser>();
         public ICollection<UserCourse> UserCourse { get; set; } = new List<UserCourse>();
         public ICollection<LessonProgress> LessonProgress { get; set; } = new List<LessonProgress>();
+        public ICollection<Certificates> Certificates { get; set; } = new List<Certificates>();
+
     }
 
 }

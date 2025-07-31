@@ -5,7 +5,7 @@ using QLDT_Becamex.Src.Application.Features.Certificates.Dtos;
 using QLDT_Becamex.Src.Application.Features.Certificates.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
 {

@@ -4,7 +4,7 @@ using QLDT_Becamex.Src.Application.Features.Certificates.Dtos;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Application.Features.Certificates.Queries;
 using QLDT_Becamex.Src.Infrastructure.Services;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
 {
@@ -26,10 +26,11 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
         {
             var (currentUserId, _) = _userService.GetCurrentUserAuthenticationInfo();
 
-            var certs = await _unitOfWork.CertificatesRepository.GetFlexibleAsync(
-                    predicate: c => c.UserId == currentUserId,
-                    includes: q => q.Include(c => c.User)
-                );
+            var certs = await _unitOfWork.CertificatesRepository.GetFlexibleAsync(predicate: c => c.UserId == currentUserId,
+                includes: q => q
+                .Include(d => d.User)
+                .Include(d => d.Course));
+
             return _mapper.Map<List<CertListDto>>(certs);
         }
     }

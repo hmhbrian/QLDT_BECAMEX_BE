@@ -3,7 +3,7 @@ using MediatR;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Queries;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace QLDT_Becamex.Src.Application.Features.CourseAttachedFiles.Handlers
 {

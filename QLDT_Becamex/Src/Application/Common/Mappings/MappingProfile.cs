@@ -163,7 +163,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //EnrollCourse
             CreateMap<UserEnrollCourseDto, Course>();
-            CreateMap<Course, UserEnrollCourseDto>(); 
+            CreateMap<Course, UserEnrollCourseDto>();
 
             //UpcomingCourse
             CreateMap<Course, UserUpcomingCourseDto>();
@@ -173,6 +173,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<Course, UserEnrollCompletedCourseDto>();
 
             //CourseStatus
+            CreateMap<Course, CourseSumary>().ReverseMap();
             CreateMap<CourseStatus, StatusDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.StatusName));
@@ -287,9 +288,15 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
 
             //Certifiates
-            CreateMap<Certificates, CertDetailDto>();
+            CreateMap<Certificates, CertDetailDto>().ForMember(dest => dest.User,
+                     opt => opt.MapFrom(src => src.User != null
+                    ? new UserSumaryDto { Id = src.User.Id, Name = src.User.FullName }
+                    : null));
 
-            CreateMap<Certificates, CertListDto>();
+            CreateMap<Certificates, CertListDto>().ForMember(dest => dest.User,
+                     opt => opt.MapFrom(src => src.User != null
+                    ? new UserSumaryDto { Id = src.User.Id, Name = src.User.FullName }
+                    : null));
 
         }
     }

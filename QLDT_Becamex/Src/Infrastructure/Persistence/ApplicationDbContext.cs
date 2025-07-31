@@ -1172,12 +1172,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                     .HasColumnName("created_at");
 
                 entity.HasOne(e => e.User)
-                    .WithMany()
+                    .WithMany(e => e.Certificates)
                     .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.Course)
-                    .WithMany()
+                    .WithMany(e => e.Certificates)
                     .HasForeignKey(e => e.CourseId)
                     .OnDelete(DeleteBehavior.Restrict);
             });

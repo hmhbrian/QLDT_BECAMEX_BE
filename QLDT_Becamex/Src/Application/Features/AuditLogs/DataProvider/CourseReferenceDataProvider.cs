@@ -4,7 +4,7 @@ using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
 using QLDT_Becamex.Src.Application.Features.AuditLogs.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Threading.Tasks;
 

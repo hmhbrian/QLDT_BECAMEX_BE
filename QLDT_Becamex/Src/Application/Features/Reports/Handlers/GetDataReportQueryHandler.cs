@@ -165,14 +165,23 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
                 f => f.Course != null && !f.Course.IsDeleted,
                 orderBy: null
             );
-
-            if (start != null && end != null)
+            foreach (var f in feedbacks)
             {
-                feedbacks = feedbacks.Where(f => f.CreatedAt.HasValue && f.CreatedAt.Value >= start && f.CreatedAt.Value <= end).ToList();
+                Console.WriteLine($"Feedback ID: {f.Id}, CreatedAt: {f.SubmissionDate}");
             }
+            if (start != null && end != null)
+                {
+                    feedbacks = feedbacks.Where(f => f.SubmissionDate.HasValue && f.SubmissionDate.Value >= start && f.SubmissionDate.Value <= end).ToList();
+                }
 
             if (!feedbacks.Any())
+            {
+                Console.WriteLine(feedbacks.Count());
+                Console.WriteLine(start.HasValue && end.HasValue
+                    ? $"No feedbacks found between {start.Value.ToShortDateString()} and {end.Value.ToShortDateString()}."
+                    : "No feedbacks found in the specified date range.");
                 return 0;
+            }
 
             int positiveCount = 0;
 

@@ -61,7 +61,7 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                 var testResultEntity = testResult.FirstOrDefault();
                 if (testResultEntity == null)
                 {
-                    throw new AppException("Bạn chưa làm bài kiểm tra này", 404);
+                    return null;
                 }
                 var userAnswers = await _unitOfWork.UserAnswerRepository.GetFlexibleAsync(
                     predicate: ua => ua.TestResultId == testResultEntity.Id,

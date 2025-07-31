@@ -67,10 +67,10 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                         LessonId = lesson.Id.ToString(),
                         LessonName = lesson.Title,
                         ProgressPercentage = lessonProgress.IsCompleted ? 100f :
-                            (lesson.TotalDurationSeconds.HasValue && lessonProgress.CurrentTimeSeconds.HasValue && lesson.TotalDurationSeconds > 0 ?
-                                (float)lessonProgress.CurrentTimeSeconds.Value / lesson.TotalDurationSeconds.Value * 100f :
-                                (lesson.TotalPages.HasValue && lessonProgress.CurrentPage.HasValue && lesson.TotalPages > 0 ?
-                                    (float)lessonProgress.CurrentPage.Value / lesson.TotalPages.Value * 100f : 0f)),
+                        (lesson.TotalDurationSeconds.HasValue && lessonProgress.CurrentTimeSeconds.HasValue && lesson.TotalDurationSeconds > 0 ?
+                            (float)Math.Round((float)lessonProgress.CurrentTimeSeconds.Value / lesson.TotalDurationSeconds.Value * 100f, 1) :
+                            (lesson.TotalPages.HasValue && lessonProgress.CurrentPage.HasValue && lesson.TotalPages > 0 ?
+                                (float)Math.Round((float)lessonProgress.CurrentPage.Value / lesson.TotalPages.Value * 100f, 1) : 0f)),
                         IsCompleted = lessonProgress.IsCompleted
                     });
                 }
@@ -108,7 +108,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 userName = user?.FullName ?? "Unknown User",
                 courseId = course.Id.ToString(),
                 courseName = course.Name,
-                progressPercentage = await GetCourseProgress(courseId, userId),
+                progressPercentage = (float)Math.Round(await GetCourseProgress(courseId, userId), 1),
                 Status = userCourse.Status != null ? userCourse.Status : "Assigned",
                 LessonProgress = lessonsProgressDtos,
                 TestScore = testsProgressDtos

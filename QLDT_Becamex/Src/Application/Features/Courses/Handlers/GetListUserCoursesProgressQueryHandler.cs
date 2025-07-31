@@ -51,7 +51,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 {
                     userId = user.Id,
                     userName = user.FullName != null ? user.FullName : "",
-                    progressPercentage = progress
+                    progressPercentage = (float)Math.Round(progress, 1)
                 };
                 userCoursesProgressDtos.Add(userCourseProgressDto);
             }

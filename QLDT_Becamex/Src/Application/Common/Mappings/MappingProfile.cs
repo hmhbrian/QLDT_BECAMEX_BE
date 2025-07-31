@@ -134,7 +134,23 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     ? new UserSumaryDto { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
                     : null));
 
-            CreateMap<CourseDto, Course>();
+            CreateMap<CourseDto, Course>()
+                .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>
+                  src.RegistrationStartDate.HasValue 
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationStartDate.Value, DateTimeKind.Utc))
+                      : (DateTime?)null))
+                .ForMember(dest => dest.RegistrationClosingDate, opt => opt.MapFrom((src, dest) =>
+                  src.RegistrationClosingDate.HasValue
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationClosingDate.Value, DateTimeKind.Utc))
+                      : (DateTime?)null))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom((src, dest) =>
+                  src.StartDate.HasValue
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.StartDate.Value, DateTimeKind.Utc))
+                      : (DateTime?)null))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom((src, dest) =>
+                  src.EndDate.HasValue
+                      ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.EndDate.Value, DateTimeKind.Utc))
+                      : (DateTime?)null));
 
             CreateMap<UpdateCourseDto, Course>()
               .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>

@@ -7,6 +7,7 @@ using QLDT_Becamex.Src.Application.Features.LessonProgresses.Queries;
 using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Shared.Helpers;
 
 namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
 {
@@ -42,9 +43,14 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                     predicate: cu => cu.CourseId == request.CourseId && cu.UserId == userId);
                 if (courseUser == null)
                 {
-                    throw new AppException("Bạn không có quyền truy cập bài học của khóa học này", 403);
+                    throw new AppException("Bạn không có quyền truy cập bài học của khóa học này", 404);
                 }
             }
+
+            var currentDate = DateTimeHelper.GetVietnamTimeNow();// lấy thời gian hiện tại theo múi giờ VN
+            if (course.StartDate > currentDate)
+                throw new AppException("Không thể hiển thị bài học do chưa tới thời gian bắt đầu.", 404);
+
 
             // Lấy danh sách bài học theo CourseId
             var lesson = await _unitOfWork.LessonRepository.GetFlexibleAsync(

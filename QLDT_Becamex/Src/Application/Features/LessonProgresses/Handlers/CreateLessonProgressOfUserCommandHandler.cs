@@ -4,6 +4,7 @@ using QLDT_Becamex.Src.Application.Features.LessonProgresses.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Shared.Helpers;
 
 namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
 {
@@ -26,6 +27,7 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
             }
             var existingLesson = await _unitOfWork.LessonRepository.GetByIdAsync(request.Request.LessonId);
             var isCompleted = false; // Mặc định là chưa hoàn thành
+
             if (existingLesson != null)
             {
                 var currentPage = request.Request.CurrentPage > 0 ? request.Request.CurrentPage : 0; // Nếu CurrentPage không được cung cấp, mặc định là 0

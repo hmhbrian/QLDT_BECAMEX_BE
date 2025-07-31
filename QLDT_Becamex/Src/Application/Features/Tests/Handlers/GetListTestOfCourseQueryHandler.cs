@@ -7,6 +7,7 @@ using QLDT_Becamex.Src.Application.Features.Tests.Queries;
 using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Shared.Helpers;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
@@ -44,6 +45,10 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
                     throw new AppException("Bạn không có quyền truy cập bài học của khóa học này", 403);
                 }
             }
+
+            var currentDate = DateTimeHelper.GetVietnamTimeNow();// lấy thời gian hiện tại theo múi giờ VN
+            if (course.StartDate > currentDate)
+                throw new AppException("Không thể hiển thị bài kiểm tra do chưa tới thời gian bắt đầu.", 404);
 
             var tests = await _unitOfWork.TestRepository.GetFlexibleAsync(
                 predicate: t => t.CourseId == request.CourseId,

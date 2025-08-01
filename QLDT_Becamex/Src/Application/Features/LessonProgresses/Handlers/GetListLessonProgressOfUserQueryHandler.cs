@@ -45,11 +45,12 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                 {
                     throw new AppException("Bạn không có quyền truy cập bài học của khóa học này", 404);
                 }
-            }
 
-            var currentDate = DateTimeHelper.GetVietnamTimeNow();// lấy thời gian hiện tại theo múi giờ VN
-            if (course.StartDate > currentDate)
-                throw new AppException("Không thể hiển thị bài học do chưa tới thời gian bắt đầu.", 404);
+                //Kiểm tra không hiển thị bài học khi chưa tới ngày bắt đầu
+                var currentDate = DateTimeHelper.GetVietnamTimeNow();// lấy thời gian hiện tại theo múi giờ VN
+                if (course.StartDate > currentDate)
+                    throw new AppException("Không thể hiển thị bài học do chưa tới thời gian bắt đầu.", 404);
+            }
 
 
             // Lấy danh sách bài học theo CourseId

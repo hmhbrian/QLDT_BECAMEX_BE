@@ -59,10 +59,10 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (string.IsNullOrEmpty(currentUserId))
                 throw new AppException("Bạn không có quyền cập nhật khóa học này", 403); // Lỗi 403 Forbidden
 
-            if (course.StartDate.HasValue && course.StartDate <= DateTime.UtcNow)
-            {
-                throw new AppException("Khóa học đã bắt đầu, không thể chỉnh sửa", 403);
-            }
+            //if (course.StartDate.HasValue && course.StartDate <= DateTimeHelper.GetVietnamTimeNow())
+            //{
+            //    throw new AppException("Khóa học đã bắt đầu, không thể chỉnh sửa", 403);
+            //}
 
             // Kiểm tra mã khóa học có bị trùng với một khóa học khác không
             if (await _unitOfWork.CourseRepository.AnyAsync(c => c.Code == request.Code && c.Id != id))
@@ -112,17 +112,17 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 request.DepartmentIds = allDepartmentIdsIncludingChildren.ToList();
             }
 
-            // Xử lý danh sách chức vụ
-            if (request.PositionIds != null && request.PositionIds.Any())
+            // Xử lý danh sách cấp bậc
+            if (request.ELevelIds != null && request.ELevelIds.Any())
             {
-                var validPosIds = await _unitOfWork.PositionRepository.GetQueryable()
-                    .Where(p => request.PositionIds.Contains(p.PositionId))
-                    .Select(p => p.PositionId)
+                var validPosIds = await _unitOfWork.EmployeeLevelRepository.GetQueryable()
+                    .Where(p => request.ELevelIds.Contains(p.ELevelId))
+                    .Select(p => p.ELevelId)
                     .ToListAsync();
 
-                var invalidPositions = request.PositionIds.Except(validPosIds).ToList();
-                if (invalidPositions.Any())
-                    throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalidPositions)}", 400);
+                var invalidELevels = request.ELevelIds.Except(validPosIds).ToList();
+                if (invalidELevels.Any())
+                    throw new AppException($"Cấp bậc không hợp lệ: {string.Join(", ", invalidELevels)}", 400);
             }
 
             // Xử lý danh sách học viên (chỉ kiểm tra nếu đây không phải khóa học bắt buộc gán theo tiêu chí)
@@ -198,22 +198,22 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
 
             // Cập nhật liên kết Khóa học - Chức vụ
-            if (request.PositionIds != null)
+            if (request.ELevelIds != null)
             {
-                var currentCoursePositions = await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == id);
-                var currentPositionIds = currentCoursePositions.Select(cp => cp.PositionId).ToHashSet();
-                var incomingPositionIds = request.PositionIds.ToHashSet();
+                var currentCourseELevels = await _unitOfWork.CourseELevelRepository.FindAsync(cp => cp.CourseId == id);
+                var currentELevelIds = currentCourseELevels.Select(cp => cp.ELevelId).ToHashSet();
+                var incomingELevelIds = request.ELevelIds.ToHashSet();
 
-                if (!currentPositionIds.SetEquals(incomingPositionIds))
+                if (!currentELevelIds.SetEquals(incomingELevelIds))
                 {
-                    _unitOfWork.CoursePositionRepository.RemoveRange(currentCoursePositions);
+                    _unitOfWork.CourseELevelRepository.RemoveRange(currentCourseELevels);
 
-                    if (incomingPositionIds.Any())
+                    if (incomingELevelIds.Any())
                     {
-                        var newCoursePositions = incomingPositionIds
-                            .Select(p => new CoursePosition { CourseId = id, PositionId = p })
+                        var newCourseELevels = incomingELevelIds
+                            .Select(p => new CourseELevel { CourseId = id, ELevelId = p })
                             .ToList();
-                        await _unitOfWork.CoursePositionRepository.AddRangeAsync(newCoursePositions);
+                        await _unitOfWork.CourseELevelRepository.AddRangeAsync(newCourseELevels);
                     }
                 }
             }
@@ -227,11 +227,11 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             {
                 if (request.DepartmentIds?.Any() == true)
                 {
-                    if (request.PositionIds?.Any() == true)
+                    if (request.ELevelIds?.Any() == true)
                     {
                         var matchedUsers = await _unitOfWork.UserRepository.GetQueryable()
                             .Where(u => u.DepartmentId.HasValue && request.DepartmentIds.Contains(u.DepartmentId.Value)
-                                     && u.PositionId.HasValue && request.PositionIds.Contains(u.PositionId.Value))
+                                     && u.ELevelId.HasValue && request.ELevelIds.Contains(u.ELevelId.Value))
                             .Select(u => u.Id)
                             .ToListAsync();
 

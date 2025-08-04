@@ -14,12 +14,13 @@ namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp
         public int? StatusId { get; set; }
         public UserStatus? UserStatus { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public string? Position { get; set; }
         public string? ManagerUId { get; set; } // Khóa ngoại tới ApplicationUser khác (không cần [ForeignKey] nữa)
         public ApplicationUser? ManagerU { get; set; }
         public int? DepartmentId { get; set; }
         public Department? Department { get; set; } // Navigation property
-        public int? PositionId { get; set; }
-        public Position? Position { get; set; } // Navigation property
+        public int? ELevelId { get; set; }
+        public EmployeeLevel? ELevel { get; set; } // Navigation property
         public string? CreateById { get; set; }
         public ApplicationUser? CreateBy { get; set; }
         public string? UpdateById { get; set; }

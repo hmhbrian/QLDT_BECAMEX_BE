@@ -68,8 +68,8 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
             if (!string.IsNullOrEmpty(rq.ManagerUId))
                 userToUpdate.ManagerUId = rq.ManagerUId;
 
-            if (rq.PositionId.HasValue)
-                userToUpdate.PositionId = rq.PositionId;
+            if (rq.ELevelId.HasValue)
+                userToUpdate.ELevelId = rq.ELevelId;
 
             userToUpdate.UpdateById = currentUserId;
             userToUpdate.ModifiedAt = DateTime.UtcNow;

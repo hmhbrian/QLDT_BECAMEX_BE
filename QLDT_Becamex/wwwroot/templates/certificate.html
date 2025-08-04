@@ -6,7 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chứng chỉ Becamex</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Dancing+Script:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        @font-face {
+            font-family: 'Playfair Display';
+            src: url('/fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf') format('truetype');
+            font-weight: 700;
+        }
+
+        @font-face {
+            font-family: 'Dancing Script';
+            src: url('/fonts/DancingScript-SemiBold.ttf') format('woff');
+            font-weight: 600;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src: url('/fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+            font-weight: 400;
+        }
 
         * {
             margin: 0;
@@ -138,10 +154,10 @@
         }
 
         .recipient-name {
-            font-family: 'Dancing Script', cursive;
+            font-family: 'Dancing Script', serif;
             font-size: 56px;
             color: #2d3748;
-            font-weight: 600;
+            font-weight: bold;
             margin: 20px 0;
             position: relative;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -185,11 +201,29 @@
             padding: 0 30px;
         }
 
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.03;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+            .watermark img {
+                max-width: 800px;
+            }
+
         .date-section,
         .signature-section {
             text-align: center;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
 
         .date-label,
         .signature-label {
@@ -240,6 +274,18 @@
             text-transform: uppercase;
             transform: rotate(-10deg);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .inner-border {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid rgba(255, 126, 95, 0.3);
+            border-radius: 16px;
+            z-index: 1;
+            pointer-events: none;
         }
 
 
@@ -296,15 +342,20 @@
             }
         }
 
+
         @media print {
             body {
-                background: white;
+                background: white !important;
             }
 
             .certificate-container {
                 box-shadow: none;
-                border: 2px solid #ff7e5f;
+                border: none;
                 transform: none !important;
+            }
+
+            .inner-border {
+                border: 1px solid #ccc !important;
             }
         }
     </style>
@@ -313,6 +364,10 @@
 <body>
     <div class="certificate-container">
         <div class="decorative-accent"></div>
+        <div class="inner-border"></div>
+        <div class="watermark">
+            <img src="https://forbes.vn/wp-content/uploads/2021/08/Becamex_Logo-01.png" alt="Watermark" />
+        </div>
         <div class="content-wrapper">
             <div class="header">
                 <div class="logo-section">
@@ -323,9 +378,9 @@
             </div>
 
             <div class="main-content">
-                <div class="awarded-text">Được cấp cho</div>
+                <div class="awarded-text">Trao tặng cho</div>
                 <div class="recipient-name" id="username">{{Name}}</div>
-                <div class="completion-text">vì đã hoàn thành xuất sắc khóa học</div>
+                <div class="completion-text">vì đã hoàn thành khóa học</div>
                 <div class="course-name" id="courseName">{{Course}}</div>
             </div>
 
@@ -340,11 +395,9 @@
                 </div>
             </div>
 
-            <!-- <div class="seal">
-                BECAMEX<br />OFFICIAL<br />SEAL
-            </div> -->
         </div>
     </div>
 </body>
+
 
 </html> 

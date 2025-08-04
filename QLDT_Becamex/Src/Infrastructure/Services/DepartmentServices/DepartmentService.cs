@@ -56,7 +56,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices
             // Kiểm tra người dùng tồn tại và vai trò
             var user = await _unitOfWork.UserRepository.GetFirstOrDefaultAsync(
                 u => u.Id == managerId,
-                includes: q => q.Include(u => u.Position)
+                includes: q => q.Include(u => u.ELevel)
             );
 
             if (user == null)
@@ -65,7 +65,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices
             }
 
             var validManagerRoles = new[] { PositionNames.SeniorManager.ToLower(), PositionNames.MiddleManager.ToLower() };
-            if (!validManagerRoles.Contains(user.Position?.PositionName?.ToLower()))
+            if (!validManagerRoles.Contains(user.ELevel?.ELevelName?.ToLower()))
             {
                 throw new AppException("Người dùng không phải là quản lý cấp cao hoặc cấp trung", 400);
             }

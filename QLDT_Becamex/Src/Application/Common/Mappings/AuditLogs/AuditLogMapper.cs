@@ -16,7 +16,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
         {
             { "Title", "Tiêu đề" },
             { "Department", "Phòng ban" },
-            { "EmploymentPosition", "Cấp bậc" },
+            { "EmploymentLevel", "Cấp bậc" },
             { "FileUrl", "Đường dẫn tệp" },
             { "PublicIdUrlPdf", "ID công khai PDF" },
             { "EndDate", "Ngày kết thúc" },

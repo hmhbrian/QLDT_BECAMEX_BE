@@ -35,7 +35,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string? UpdatedById { get; set; }
         public ApplicationUser? UpdateBy { get; set; }
         public ICollection<CourseDepartment>? CourseDepartments { get; set; } = new List<CourseDepartment>();
-        public ICollection<CoursePosition>? CoursePositions { get; set; } = new List<CoursePosition>();
+        public ICollection<CourseELevel>? CourseELevels { get; set; } = new List<CourseELevel>();
         public ICollection<UserCourse>? UserCourses { get; set; } = new List<UserCourse>();
         public ICollection<CourseAttachedFile>? AttachedFiles { get; set; }
         public ICollection<Lesson>? Lessons { get; set; } = new List<Lesson>();

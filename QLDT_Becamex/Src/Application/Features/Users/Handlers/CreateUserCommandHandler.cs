@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Domain.Interfaces;
 
 namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
 {
@@ -22,15 +23,17 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserService _userService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public CreateUserCommandHandler(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
-             IUserService userService)
+             IUserService userService, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _userService = userService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<string> Handle(CreateUserCommand command, CancellationToken cancellationToken)
@@ -53,6 +56,9 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
             if (await _userManager.FindByEmailAsync(request.Email) is not null)
                 throw new AppException("Email đã được sử dụng", 409);
 
+            if(await _unitOfWork.UserRepository.GetFirstOrDefaultAsync(c => c.PhoneNumber == request.NumberPhone) is not null)
+                throw new AppException("Số điện thoại đã được sử dụng", 409);
+
             // 3. Tạo user
             var user = new ApplicationUser
             {
@@ -66,7 +72,7 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
                 ModifiedAt = DateTime.Now,
                 Code = request.Code,
                 DepartmentId = request.DepartmentId,
-                PositionId = request.PositionId,
+                ELevelId = request.ELevelId,
                 StatusId = request.StatusId,
                 ManagerUId = request.ManagerUId,
                 CreateById = currentUserId,

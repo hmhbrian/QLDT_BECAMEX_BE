@@ -30,34 +30,34 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 throw new AppException($"Id khóa học không hợp lệ", 400);
 
             // Lấy dữ liệu hiện tại và bao gồm cả ID từ bản ghi Deleted
-            var (departmentDict, positionDict, userDict, previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds) = await GetCurrentReferenceDictionariesAsync(courseId, auditLog); 
+            var (departmentDict, ELevelDict, userDict, previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds) = await GetCurrentReferenceDictionariesAsync(courseId, auditLog); 
             var (statusName, categoryName, lecturerName, hasStatusChange) = await GetCurrentCourseDetailsAsync(courseId, auditLog);
 
 
             if (auditLog.Action == "Added")
             {
-                await AddFieldsForAddedActionAsync(referenceData, courseId, departmentDict, positionDict, userDict, statusName, categoryName, lecturerName, currentDepartmentIds, currentPositionIds);
+                await AddFieldsForAddedActionAsync(referenceData, courseId, departmentDict, ELevelDict, userDict, statusName, categoryName, lecturerName, currentDepartmentIds, currentELevelIds);
             }
             else if (auditLog.Action == "Modified")
             {
-                await AddFieldsForModifiedActionAsync(referenceData, auditLog, courseId, departmentDict, positionDict, userDict, statusName, categoryName, lecturerName, hasStatusChange, previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds);
+                await AddFieldsForModifiedActionAsync(referenceData, auditLog, courseId, departmentDict, ELevelDict, userDict, statusName, categoryName, lecturerName, hasStatusChange, previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds);
             }
 
             return referenceData;
         }
 
-        private async Task<(Dictionary<string, string> departmentDict, Dictionary<string, string> positionDict, Dictionary<string, string> userDict, List<string> previousDepartmentIds, List<string> currentDepartmentIds, List<string> previousPositionIds, List<string> currentPositionIds)> GetCurrentReferenceDictionariesAsync(string courseId, AuditLog auditLog)
+        private async Task<(Dictionary<string, string> departmentDict, Dictionary<string, string> ELevelDict, Dictionary<string, string> userDict, List<string> previousDepartmentIds, List<string> currentDepartmentIds, List<string> previousELevelIds, List<string> currentELevelIds)> GetCurrentReferenceDictionariesAsync(string courseId, AuditLog auditLog)
         {
             // Loại bỏ mili giây
             var auditLogTimeWithoutMs = auditLog.Timestamp.AddTicks(-(auditLog.Timestamp.Ticks % TimeSpan.TicksPerSecond));
             var timeWindow = TimeSpan.FromSeconds(1);
 
-            // Lấy CourseDepartment, CoursePosition và UserCourse
+            // Lấy CourseDepartment, CourseELevel và UserCourse
             //var courseDepartments = await _unitOfWork.CourseDepartmentRepository.FindAsync(cd => cd.CourseId == courseId);
             //var departmentIds = courseDepartments.Select(cd => cd.DepartmentId.ToString()).ToList();
 
-            //var coursePositions = await _unitOfWork.CoursePositionRepository.FindAsync(cp => cp.CourseId == courseId);
-            //var positionIds = coursePositions.Select(cp => cp.PositionId.ToString()).ToList();
+            //var courseELevels = await _unitOfWork.CourseELevelRepository.FindAsync(cp => cp.CourseId == courseId);
+            //var ELevelIds = courseELevels.Select(cp => cp.ELevelId.ToString()).ToList();
 
             var courseUsers = await _unitOfWork.UserCourseRepository.FindAsync(cp => cp.CourseId == courseId);
             var userIds = courseUsers.Select(cp => cp.UserId).ToList();
@@ -71,13 +71,13 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 .ToList();
             var currentDepartmentIds = ExtractIdsFromAddedLogs(addedDepartmentLogs, "DepartmentId");
 
-            var addedPositionLogs = _allAuditLogs
-                .Where(p => p.EntityName == "CoursePosition" && p.Action == "Added" &&
+            var addedELevelLogs = _allAuditLogs 
+                .Where(p => p.EntityName == "CourseELevel" && p.Action == "Added" &&
                     p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") &&
                     p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();
-            var currentPositionIds = ExtractIdsFromAddedLogs(addedPositionLogs, "PositionId");
+            var currentELevelIds = ExtractIdsFromAddedLogs(addedELevelLogs, "ELevelId");
 
             // Lấy ID từ bản ghi Deleted để đảm bảo ánh xạ đầy đủ
             var deletedDepartmentLogs = _allAuditLogs
@@ -87,12 +87,12 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 .ToList();
             var previousDepartmentIds = ExtractIdsFromDeletedLogs(deletedDepartmentLogs, "DepartmentId");
 
-            var deletedPositionLogs = _allAuditLogs
-                .Where(p => p.EntityName == "CoursePosition" && p.Action == "Deleted" && p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") 
+            var deletedELevelLogs = _allAuditLogs
+                .Where(p => p.EntityName == "CourseELevel" && p.Action == "Deleted" && p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") 
                         && p.Timestamp.AddTicks(-(p.Timestamp.Ticks % TimeSpan.TicksPerSecond)) == auditLogTimeWithoutMs)
                 .OrderByDescending(p => p.Timestamp)
                 .ToList();
-            var previousPositionIds = ExtractIdsFromDeletedLogs(deletedPositionLogs, "PositionId");
+            var previousELevelIds = ExtractIdsFromDeletedLogs(deletedELevelLogs, "ELevelId");
 
             var deletedUserLogs = _allAuditLogs
                 .Where(p => p.EntityName == "UserCourse" && p.Action == "Deleted" && p.Changes!.Contains($"\"CourseId\":\"{courseId}\"") 
@@ -100,12 +100,12 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 .ToList();
             var previousUserIds = ExtractIdsFromDeletedLogs(deletedUserLogs, "UserId");
 
-            // Lấy tên Department, Position, User
+            // Lấy tên Department, ELevel, User
             var departments = await _unitOfWork.DepartmentRepository.FindAsync(d => currentDepartmentIds.Concat(previousDepartmentIds).Contains(d.DepartmentId.ToString()));
             var departmentDict = departments.ToDictionary(d => d.DepartmentId.ToString(), d => d.DepartmentName);
 
-            var positions = await _unitOfWork.PositionRepository.FindAsync(p => currentPositionIds.Concat(previousPositionIds).Contains(p.PositionId.ToString()));
-            var positionDict = positions.ToDictionary(p => p.PositionId.ToString(), p => p.PositionName);
+            var ELevels = await _unitOfWork.EmployeeLevelRepository.FindAsync(p => currentELevelIds.Concat(previousELevelIds).Contains(p.ELevelId.ToString()));
+            var ELevelDict = ELevels.ToDictionary(p => p.ELevelId.ToString(), p => p.ELevelName);
 
             var users = await _unitOfWork.UserRepository.FindAsync(p => userIds.Contains(p.Id));
             var userDict = users.ToDictionary(p => p.Id, p => p.FullName);
@@ -114,10 +114,10 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             Console.WriteLine($"CourseId: {courseId}, AuditLog Timestamp (without ms): {auditLogTimeWithoutMs}, Original: {auditLog.Timestamp}");
             Console.WriteLine($"Previous Department IDs: {string.Join(", ", previousDepartmentIds)}");
             Console.WriteLine($"Current Department IDs: {string.Join(", ", currentDepartmentIds)}");
-            Console.WriteLine($"Previous Position IDs: {string.Join(", ", previousPositionIds)}");
-            Console.WriteLine($"Current Position IDs: {string.Join(", ", currentPositionIds)}");
+            Console.WriteLine($"Previous ELevel IDs: {string.Join(", ", previousELevelIds)}");
+            Console.WriteLine($"Current ELevel IDs: {string.Join(", ", currentELevelIds)}");
 
-            return (departmentDict, positionDict, userDict, previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds);
+            return (departmentDict, ELevelDict, userDict, previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds);
         }
 
         private async Task<(string statusName, string categoryName, string lecturerName,bool hasStatusChange)> GetCurrentCourseDetailsAsync(string courseId, AuditLog auditLog)
@@ -163,13 +163,13 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             ReferenceData referenceData,
             string courseId,
             Dictionary<string, string> departmentDict,
-            Dictionary<string, string> positionDict,
+            Dictionary<string, string> ELevelDict,
             Dictionary<string, string> userDict,
             string statusName,
             string categoryName,
             string lecturerName,
             List<string> currentDepartmentIds,
-            List<string> currentPositionIds)
+            List<string> currentELevelIds)
         {
             // Thêm Department vào AddedFields
             if (currentDepartmentIds.Any())
@@ -186,18 +186,18 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 });
             }
 
-            // Thêm Position vào AddedFields
-            if (currentPositionIds.Any())
+            // Thêm ELevel vào AddedFields
+            if (currentELevelIds.Any())
             {
-                var positionNames = currentPositionIds
-                    .Where(id => positionDict.ContainsKey(id))
-                    .Select(id => positionDict[id])
+                var ELevelNames = currentELevelIds
+                    .Where(id => ELevelDict.ContainsKey(id))
+                    .Select(id => ELevelDict[id])
                     .OrderBy(name => name)
                     .ToList();
                 referenceData.AddedFields.Add(new AddedField
                 {
-                    FieldName = "EmploymentPosition",
-                    Value = string.Join(", ", positionNames)
+                    FieldName = "EmploymentLevel",
+                    Value = string.Join(", ", ELevelNames)
                 });
             }
 
@@ -238,15 +238,15 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             AuditLog auditLog,
             string courseId,
             Dictionary<string, string> departmentDict,
-            Dictionary<string, string> positionDict,
+            Dictionary<string, string> ELevelDict,
             Dictionary<string, string> userDict,
             string statusName,
             string categoryName,
             string lecturerName, bool hasStatusChange,
             List<string> previousDepartmentIds,
             List<string> currentDepartmentIds,
-            List<string> previousPositionIds,
-            List<string> currentPositionIds)
+            List<string> previousELevelIds,
+            List<string> currentELevelIds)
         {
             // Lấy các bản ghi Deleted trong khoảng thời gian gần với auditLog.Timestamp
             var auditLogTimeWithoutMs = auditLog.Timestamp.AddTicks(-(auditLog.Timestamp.Ticks % TimeSpan.TicksPerSecond));
@@ -266,8 +266,8 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             var (previousStatusName, previousCategoryName, previousLecturerName) = await GetPreviousCourseDetailsAsync(auditLog, courseId);
 
             // So sánh và thêm vào ChangedFields
-            await AddChangedFieldsAsync(referenceData, courseId, departmentDict, positionDict, userDict,
-                previousDepartmentIds, currentDepartmentIds, previousPositionIds, currentPositionIds, previousUserIds,
+            await AddChangedFieldsAsync(referenceData, courseId, departmentDict, ELevelDict, userDict,
+                previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds, previousUserIds,
                 statusName, previousStatusName, categoryName, previousCategoryName, lecturerName, previousLecturerName, hasStatusChange);
         }
 
@@ -387,12 +387,12 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             ReferenceData referenceData,
             string courseId,
             Dictionary<string, string> departmentDict,
-            Dictionary<string, string> positionDict,
+            Dictionary<string, string> ELevelDict,
             Dictionary<string, string> userDict,
             List<string> previousDepartmentIds,
             List<string> currentDepartmentIds,
-            List<string> previousPositionIds,
-            List<string> currentPositionIds,
+            List<string> previousELevelIds,
+            List<string> currentELevelIds,
             List<string> previousUserIds,
             string statusName,
             string previousStatusName,
@@ -409,9 +409,9 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 .OrderBy(name => name)
                 .ToList();
 
-            var currentPositionNames = currentPositionIds
-                .Where(id => positionDict.ContainsKey(id))
-                .Select(id => positionDict[id])
+            var currentELevelNames = currentELevelIds
+                .Where(id => ELevelDict.ContainsKey(id))
+                .Select(id => ELevelDict[id])
                 .OrderBy(name => name)
                 .ToList();
 
@@ -429,9 +429,9 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 .OrderBy(name => name)
                 .ToList();
 
-            var previousPositionNames = previousPositionIds
-                .Where(id => positionDict.ContainsKey(id))
-                .Select(id => positionDict[id])
+            var previousELevelNames = previousELevelIds
+                .Where(id => ELevelDict.ContainsKey(id))
+                .Select(id => ELevelDict[id])
                 .OrderBy(name => name)
                 .ToList();
 
@@ -456,17 +456,17 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 }
             }
 
-            if (previousPositionNames.Any())
+            if (previousELevelNames.Any())
             {
-                var positionOldValue = previousPositionNames.Any() ? string.Join(", ", previousPositionNames) : "None";
-                var positionNewValue = currentPositionNames.Any() ? string.Join(", ", currentPositionNames) : "None";
-                if (positionOldValue != positionNewValue)
+                var ELevelOldValue = previousELevelNames.Any() ? string.Join(", ", previousELevelNames) : "None";
+                var ELevelNewValue = currentELevelNames.Any() ? string.Join(", ", currentELevelNames) : "None";
+                if (ELevelOldValue != ELevelNewValue)
                 {
                     referenceData.ChangedFields.Add(new ChangedField
                     {
-                        FieldName = "EmploymentPosition",
-                        OldValue = positionOldValue,
-                        NewValue = positionNewValue
+                        FieldName = "EmploymentLevel",
+                        OldValue = ELevelOldValue,
+                        NewValue = ELevelNewValue
                     });
                 }
             }

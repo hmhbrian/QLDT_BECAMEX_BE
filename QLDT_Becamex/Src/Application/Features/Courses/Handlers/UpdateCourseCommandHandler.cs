@@ -126,14 +126,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
 
             // Xử lý danh sách học viên (chỉ kiểm tra nếu đây không phải khóa học bắt buộc gán theo tiêu chí)
-            if (request.Optional != ConstantCourse.OPTIONAL_BATBUOC && request.StudentIds != null && request.StudentIds.Any())
+            if (request.Optional != ConstantCourse.OPTIONAL_BATBUOC && request.UserIds != null && request.UserIds.Any())
             {
                 var validUserIds = await _unitOfWork.UserRepository.GetQueryable()
-                    .Where(u => request.StudentIds.Contains(u.Id))
+                    .Where(u => request.UserIds.Contains(u.Id))
                     .Select(u => u.Id)
                     .ToListAsync();
 
-                var invalidUserIds = request.StudentIds.Except(validUserIds).ToList();
+                var invalidUserIds = request.UserIds.Except(validUserIds).ToList();
                 if (invalidUserIds.Any())
                     throw new AppException($"Người dùng không hợp lệ: {string.Join(", ", invalidUserIds)}", 400);
             }
@@ -270,9 +270,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     }
                 }
 
-                if (request.StudentIds?.Any() == true)
+                if (request.UserIds?.Any() == true)
                 {
-                    foreach (var userId in request.StudentIds)
+                    foreach (var userId in request.UserIds)
                     {
                         if (assignedUserIds.Add(userId))
                         {
@@ -288,9 +288,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
             else
             {
-                if (request.StudentIds?.Any() == true)
+                if (request.UserIds?.Any() == true)
                 {
-                    foreach (var userId in request.StudentIds)
+                    foreach (var userId in request.UserIds)
                     {
                         if (assignedUserIds.Add(userId))
                         {

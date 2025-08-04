@@ -14,5 +14,6 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Dtos
     {
         public string courseName { get; set; } = null!;
         public AvgFeedbackDto AvgFeedback { get; set; } = new AvgFeedbackDto();
+        public float avgFeedbackScore => (AvgFeedback.Q1_relevanceAvg + AvgFeedback.Q2_clarityAvg + AvgFeedback.Q3_structureAvg + AvgFeedback.Q4_durationAvg + AvgFeedback.Q5_materialAvg) / 5;
     }
 }

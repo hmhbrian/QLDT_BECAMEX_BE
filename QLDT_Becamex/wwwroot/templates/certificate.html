@@ -60,66 +60,51 @@
             .certificate-container::before {
                 content: '';
                 position: absolute;
-                top: -4px;
-                left: -4px;
-                right: -4px;
-                bottom: -4px;
-                background: linear-gradient(45deg, #e67e00, #d96500, #e67300, #e67300, #ff8000, #e67e00);
-                border-radius: 24px;
-                z-index: -1;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle at 50% 50%, rgba(255, 126, 95, 0.1), transparent 70%);
+                z-index: 1;
             }
 
-        .decorative-border {
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .decorative-accent {
             position: absolute;
-            top: 25px;
-            left: 25px;
-            right: 25px;
-            bottom: 25px;
-            border: 2px solid #e67300;
-            border-radius: 15px;
-            pointer-events: none;
-            opacity: 0.6;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
-        .decorative-corners {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border: 3px solid #e67300;
-            opacity: 0.7;
-        }
+            .decorative-accent::before,
+            .decorative-accent::after {
+                content: '';
+                position: absolute;
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(45deg, #ff7e5f, #feb47b);
+                opacity: 0.2;
+                border-radius: 10px;
+            }
 
-        .corner-tl {
-            top: 15px;
-            left: 15px;
-            border-right: none;
-            border-bottom: none;
-            border-radius: 15px 0 0 0;
-        }
+            .decorative-accent::before {
+                top: 20px;
+                left: 20px;
+                transform: rotate(45deg);
+            }
 
-        .corner-tr {
-            top: 15px;
-            right: 15px;
-            border-left: none;
-            border-bottom: none;
-            border-radius: 0 15px 0 0;
-        }
-
-        .corner-bl {
-            bottom: 15px;
-            left: 15px;
-            border-right: none;
-            border-top: none;
-            border-radius: 0 0 0 15px;
-        }
-
-        .corner-br {
-            bottom: 15px;
-            right: 15px;
-            border-left: none;
-            border-top: none;
-            border-radius: 0 0 15px 0;
-        }
+            .decorative-accent::after {
+                bottom: 20px;
+                right: 20px;
+                transform: rotate(45deg);
+            }
 
         .header {
             margin-bottom: 35px;
@@ -143,7 +128,7 @@
         .certificate-title {
             font-family: 'Playfair Display', serif;
             font-size: 44px;
-            font-weight: 600;
+            font-weight: bold;
             font-style: italic;
             margin-top: 20px;
             color: #E04826;
@@ -169,10 +154,11 @@
         }
 
         .recipient-name {
-            font-family: 'Dancing Script', serif;
+            font-family: 'Playfair Display', serif;
             font-size: 56px;
             color: #2d3748;
             font-weight: bold;
+            font-style: italic;
             margin: 20px 0;
             position: relative;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -181,35 +167,32 @@
             .recipient-name::after {
                 content: '';
                 position: absolute;
-                bottom: -12px;
+                bottom: -10px;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 90%;
+                width: 50%;
                 height: 4px;
-                background: linear-gradient(90deg, transparent, #E04826, #F06B47, #ff8c66, #F06B47, #E04826, transparent);
+                background: linear-gradient(90deg, transparent, #ff7e5f, transparent);
                 border-radius: 2px;
-                box-shadow: 0 1px 3px rgba(224, 72, 38, 0.3);
             }
 
-        .completion-text {
-            font-size: 20px;
-            color: #6c757d;
-            margin-bottom: 15px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-        }
 
         .course-name {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Dancing Script', serif;
             font-size: 30px;
             color: #ff7e5f;
-            font-weight: 600;
+            font-weight: bold;
             font-style: italic;
             margin-top: 15px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-family: 'Poppins', sans-serif;
+            letter-spacing: 1.5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
         }
+
+            .course-name:hover {
+                transform: scale(1.02);
+            }
 
         .footer {
             display: flex;
@@ -219,29 +202,11 @@
             padding: 0 30px;
         }
 
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.03;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-            .watermark img {
-                max-width: 800px;
-            }
-
         .date-section,
         .signature-section {
             text-align: center;
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
-
 
         .date-label,
         .signature-label {
@@ -261,8 +226,17 @@
             border-bottom: 2px solid #feb47b;
             padding-bottom: 8px;
             display: inline-block;
-            font-family: 'Poppins', sans-serif;
+            min-width: 200px;
+            font-weight: 500;
+            font-style: italic;
+            transition: border-color 0.3s ease, color 0.3s ease;
         }
+
+            .date-value:hover,
+            .signature-line:hover {
+                border-color: #ff7e5f;
+                color: #ff7e5f;
+            }
 
         .seal {
             position: absolute;
@@ -279,12 +253,12 @@
             font-size: 11px;
             color: #ff7e5f;
             text-align: center;
-            line-height: 1.2;
-            box-shadow: 0 5px 15px rgba(224, 72, 38, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(224, 72, 38, 0.2);
-            transform: rotate(-5deg);
+            font-weight: 600;
+            text-transform: uppercase;
+            transform: rotate(-10deg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-<<<<<<< HEAD
         .inner-border {
             position: absolute;
             top: 20px;
@@ -296,6 +270,20 @@
             z-index: 1;
             pointer-events: none;
         }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.03;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+            .watermark img {
+                max-width: 600px;
+            }
 
 
 
@@ -318,117 +306,37 @@
             .course-name {
                 font-size: 24px;
             }
-=======
-        .medal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 150px;
-            height: 170px;
-            z-index: 10;
->>>>>>> 5674cc8146f4b63451e68a8e3244b71e7585d8e8
         }
 
-        .medal-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
 
-        .decorative-squares {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
+            .certificate-container {
+                width: 100%;
+                padding: 30px 20px;
+                border-radius: 15px;
+            }
 
-        .square {
-            position: absolute;
-            border-radius: 2px;
-            box-shadow: 0 1px 3px rgba(230, 115, 0, 0.2);
-        }
+            .certificate-title {
+                font-size: 28px;
+            }
 
-        .square-1 {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(45deg, #e67300, #ff8000);
-            top: 50px;
-            left: 60px;
-            transform: rotate(15deg);
-            opacity: 0.25;
-        }
+            .recipient-name {
+                font-size: 32px;
+                margin: 15px 0;
+            }
 
-        .square-2 {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #ff8000, #e67300);
-            top: 150px;
-            right: 80px;
-            transform: rotate(-20deg);
-            opacity: 0.3;
-        }
+            .course-name {
+                font-size: 20px;
+            }
 
-        .square-3 {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(225deg, #e67300, #ff9933);
-            bottom: 120px;
-            left: 50px;
-            transform: rotate(30deg);
-            opacity: 0.2;
-        }
-
-        .square-4 {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(315deg, #ff8000, #e67300);
-            bottom: 50px;
-            right: 50px;
-            transform: rotate(-15deg);
-            opacity: 0.28;
-        }
-
-        .square-5 {
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(90deg, #e67300, #ff8000);
-            top: 200px;
-            left: 120px;
-            transform: rotate(45deg);
-            opacity: 0.35;
-        }
-
-        .square-6 {
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(180deg, #ff8000, #e67300);
-            top: 300px;
-            right: 70px;
-            transform: rotate(-25deg);
-            opacity: 0.22;
-        }
-
-        .square-7 {
-            width: 22px;
-            height: 22px;
-            background: linear-gradient(270deg, #ff9933, #e67300);
-            top: 120px;
-            left: 200px;
-            transform: rotate(35deg);
-            opacity: 0.26;
-        }
-
-        .square-8 {
-            width: 18px;
-            height: 18px;
-            background: linear-gradient(60deg, #e67300, #ff8000);
-            bottom: 200px;
-            right: 150px;
-            transform: rotate(-30deg);
-            opacity: 0.32;
+            .footer {
+                flex-direction: column;
+                gap: 20px;
+                padding: 0 10px;
+            }
         }
 
 
@@ -453,10 +361,10 @@
 <body>
     <div class="certificate-container">
         <div class="decorative-accent"></div>
-        <div class="inner-border"></div>
         <div class="watermark">
             <img src="https://forbes.vn/wp-content/uploads/2021/08/Becamex_Logo-01.png" alt="Watermark" />
         </div>
+        <div class="inner-border"></div>
         <div class="content-wrapper">
             <div class="header">
                 <div class="logo-section">

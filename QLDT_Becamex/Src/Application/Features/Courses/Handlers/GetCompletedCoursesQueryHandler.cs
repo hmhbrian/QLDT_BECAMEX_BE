@@ -65,6 +65,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 includes: null,
                 asNoTracking: true
             );
+            totalItems = courses.Count();
             var pagination = new Pagination(queryParams.Page,
                 queryParams.Limit,
                 totalItems);

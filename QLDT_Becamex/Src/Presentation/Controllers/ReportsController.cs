@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Reports.Dtos;
@@ -8,6 +9,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 {
     [Route("api/Report")]
     [ApiController]
+    [Authorize(Roles = "ADMIN, HR")]
     public class ReportsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -17,6 +19,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpGet("course-and-avg-feedback")]
+
         public async Task<IActionResult> GetAllCourseAndAvgFeedback()
         {
             var result = await _mediator.Send(new GetListCourseAndAvgFeedbackQuery());

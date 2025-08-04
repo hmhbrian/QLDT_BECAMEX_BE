@@ -1,15 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.AuditLogs.Dtos;
 using QLDT_Becamex.Src.Application.Features.AuditLogs.Queries;
-using QLDT_Becamex.Src.Application.Features.Courses.Commands;
-using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
-using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
-using QLDT_Becamex.Src.Application.Features.Lessons.Queries;
-using QLDT_Becamex.Src.Domain.Entities;
+
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {

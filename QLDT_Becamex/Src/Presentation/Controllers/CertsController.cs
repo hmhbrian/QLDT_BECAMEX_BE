@@ -14,6 +14,7 @@ namespace QLDT_Becamex.Src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CertsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -24,7 +25,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet("{courseId}")]
-        [Authorize]
+  
         public async Task<IActionResult> GetCertByCourseId(string courseId)
         {
             var result = await _mediator.Send(new GetDetailCertQuery(courseId));
@@ -32,7 +33,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet()]
-        [Authorize]
+      
         public async Task<IActionResult> GetListCert()
         {
             var result = await _mediator.Send(new GetListCertQuery());

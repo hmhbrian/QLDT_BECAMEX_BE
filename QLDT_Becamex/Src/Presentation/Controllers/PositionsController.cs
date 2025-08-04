@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Positions.Commands;
@@ -11,6 +12,7 @@ namespace QLDT_Becamex.Src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "ADMIN, HR")]
     public class PositionsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -29,6 +31,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpPost]
+
         public async Task<IActionResult> Create([FromBody] CreatePositionDto request)
         {
             var result = await _mediator.Send(new CreatePositionCommand(request));

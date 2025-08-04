@@ -71,6 +71,9 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
             if (rq.ELevelId.HasValue)
                 userToUpdate.ELevelId = rq.ELevelId;
 
+            if(rq.Position != null)
+                userToUpdate.Position = rq.Position;
+
             userToUpdate.UpdateById = currentUserId;
             userToUpdate.ModifiedAt = DateTime.UtcNow;
 

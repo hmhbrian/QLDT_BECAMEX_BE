@@ -37,15 +37,10 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             {
                 basePredicate = c => c.IsDeleted == false;
             }
-            else if (role == "USER")
-            {
-                // USER can only see courses that are not deleted and not private
-                basePredicate = c => c.IsDeleted == false && c.IsPrivate == false;
-            }
             else
             {
                 // Default for unknown roles or no role: same as USER (or stricter if needed)
-                basePredicate = c => c.IsDeleted == false && c.IsPrivate == false;
+                basePredicate = c => c.IsDeleted == false && c.IsPrivate == false && c.Status.Key > 0;
             }
 
             int totalItems = await _unitOfWork.CourseRepository.CountAsync(basePredicate);

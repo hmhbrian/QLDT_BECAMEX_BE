@@ -137,84 +137,26 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
                 await _unitOfWork.CourseELevelRepository.AddRangeAsync(courseELevels);
             }
-
-            // --- Ghi danh người dùng vào khóa học ---
-            var userCoursesToCreate = new List<UserCourse>();
-            var usersFromDepartmentsAndELevels = new HashSet<string>();
-
-            if (dto.DepartmentIds != null && dto.DepartmentIds.Any())
-            {
-                if (dto.ELevelIds != null && dto.ELevelIds.Any())
-                {
-                    var matchedUsers = await _unitOfWork.UserRepository
-                        .FindAsync(u => u.DepartmentId.HasValue && dto.DepartmentIds.Contains(u.DepartmentId.Value) &&
-                                        u.ELevelId.HasValue && dto.ELevelIds.Contains(u.ELevelId.Value));
-
-                    foreach (var user in matchedUsers)
-                        usersFromDepartmentsAndELevels.Add(user.Id);
-                }
-                else
-                {
-                    var matchedUsers = await _unitOfWork.UserRepository
-                        .FindAsync(u => u.DepartmentId.HasValue && dto.DepartmentIds.Contains(u.DepartmentId.Value));
-
-                    foreach (var user in matchedUsers)
-                        usersFromDepartmentsAndELevels.Add(user.Id);
-                }
-            }
-
-            if (dto.Optional == ConstantCourse.OPTIONAL_BATBUOC)
-            {
-                foreach (var userId in usersFromDepartmentsAndELevels)
-                {
-                    userCoursesToCreate.Add(new UserCourse
-                    {
-                        UserId = userId,
-                        CourseId = course.Id,
-                        AssignedAt = DateTime.Now,
-                        IsMandatory = true,
-                        Status = ConstantStatus.ASSIGINED,
-                        CreatedAt = DateTime.Now,
-                        ModifiedAt = DateTime.Now,
-                    });
-                }
-
-                if (dto.StudentIds != null && dto.StudentIds.Any())
-                {
-                    foreach (var userId in dto.StudentIds)
-                    {
-                        if (!usersFromDepartmentsAndELevels.Contains(userId))
-                        {
-                            userCoursesToCreate.Add(new UserCourse
-                            {
-                                UserId = userId,
-                                CourseId = course.Id,
-                                AssignedAt = DateTime.Now,
-                                IsMandatory = true,
-                                Status = ConstantStatus.ASSIGINED,
-                                CreatedAt = DateTime.Now,
-                                ModifiedAt = DateTime.Now,
-                            });
-                        }
-                    }
-                }
-            }
+            if (dto.UserIds == null)
+                Console.WriteLine("StudentIds is null, no students to enroll.");
             else
+                Console.WriteLine(dto.UserIds);
+            var userCoursesToCreate = new List<UserCourse>();
+            // --- Ghi danh người dùng vào khóa học ---
+            if (dto.Optional == ConstantCourse.OPTIONAL_BATBUOC && dto.UserIds != null && dto.UserIds.Any())
             {
-                foreach (var userId in usersFromDepartmentsAndELevels)
+                var now = DateTime.Now;
+
+                userCoursesToCreate = dto.UserIds.Select(userId => new UserCourse
                 {
-                    userCoursesToCreate.Add(new UserCourse
-                    {
-                        UserId = userId,
-                        CourseId = course.Id,
-                        AssignedAt = DateTime.Now,
-                        IsMandatory = false,
-                        Status = ConstantStatus.ASSIGINED,
-                        CreatedAt = DateTime.Now,
-                        ModifiedAt = DateTime.Now,
-                    });
-                }
-                // Không thêm từ UserIds cho TÙY CHỌN
+                    UserId = userId,
+                    CourseId = course.Id,
+                    AssignedAt = now,
+                    IsMandatory = true,
+                    Status = "Assigned",
+                    CreatedAt = now,
+                    ModifiedAt = now
+                }).ToList();
             }
 
             if (userCoursesToCreate.Any())

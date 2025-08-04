@@ -22,12 +22,13 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
             if (!courses.Any())
                 return new List<StudentOfCourseDto>();
 
-            var result = courses.Select(course => new StudentOfCourseDto
-            {
-                CourseName = course.Name,
-                TotalStudent = userCourses.Count(uc => uc.CourseId == course.Id)
+            var result = courses
+                .Where(course => userCourses.Count(uc => uc.CourseId == course.Id) > 0)
+                .Select(course => new StudentOfCourseDto
+                {
+                    CourseName = course.Name,
+                    TotalStudent = userCourses.Count(uc => uc.CourseId == course.Id)
             }).ToList();
-
             return result;
         }
     }

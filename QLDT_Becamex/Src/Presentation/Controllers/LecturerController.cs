@@ -4,8 +4,6 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Commands;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Queries;
-using QLDT_Becamex.Src.Application.Features.Users.Commands;
-using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {

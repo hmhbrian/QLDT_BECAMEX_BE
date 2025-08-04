@@ -10,6 +10,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 {
     [ApiController]
     [Route("api/feedback/{courseId}")]
+    [Authorize]
     public class FeedbacksController : ControllerBase
     {
         public readonly IMediator _mediator;
@@ -18,7 +19,6 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             _mediator = mediator;
         }
         [HttpPost("create")]
-        [Authorize(Roles = "HOCVIEN")]
         public async Task<IActionResult> CreateFeedback([FromBody] CreateFeedbackDto request, string courseId)
         {
             var command = new CreateFeedbackCommand(request, courseId);

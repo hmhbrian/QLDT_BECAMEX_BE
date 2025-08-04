@@ -76,7 +76,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 CourseId = request.CourseId,
                 AssignedAt = DateTime.Now,
                 IsMandatory = false,
-                Status = ConstantStatus.ASSIGINED,
+                Status = ConstantStatus.ASSIGNED,
                 CreatedAt = DateTime.Now,
                 ModifiedAt = DateTime.Now,
             };

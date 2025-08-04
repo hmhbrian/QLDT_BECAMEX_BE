@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.EmployeeLevels.Commands;
@@ -11,6 +12,7 @@ namespace QLDT_Becamex.Src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "ADMIN")]
     public class EmployeeLevelController : ControllerBase
     {
         private readonly IMediator _mediator;

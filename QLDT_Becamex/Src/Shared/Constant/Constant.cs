@@ -12,7 +12,7 @@
 
     public static class ConstantStatus
     {
-        public const string ASSIGINED = "Assigned";
+        public const string ASSIGNED = "Assigned";
         public const string INPROGRESS = "InProgress";
         public const string COMPLETED = "Completed";
     }

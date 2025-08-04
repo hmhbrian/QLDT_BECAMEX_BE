@@ -71,6 +71,7 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
                 CreatedAt = DateTime.Now,
                 ModifiedAt = DateTime.Now,
                 Code = request.Code,
+                Position = request.Position,
                 DepartmentId = request.DepartmentId,
                 ELevelId = request.ELevelId,
                 StatusId = request.StatusId,

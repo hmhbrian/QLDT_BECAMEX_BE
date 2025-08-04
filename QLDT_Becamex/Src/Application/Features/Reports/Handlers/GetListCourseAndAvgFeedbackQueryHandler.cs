@@ -50,6 +50,7 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
                 courseAndAvgFeedbackDto.AvgFeedback = avgFeedback;
                 courseAndAvgFeedbackDtos.Add(courseAndAvgFeedbackDto);
             }
+            courseAndAvgFeedbackDtos.Sort((x, y) => y.avgFeedbackScore.CompareTo(x.avgFeedbackScore));
             return courseAndAvgFeedbackDtos;
         }
     }

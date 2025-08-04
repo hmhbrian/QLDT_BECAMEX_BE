@@ -5,6 +5,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Queries;
 using  QLDT_Becamex.Src.Application.Features.CourseCategory.Commands;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QLDT_Becamex.Src.Presentation.Controllers
 {
@@ -26,6 +27,8 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+
         public async Task<IActionResult> CreateCourseCategory([FromBody] CourseCategoryRqDto dto)
         {
             var result = await _mediator.Send(new CreateCourseCategoryCommand(dto));
@@ -33,6 +36,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> UpdateCourseCategory(int id, [FromBody] CourseCategoryRqDto dto)
         {
             await _mediator.Send(new UpdateCourseCategoryCommand(id, dto));
@@ -40,6 +44,8 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
+
         public async Task<IActionResult> DeleteTypeDocument([FromBody] List<int> ids)
         {
             if (ids == null || !ids.Any())

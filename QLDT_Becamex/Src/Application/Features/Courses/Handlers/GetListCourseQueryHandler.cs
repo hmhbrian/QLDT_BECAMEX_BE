@@ -12,12 +12,12 @@ using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
-    public class GetCoursesQueryHandler : IRequestHandler<GetListCourseQuery, PagedResult<CourseDto>>
+    public class GetListCourseQueryHandler : IRequestHandler<GetListCourseQuery, PagedResult<CourseDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        public GetCoursesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
+        public GetListCourseQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -66,8 +66,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 includes: q => q
                     .Include(c => c.CourseDepartments)!
                         .ThenInclude(cd => cd.Department)
-                    .Include(c => c.CoursePositions)!
-                        .ThenInclude(cp => cp.Position)
+                    .Include(c => c.CourseELevels)!
+                        .ThenInclude(cp => cp.ELevel)
                     .Include(c => c.Status)
                     .Include(c => c.Category)
                     .Include(c => c.Lecturer)

@@ -3,6 +3,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Shared.Helpers;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -21,11 +22,12 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (course == null)
                 throw new AppException("Khóa học không tồn tại", 404);
 
-            if (course.RegistrationStartDate.HasValue && DateTime.Now > course.RegistrationStartDate.Value)
+            var currentDate = DateTimeHelper.GetVietnamTimeNow();
+            if (course.RegistrationStartDate.HasValue && currentDate > course.RegistrationStartDate.Value)
                 throw new AppException("Ngày xóa phải trước ngày bắt đầu đăng ký", 400);
 
             course.IsDeleted = true;
-            course.UpdatedAt = DateTime.UtcNow;
+            course.UpdatedAt = currentDate;
 
             await _unitOfWork.CompleteAsync();
 

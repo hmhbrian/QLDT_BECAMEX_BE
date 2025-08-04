@@ -43,7 +43,7 @@ namespace QLDT_Becamex.Src.Application.Common.Dtos
         public string? Keyword { get; set; }
         public string? StatusIds { get; set; }
         public string? DepartmentIds { get; set; }
-        public string? PositionIds { get; set; }
+        public string? ELevelIds { get; set; }
         public string? CategoryIds { get; set; }
         public string? LecturerIds { get; set; }
         public string? FromDate { get; set; }

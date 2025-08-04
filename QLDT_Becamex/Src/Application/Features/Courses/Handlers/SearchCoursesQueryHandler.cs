@@ -55,14 +55,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
 
             // Filter by PositionIds
-            if (!string.IsNullOrEmpty(queryParam.PositionIds))
+            if (!string.IsNullOrEmpty(queryParam.ELevelIds))
             {
-                var posIds = queryParam.PositionIds.Split(',')
+                var ELevelIds = queryParam.ELevelIds.Split(',')
                     .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
                     .Where(id => id != -1).ToList();
-                if (posIds.Any())
+                if (ELevelIds.Any())
                 {
-                    Expression<Func<Course, bool>> posPredicate = c => c.CoursePositions != null && c.CoursePositions.Any(cp => posIds.Contains(cp.PositionId));
+                    Expression<Func<Course, bool>> posPredicate = c => c.CourseELevels != null && c.CourseELevels.Any(cp => ELevelIds.Contains(cp.ELevelId));
                     predicate = predicate == null ? posPredicate : predicate.And(posPredicate);
                 }
             }
@@ -119,8 +119,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var query = _unitOfWork.CourseRepository.GetQueryable()
                 .Include(c => c.CourseDepartments)!
                     .ThenInclude(cd => cd.Department)
-                .Include(c => c.CoursePositions)!
-                    .ThenInclude(cp => cp.Position)
+                .Include(c => c.CourseELevels)!
+                    .ThenInclude(cp => cp.ELevel)
                 .Include(c => c.Status)
                 .Include(c => c.Category)
                 .Include(c => c.Lecturer)

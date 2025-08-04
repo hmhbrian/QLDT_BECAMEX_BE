@@ -2,13 +2,13 @@
 
 namespace QLDT_Becamex.Src.Domain.Entities
 {
-    public class CoursePosition
+    public class CourseELevel
     {
         public int Id { get; set; }
         public string CourseId { get; set; } = null!;
-        public int PositionId { get; set; }
+        public int ELevelId { get; set; }
         [JsonIgnore]
         public Course Course { get; set; } = null!;
-        public Position Position { get; set; } = null!;
+        public EmployeeLevel ELevel { get; set; } = null!;
     }
 }

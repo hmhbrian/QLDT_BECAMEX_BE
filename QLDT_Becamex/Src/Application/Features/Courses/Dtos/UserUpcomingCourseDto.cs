@@ -1,11 +1,4 @@
-﻿using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
-using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
-using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
-using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
-using QLDT_Becamex.Src.Application.Features.Status.Dtos;
-using QLDT_Becamex.Src.Application.Features.Users.Dtos;
-
-namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
+﻿namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
 {
     public class UserUpcomingCourseDto
     {

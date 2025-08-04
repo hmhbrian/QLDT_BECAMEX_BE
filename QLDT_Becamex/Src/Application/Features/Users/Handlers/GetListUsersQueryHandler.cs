@@ -51,7 +51,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 orderBy: orderByFunc,
                 page: queryParams.Page,
                 pageSize: queryParams.Limit,
-                includes: q => q.Include(u => u.Position)
+                includes: q => q.Include(u => u.ELevel)
                                 .Include(u => u.Department)
                                 .Include(u => u.ManagerU)
                                 .Include(u => u.UserStatus)

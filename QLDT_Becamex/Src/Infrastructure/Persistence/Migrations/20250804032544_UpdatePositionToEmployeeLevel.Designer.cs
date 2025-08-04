@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QLDT_Becamex.Src.Infrastructure.Persistence;
 namespace QLDT_Becamex.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250804032544_UpdatePositionToEmployeeLevel")]
+    partial class UpdatePositionToEmployeeLevel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,10 +246,6 @@ namespace QLDT_Becamex.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Position")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("position");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -755,22 +754,22 @@ namespace QLDT_Becamex.Migrations
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.EmployeeLevel", b =>
                 {
-                    b.Property<int>("ELevelId")
+                    b.Property<int>("LevelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("elevel_id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ELevelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LevelId"));
 
-                    b.Property<string>("ELevelName")
+                    b.Property<string>("LevelName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("elevel_name");
 
-                    b.HasKey("ELevelId");
+                    b.HasKey("LevelId");
 
-                    b.ToTable("EmployeeLevel", (string)null);
+                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Feedback", b =>

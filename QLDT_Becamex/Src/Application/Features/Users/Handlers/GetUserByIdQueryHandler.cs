@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
             cancellationToken.ThrowIfCancellationRequested();
 
             var user = await _userManager.Users
-                .Include(u => u.Position)
+                .Include(u => u.ELevel)
                 .Include(u => u.Department)
                 .Include(u => u.UserStatus)
                 .Include(u => u.ManagerU)

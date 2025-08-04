@@ -18,12 +18,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
 
         // Định nghĩa các DbSet cho các Model của bạn
         public DbSet<Department> Departments { get; set; }
-        public DbSet<Position> Positions { get; set; }
+        public DbSet<EmployeeLevel> ELevels { get; set; }
         public DbSet<UserStatus> UserStatus { get; set; }
         public DbSet<Course> Course { get; set; }
         public DbSet<CourseStatus> CourseStatus { get; set; }
         public DbSet<CourseDepartment> CourseDepartment { get; set; }
-        public DbSet<CoursePosition> CoursePosition { get; set; }
+        public DbSet<CourseELevel> CourseElevel { get; set; }
         public DbSet<CourseAttachedFile> CourseAttachedFile { get; set; }
         public DbSet<UserCourse> UserCourse { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
@@ -49,12 +49,12 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             // Gọi các phương thức cấu hình riêng biệt để giữ cho OnModelCreating gọn gàng và dễ đọc
             ConfigureApplicationUser(modelBuilder);
             ConfigureDepartment(modelBuilder);
-            ConfigurePosition(modelBuilder);
+            ConfigureEmployeeLevel(modelBuilder);
             ConfigureUserStatus(modelBuilder);
             ConfigureCourse(modelBuilder);
             ConfigureCourseStatus(modelBuilder);
             ConfigureCourseDepartment(modelBuilder);
-            ConfigureCoursePosition(modelBuilder);
+            ConfigureCourseELevel(modelBuilder);
             ConfigureCourseAttachedFile(modelBuilder);
             ConfigureUserCourse(modelBuilder);
             ConfigureCourseCategory(modelBuilder);
@@ -156,6 +156,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(u => u.Code)
                       .HasColumnName("code");
 
+                entity.Property(u => u.Position)
+                      .HasColumnName("position");
+
                 entity.Property(u => u.StartWork)
                       .HasColumnName("start_work");
 
@@ -180,8 +183,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(u => u.DepartmentId)
                       .HasColumnName("department_id");
 
-                entity.Property(u => u.PositionId)
-                      .HasColumnName("position_id");
+                entity.Property(u => u.ELevelId)
+                      .HasColumnName("elevel_id");
 
                 entity.Property(p => p.CreateById)
                    .HasColumnName("created_by_id")
@@ -198,9 +201,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .IsRequired(false)
                       .OnDelete(DeleteBehavior.SetNull);
 
-                entity.HasOne(u => u.Position)
+                entity.HasOne(u => u.ELevel)
                       .WithMany(p => p.Users)
-                      .HasForeignKey(u => u.PositionId)
+                      .HasForeignKey(u => u.ELevelId)
                       .IsRequired(false)
                       .OnDelete(DeleteBehavior.SetNull);
 
@@ -311,18 +314,19 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             });
         }
 
-        private void ConfigurePosition(ModelBuilder modelBuilder)
+        private void ConfigureEmployeeLevel(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Position>(entity =>
+            modelBuilder.Entity<EmployeeLevel>(entity =>
             {
+                entity.ToTable("EmployeeLevel");
                 // Định nghĩa khóa chính
-                entity.HasKey(p => p.PositionId);
-                entity.Property(p => p.PositionId)
-                      .HasColumnName("position_id")
+                entity.HasKey(p => p.ELevelId);
+                entity.Property(p => p.ELevelId)
+                      .HasColumnName("elevel_id")
                       .ValueGeneratedOnAdd();
 
-                entity.Property(p => p.PositionName)
-                      .HasColumnName("position_name")
+                entity.Property(p => p.ELevelName)
+                      .HasColumnName("elevel_name")
                       .IsRequired()               // Bắt buộc phải có giá trị
                       .HasMaxLength(255);         // Giới hạn độ 
             });
@@ -480,7 +484,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasForeignKey(cd => cd.CourseId)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(c => c.CoursePositions)
+                entity.HasMany(c => c.CourseELevels)
                       .WithOne(cp => cp.Course)
                       .HasForeignKey(cp => cp.CourseId)
                       .OnDelete(DeleteBehavior.Cascade);
@@ -623,11 +627,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
             });
         }
 
-        private void ConfigureCoursePosition(ModelBuilder modelBuilder)
+        private void ConfigureCourseELevel(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CoursePosition>(entity =>
+            modelBuilder.Entity<CourseELevel>(entity =>
             {
-                entity.ToTable("CoursePosition");
+                entity.ToTable("CourseELevel");
 
                 entity.HasKey(e => e.Id);
 
@@ -637,17 +641,17 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(cd => cd.CourseId)
                       .IsRequired().HasColumnName("course_id");
 
-                entity.Property(cd => cd.PositionId)
-                      .IsRequired().HasColumnName("position_id");
+                entity.Property(cd => cd.ELevelId)
+                      .IsRequired().HasColumnName("elevel_id");
 
                 entity.HasOne(cp => cp.Course)
-                      .WithMany(c => c.CoursePositions)
+                      .WithMany(c => c.CourseELevels)
                       .HasForeignKey(cp => cp.CourseId)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(cp => cp.Position)
-                      .WithMany(p => p.CoursePositions)
-                      .HasForeignKey(cp => cp.PositionId)
+                entity.HasOne(cp => cp.ELevel)
+                      .WithMany(p => p.CourseELevel)
+                      .HasForeignKey(cp => cp.ELevelId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }

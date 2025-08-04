@@ -3,10 +3,10 @@ using QLDT_Becamex.Src.Domain.Entities;
 
 namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
 {
-    public class PositionRepository : GenericRepository<Position>, IPositionRepostiory
+    public class EmployeeLevelRepository : GenericRepository<EmployeeLevel>, IEmployeeLevelRepository
     {
 
-        public PositionRepository(ApplicationDbContext dbContext) : base(dbContext)
+        public EmployeeLevelRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
 
         }

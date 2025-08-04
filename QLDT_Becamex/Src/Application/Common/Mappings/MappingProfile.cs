@@ -7,10 +7,10 @@ using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
+using QLDT_Becamex.Src.Application.Features.EmployeeLevels.Dtos;
 using QLDT_Becamex.Src.Application.Features.Feedbacks.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
-using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Questions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
@@ -81,9 +81,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<DepartmentStatus, StatusDto>().ReverseMap();
             CreateMap<CreateStatusDto, DepartmentStatus>().ReverseMap();
 
-            //Position
-            CreateMap<Position, PositionDto>().ReverseMap();
-            CreateMap<CreatePositionDto, Position>();
+            //EmployeeLevel
+            CreateMap<EmployeeLevel, ELevelDto>().ReverseMap();
+            CreateMap<CreateELevelDto, EmployeeLevel>();
 
             //Role
             CreateMap<IdentityRole, RoleDto>().ReverseMap();
@@ -108,10 +108,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     DepartmentId = cd.DepartmentId,
                     DepartmentName = cd.Department.DepartmentName,
                 }).ToList()))
-                .ForMember(dest => dest.Positions, opt => opt.MapFrom(src => (src.CoursePositions ?? Enumerable.Empty<CoursePosition>()).Select(cp => new PositionDto
+                .ForMember(dest => dest.ELevels, opt => opt.MapFrom(src => (src.CourseELevels ?? Enumerable.Empty<CourseELevel>()).Select(cp => new ELevelDto
                 {
-                    PositionId = cp.PositionId,
-                    PositionName = cp.Position.PositionName,
+                    ELevelId = cp.ELevelId,
+                    ELevelName = cp.ELevel.ELevelName,
                 }).ToList()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.Lecturer))

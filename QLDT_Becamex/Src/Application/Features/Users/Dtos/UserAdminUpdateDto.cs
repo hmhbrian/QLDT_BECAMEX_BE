@@ -15,8 +15,8 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
         [StringLength(50, MinimumLength = 10, ErrorMessage = "Code must be between 10 and 50 characters.")]
         public string? Code { get; set; } = null;
 
-
-        public int? PositionId { get; set; }
+        public string? Position { get; set; }
+        public int? ELevelId { get; set; }
 
         public string? RoleId { get; set; }
 

@@ -26,7 +26,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 predicate: c => c.Id == request.Id,
                 includes: q => q
                     .Include(c => c.CourseDepartments)!.ThenInclude(cd => cd.Department)
-                    .Include(c => c.CoursePositions)!.ThenInclude(cp => cp.Position)
+                    .Include(c => c.CourseELevels)!.ThenInclude(cp => cp.ELevel)
                     .Include(c => c.UserCourses)!.ThenInclude(uc => uc.User)
                     .Include(c => c.Status)
                     .Include(c => c.Category)

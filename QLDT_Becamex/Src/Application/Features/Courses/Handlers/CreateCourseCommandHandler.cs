@@ -91,17 +91,17 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 dto.DepartmentIds = allDepartmentIds.ToList();
             }
 
-            if (dto.PositionIds != null && dto.PositionIds.Any())
+            if (dto.ELevelIds != null && dto.ELevelIds.Any())
             {
-                var invalidPositions = new List<int>();
-                foreach (var posId in dto.PositionIds)
+                var invalidELevels = new List<int>();
+                foreach (var ElevelId in dto.ELevelIds)
                 {
-                    var exists = await _unitOfWork.PositionRepository.AnyAsync(p => p.PositionId == posId);
-                    if (!exists) invalidPositions.Add(posId);
+                    var exists = await _unitOfWork.EmployeeLevelRepository.AnyAsync(p => p.ELevelId == ElevelId);
+                    if (!exists) invalidELevels.Add(ElevelId);
                 }
 
-                if (invalidPositions.Any())
-                    throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalidPositions)}", 400);
+                if (invalidELevels.Any())
+                    throw new AppException($"Vị trí không hợp lệ: {string.Join(", ", invalidELevels)}", 400);
             }
 
             string? imageUrl = null;
@@ -127,15 +127,15 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 await _unitOfWork.CourseDepartmentRepository.AddRangeAsync(courseDepartments);
             }
 
-            if (dto.PositionIds != null && dto.PositionIds.Any())
+            if (dto.ELevelIds != null && dto.ELevelIds.Any())
             {
-                var coursePositions = dto.PositionIds.Select(posId => new CoursePosition
+                var courseELevels = dto.ELevelIds.Select(posId => new CourseELevel
                 {
                     CourseId = course.Id,
-                    PositionId = posId
+                    ELevelId = posId
                 }).ToList();
 
-                await _unitOfWork.CoursePositionRepository.AddRangeAsync(coursePositions);
+                await _unitOfWork.CourseELevelRepository.AddRangeAsync(courseELevels);
             }
             if (dto.UserIds == null)
                 Console.WriteLine("StudentIds is null, no students to enroll.");

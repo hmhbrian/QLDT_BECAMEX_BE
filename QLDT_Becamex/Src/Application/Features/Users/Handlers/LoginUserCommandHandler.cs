@@ -7,7 +7,6 @@ using QLDT_Becamex.Src.Domain.Entities;
 using AutoMapper;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
-using QLDT_Becamex.Src.Application.Features.Positions.Dtos;
 using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
 
 namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
@@ -37,7 +36,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 
             // 1. Tìm người dùng theo email
             var user = await _userManager.Users
-                .Include(u => u.Position)
+                .Include(u => u.ELevel)
                 .Include(u => u.Department)
                 .Include(u => u.ManagerU)
                 .Include(u => u.UserStatus)

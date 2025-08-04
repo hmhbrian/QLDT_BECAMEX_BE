@@ -43,7 +43,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? LecturerId { get; set; }
         public bool? IsPrivate { get; set; } = false;
         public List<int>? DepartmentIds { get; set; }
-        public List<int>? PositionIds { get; set; }
+        public List<int>? ELevelIds { get; set; }
         public List<string>? UserIds { get; set; }
 
 

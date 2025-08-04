@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.TypeDocument.Commands;
@@ -31,6 +32,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             return StatusCode(201, ApiResponse.Ok("Thêm loại tài liệu thành công"));
         }
 
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateTypeDocument(int id, [FromBody] TypeDocumentRqDto dto)
         {
@@ -38,6 +40,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             return Ok(ApiResponse.Ok("Cập nhật thành công"));
         }
 
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpDelete]
         public async Task<IActionResult> DeleteTypeDocument([FromBody] List<int> ids)
         {

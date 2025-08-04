@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Commands;
@@ -12,6 +13,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 {
     [ApiController]
     [Route("api/status")]
+
     public class StatusController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -37,13 +39,14 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             return StatusCode(201, ApiResponse.Ok("Tạo thành công"));
         }
 
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpPut("courses/{id:int}")]
         public async Task<IActionResult> UpdateCourseStatus(int id, [FromBody] CreateStatusDto dto)
         {
             await _mediator.Send(new UpdateCourseStatusCommand(id, dto));
             return Ok(ApiResponse.Ok("Cập nhật thành công"));
         }
-
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpDelete("courses")]
         public async Task<IActionResult> DeleteCourseStatuses([FromBody] List<int> ids)
         {
@@ -69,14 +72,14 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             var result = await _mediator.Send(new CreateUserStatusCommand(dto));
             return StatusCode(201, ApiResponse.Ok("Tạo thành công"));
         }
-
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpPut("users/{id:int}")]
         public async Task<IActionResult> UpdateUserStatus(int id, [FromBody] UserStatusDtoRq dto)
         {
             await _mediator.Send(new UpdateUserStatusCommand(id, dto));
             return Ok(ApiResponse.Ok("Cập nhật thành công"));
         }
-
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpDelete("users")]
         public async Task<IActionResult> DeleteUserStatuses([FromBody] List<int> ids)
         {
@@ -102,14 +105,14 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             await _mediator.Send(new CreateDepartmentStatusCommand(dto));
             return StatusCode(201, ApiResponse.Ok("Tạo thành công"));
         }
-
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpPut("department/{id:int}")]
         public async Task<IActionResult> UpdateDepartmentStatus(int id, [FromBody] CreateStatusDto dto)
         {
             await _mediator.Send(new UpdateDepartmentStatusCommand(id, dto));
             return Ok(ApiResponse.Ok("Cập nhật thành công"));
         }
-
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpDelete("department")]
         public async Task<IActionResult> DeleteDepartmentStatuses([FromBody] List<int> ids)
         {

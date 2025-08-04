@@ -1,5 +1,6 @@
 ﻿
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Commands;
@@ -32,14 +33,14 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new CreateRoleCommand(request));
             return Ok(ApiResponse.Ok("Tạo thành công"));
         }
-
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRole(string id, [FromBody] CreateRoleDto request)
         {
             var result = await _mediator.Send(new UpdateRoleCommand(id, request));
             return Ok(ApiResponse.Ok("Cập nhật thành công"));
         }
-
+        [Authorize(Roles = "ADMIN, HR")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(string id)
         {

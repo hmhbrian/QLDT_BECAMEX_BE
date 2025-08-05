@@ -103,5 +103,11 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             return Ok(ApiResponse<DetailTestResultDto>.Ok(result));
         }
+        [HttpGet("no-answer/{testId}")]
+        public async Task<IActionResult> GetListQuestionNoAnswer([FromRoute] string courseId, [FromRoute] int testId)
+        {
+            var result = await _mediator.Send(new GetTestNoAnswerQuery(courseId, testId));
+            return Ok(ApiResponse<List<QuestionNoAnswerDto>>.Ok(result));
+        }
     }
 }

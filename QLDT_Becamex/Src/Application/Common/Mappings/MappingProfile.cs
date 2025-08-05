@@ -249,7 +249,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<TestResult, TestResultDto>();
             CreateMap<TestResult, DetailTestResultDto>();
             CreateMap<Test, TestSummaryDto>(); // 👈 Map từ entity Test → DTO TestSummaryDto
-
+            
             //Question
             CreateMap<CreateQuestionDto, Question>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

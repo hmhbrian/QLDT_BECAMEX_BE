@@ -55,11 +55,18 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 };
                 userCoursesProgressDtos.Add(userCourseProgressDto);
             }
+            var sortedUserCoursesProgressDtos = userCoursesProgressDtos
+                .OrderByDescending(dto => dto.progressPercentage)
+                .ToList();
+
             var pagination = new Pagination(queryParams.Page,
                 queryParams.Limit,
-                userCoursesProgressDtos.Count());
-            var pagedResult = new PagedResult<UserCourseProgressDto>(userCoursesProgressDtos, pagination);
-            return pagedResult;
+                sortedUserCoursesProgressDtos.Count);
+
+            // 🔽 Chỉ lấy phần dữ liệu cần hiển thị theo trang
+            var pagedData = sortedUserCoursesProgressDtos.ToList();
+
+            return new PagedResult<UserCourseProgressDto>(pagedData, pagination);
         }
         private async Task<float> CalculateLessonsProgressAsync(string courseId, string userId)
         {

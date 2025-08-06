@@ -152,6 +152,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     UserId = userId,
                     CourseId = course.Id,
                     AssignedAt = now,
+                    Optional = 1,
                     IsMandatory = true,
                     Status = "Assigned",
                     CreatedAt = now,

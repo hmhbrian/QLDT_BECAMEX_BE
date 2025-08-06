@@ -147,7 +147,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             if (request.ThumbUrl != null)
             {
-                // Lấy public id từ ảnh cũ
+                // Lấy public id từ ảnh cũ 
                 if (course.ThumbUrl != null)
                 {
                     var oldPublicId = ExtractPublicId(course.ThumbUrl);
@@ -224,9 +224,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             if (request.Optional == ConstantCourse.OPTIONAL_BATBUOC)
             {
-                if (request.DepartmentIds?.Any() == true)
+                if (request.DepartmentIds?.Any() == true && request.DepartmentIds != null)
                 {
-                    if (request.ELevelIds?.Any() == true)
+                    if (request.ELevelIds?.Any() == true && request.ELevelIds != null)
                     {
                         var matchedUsers = await _unitOfWork.UserRepository.GetQueryable()
                             .Where(u => u.DepartmentId.HasValue && request.DepartmentIds.Contains(u.DepartmentId.Value)
@@ -242,6 +242,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                                 {
                                     CourseId = id,
                                     UserId = userId,
+                                    Optional = 1,
                                     IsMandatory = true
                                 });
                             }
@@ -262,6 +263,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                                 {
                                     CourseId = id,
                                     UserId = userId,
+                                    Optional = 1,
                                     IsMandatory = true
                                 });
                             }
@@ -269,7 +271,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     }
                 }
 
-                if (request.UserIds?.Any() == true)
+                if (request.UserIds?.Any() == true && request.UserIds != null)
                 {
                     foreach (var userId in request.UserIds)
                     {
@@ -279,15 +281,30 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                             {
                                 CourseId = id,
                                 UserId = userId,
-                                IsMandatory = true
+                                IsMandatory = true,
+                                Optional = 1
                             });
                         }
+                    }
+                }
+
+                // So sánh và cập nhật nếu có thay đổi học viên
+                var currentUserCourses = await _unitOfWork.UserCourseRepository.FindAsync(uc => uc.CourseId == id && uc.Optional == 1);
+                var currentUserIds = currentUserCourses.Select(uc => uc.UserId).ToHashSet();
+                var newUserIds = newUserCoursesToAssign.Select(uc => uc.UserId).ToHashSet();
+
+                if (newUserIds.Count > 0 && !currentUserIds.SetEquals(newUserIds))
+                {
+                    _unitOfWork.UserCourseRepository.RemoveRange(currentUserCourses);
+                    if (newUserCoursesToAssign.Any())
+                    {
+                        await _unitOfWork.UserCourseRepository.AddRangeAsync(newUserCoursesToAssign);
                     }
                 }
             }
             else
             {
-                if (request.UserIds?.Any() == true)
+                if (request.UserIds?.Any() == true && request.UserIds != null)
                 {
                     foreach (var userId in request.UserIds)
                     {
@@ -297,26 +314,29 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                             {
                                 CourseId = id,
                                 UserId = userId,
-                                IsMandatory = false
+                                IsMandatory = false,
+                                Optional = 1
                             });
                         }
                     }
                 }
-            }
 
-            // So sánh và cập nhật nếu có thay đổi học viên
-            var currentUserCourses = await _unitOfWork.UserCourseRepository.FindAsync(uc => uc.CourseId == id);
-            var currentUserIds = currentUserCourses.Select(uc => uc.UserId).ToHashSet();
-            var newUserIds = newUserCoursesToAssign.Select(uc => uc.UserId).ToHashSet();
+                // So sánh và cập nhật nếu có thay đổi học viên
+                var currentUserCourses = await _unitOfWork.UserCourseRepository.FindAsync(uc => uc.CourseId == id && uc.Optional == 1);
+                var currentUserIds = currentUserCourses.Select(uc => uc.UserId).ToHashSet();
+                var newUserIds = newUserCoursesToAssign.Select(uc => uc.UserId).ToHashSet();
 
-            if (!currentUserIds.SetEquals(newUserIds))
-            {
-                _unitOfWork.UserCourseRepository.RemoveRange(currentUserCourses);
-                if (newUserCoursesToAssign.Any())
+                if (!currentUserIds.SetEquals(newUserIds))
                 {
-                    await _unitOfWork.UserCourseRepository.AddRangeAsync(newUserCoursesToAssign);
+                    _unitOfWork.UserCourseRepository.RemoveRange(currentUserCourses);
+                    if (newUserCoursesToAssign.Any())
+                    {
+                        await _unitOfWork.UserCourseRepository.AddRangeAsync(newUserCoursesToAssign);
+                    }
                 }
             }
+
+
 
             // === BƯỚC 7: LƯU THAY ĐỔI ===
             await _unitOfWork.CompleteAsync();

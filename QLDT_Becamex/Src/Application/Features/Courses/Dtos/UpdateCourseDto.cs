@@ -29,9 +29,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public int? CategoryId { get; set; }
         public int? LecturerId { get; set; }
         public bool? IsPrivate { get; set; }
-        public List<int>? DepartmentIds { get; set; }
-        public List<int>? ELevelIds { get; set; }
-        public List<string>? UserIds { get; set; }
+        public List<int> DepartmentIds { get; set; } = new List<int>();
+        public List<int> ELevelIds { get; set; } = new List<int>();
+        public List<string> UserIds { get; set; } = new List<string>();
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

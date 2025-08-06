@@ -18,7 +18,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
 
         [RegularExpression($"^({ConstantCourse.OPTIONAL_TUYCHON}|{ConstantCourse.OPTIONAL_BATBUOC})$",
             ErrorMessage = "Giá trị chỉ được là 'tùy chọn' hoặc 'bắt buộc'.")]
-        public string? Optional { get; set; } = ConstantCourse.OPTIONAL_TUYCHON;
+        public string? Optional { get; set; }
         public int? MaxParticipant { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

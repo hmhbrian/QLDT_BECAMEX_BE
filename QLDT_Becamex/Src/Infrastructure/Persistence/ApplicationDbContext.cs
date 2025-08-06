@@ -690,6 +690,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(s => s.UserId)
                       .HasColumnName("user_id");
 
+                entity.Property(s => s.Optional)
+                    .HasColumnName("Optional");
+
                 entity.HasOne(cp => cp.Course)
                       .WithMany(c => c.UserCourses)
                       .HasForeignKey(cp => cp.CourseId)

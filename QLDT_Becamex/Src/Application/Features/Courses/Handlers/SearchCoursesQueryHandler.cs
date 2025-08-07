@@ -105,13 +105,15 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 predicate = predicate == null ? datePredicate : predicate.And(datePredicate);
             }
 
+
+            int totalItems = await _unitOfWork.CourseRepository.CountAsync(predicate);
+
             Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderBy = q =>
             {
                 bool isDesc = queryParam.SortType?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true;
                 return queryParam.SortField?.ToLower() switch
                 {
-                    "name" => isDesc ? q.OrderByDescending(c => c.Name) : q.OrderBy(c => c.Name),
-                    "createdat" => isDesc ? q.OrderByDescending(c => c.CreatedAt) : q.OrderBy(c => c.CreatedAt),
+                    "created.at" => isDesc ? q.OrderByDescending(c => c.CreatedAt) : q.OrderBy(c => c.CreatedAt),
                     _ => q.OrderBy(c => c.CreatedAt)
                 };
             };
@@ -142,14 +144,19 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 ).ToList();
             }
 
-            var totalItems = courses.Count;
             int page = queryParam.Page;
             int limit = queryParam.Limit > 0 ? queryParam.Limit : 10;
             var paged = courses.Skip((page - 1) * limit).Take(limit).ToList();
 
-            var items = _mapper.Map<List<CourseDto>>(courses);
-            var pagination = new Pagination(page, limit, totalItems);
-            var result = new PagedResult<CourseDto>(items, pagination);
+            var courseDtos = _mapper.Map<List<CourseDto>>(courses);
+            var pagination = new Pagination(
+                currentPage: page, 
+                itemsPerPage: limit, 
+                totalItems: totalItems);
+
+            var result = new PagedResult<CourseDto>(
+                items: courseDtos, 
+                pagination: pagination);
             return result;
 
         }

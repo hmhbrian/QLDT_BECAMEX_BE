@@ -77,12 +77,13 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 if (user != null)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
-                    userDto.Role = roles.FirstOrDefault();
+                    
                     if (role == ConstantRole.ADMIN && roles.Contains(ConstantRole.ADMIN))
                         continue; // Bỏ qua ADMIN nếu người dùng hiện tại là ADMIN
                     if (role == ConstantRole.MANAGER && (roles.Contains(ConstantRole.MANAGER) || roles.Contains(ConstantRole.ADMIN)))
                         continue; // Bỏ qua HR và ADMIN nếu người dùng hiện tại là HR
 
+                    userDto.Role = roles.FirstOrDefault();
                     filteredUsers.Add(userDto);
 
                 }
@@ -90,10 +91,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 
             var pagination = new Pagination(queryParams.Page, queryParams.Limit, totalItems);
             // 5. Tạo kết quả phân trang
-            var result = new PagedResult<UserDto>(
-                filteredUsers,
-                pagination
-            );
+            var result = new PagedResult<UserDto>(filteredUsers,pagination);
             return result;
         }
     }

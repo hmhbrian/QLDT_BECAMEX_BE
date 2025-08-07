@@ -102,7 +102,7 @@ namespace QLDT_Becamex.Src.Application.Features.Lessons.Handlers
                 //8.Commit transaction
                 await transaction.CommitAsync(cancellationToken);
             }
-            catch (AppException ex)
+            catch (AppException)
             {
                 await transaction.RollbackAsync(cancellationToken);
                 throw; // Ném lại AppException để client nhận thông báo

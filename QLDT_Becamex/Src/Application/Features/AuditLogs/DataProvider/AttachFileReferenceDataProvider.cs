@@ -24,7 +24,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             var attachFileId = auditLog.EntityId;
 
             // Lấy thông tin Lesson
-            var attachFile =await _unitOfWork.CourseAttachedFileRepository.GetFirstOrDefaultAsync(predicate: q => q.Id.ToString() == attachFileId);
+            var attachFile = await _unitOfWork.CourseAttachedFileRepository.GetFirstOrDefaultAsync(predicate: q => q.Id.ToString() == attachFileId);
             string documentTypeName = "Unknown";
 
             if (attachFile != null)

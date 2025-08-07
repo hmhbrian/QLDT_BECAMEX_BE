@@ -102,13 +102,13 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
 
             // Lấy tên Department, ELevel, User
             var departments = await _unitOfWork.DepartmentRepository.FindAsync(d => currentDepartmentIds.Concat(previousDepartmentIds).Contains(d.DepartmentId.ToString()));
-            var departmentDict = departments.ToDictionary(d => d.DepartmentId.ToString(), d => d.DepartmentName);
+            var departmentDict = departments.ToDictionary(d => d.DepartmentId.ToString(), d => d.DepartmentName ?? string.Empty);
 
             var ELevels = await _unitOfWork.EmployeeLevelRepository.FindAsync(p => currentELevelIds.Concat(previousELevelIds).Contains(p.ELevelId.ToString()));
-            var ELevelDict = ELevels.ToDictionary(p => p.ELevelId.ToString(), p => p.ELevelName);
+            var ELevelDict = ELevels.ToDictionary(p => p.ELevelId.ToString(), p => p.ELevelName ?? string.Empty);
 
             var users = await _unitOfWork.UserRepository.FindAsync(p => userIds.Contains(p.Id));
-            var userDict = users.ToDictionary(p => p.Id, p => p.FullName);
+            var userDict = users.ToDictionary(p => p.Id, p => p.FullName ?? string.Empty);
 
             // Ghi log để debug
             Console.WriteLine($"CourseId: {courseId}, AuditLog Timestamp (without ms): {auditLogTimeWithoutMs}, Original: {auditLog.Timestamp}");
@@ -285,7 +285,15 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                         if (changes?.NewValues?.ContainsKey(idFieldName) == true)
                         {
-                            ids.Add(changes.NewValues[idFieldName].ToString()!);
+                            var idValue = changes.NewValues[idFieldName].ToString();
+                            if (idValue != null)
+                            {
+                                ids.Add(idValue);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Null value found for {idFieldName} in AuditLog ID {log.Id}");
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -311,7 +319,15 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                         if (changes?.OldValues?.ContainsKey(idFieldName) == true)
                         {
-                            ids.Add(changes.OldValues[idFieldName].ToString());
+                            var idValue = changes.OldValues[idFieldName].ToString();
+                            if (idValue != null)
+                            {
+                                ids.Add(idValue);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Null value found for {idFieldName} in AuditLog ID {log.Id}");
+                            }
                         }
                     }
                     catch (Exception ex)

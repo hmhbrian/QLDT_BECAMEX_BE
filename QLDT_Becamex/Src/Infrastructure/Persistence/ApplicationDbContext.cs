@@ -1225,6 +1225,8 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                         UserId = userId
                     };
 
+                    bool hasChanges = false;
+
                     foreach (var prop in entry.Properties)
                     {
                         var propName = prop.Metadata.Name;
@@ -1237,20 +1239,26 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                         if (entry.State == EntityState.Added)
                         {
                             audit.NewValues[propName] = prop.CurrentValue ?? "Unknown";
+                            hasChanges = true;
                         }
                         else if (entry.State == EntityState.Deleted)
                         {
                             audit.OldValues[propName] = prop.OriginalValue ?? "Unknown";
+                            hasChanges = true;
                         }
                         else if (entry.State == EntityState.Modified && prop.IsModified)
                         {
                             audit.OldValues[propName] = prop.OriginalValue ?? "Unknown";
                             audit.NewValues[propName] = prop.CurrentValue ?? "Unknown";
+                            hasChanges = true;
                         }
                         Console.WriteLine($"{prop.Metadata.Name}: IsModified = {prop.IsModified}");
                     }
 
-                    auditEntries.Add(audit);
+                    if (hasChanges)
+                    {
+                        auditEntries.Add(audit);
+                    }
                 }
 
             }

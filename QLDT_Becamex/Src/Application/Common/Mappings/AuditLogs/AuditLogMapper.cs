@@ -78,7 +78,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
             };
 
             // Xử lý dữ liệu tham chiếu (Department, Position, v.v.)
-            if (referenceDataProviders.ContainsKey(auditLog.EntityName))
+            if (auditLog.EntityName != null && referenceDataProviders.ContainsKey(auditLog.EntityName))
             {
                 var provider = referenceDataProviders[auditLog.EntityName];
                 //var referenceData = provider.GetReferenceData(auditLog);
@@ -87,20 +87,20 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
                 // Ánh xạ tên trường từ ReferenceData
                 dto.AddedFields.AddRange(referenceData.AddedFields.Select(f => new AddedField
                 {
-                    FieldName = FieldNameMappings.ContainsKey(f.FieldName) ? FieldNameMappings[f.FieldName] : f.FieldName,
+                    FieldName = f.FieldName != null && FieldNameMappings.ContainsKey(f.FieldName) ? FieldNameMappings[f.FieldName] : f.FieldName,
                     Value = f.Value
                 }));
 
                 dto.ChangedFields.AddRange(referenceData.ChangedFields.Select(f => new ChangedField
                 {
-                    FieldName = FieldNameMappings.ContainsKey(f.FieldName) ? FieldNameMappings[f.FieldName] : f.FieldName,
+                    FieldName = f.FieldName != null && FieldNameMappings.ContainsKey(f.FieldName) ? FieldNameMappings[f.FieldName] : f.FieldName,
                     OldValue = f.OldValue,
                     NewValue = f.NewValue
                 }));
 
                 dto.DeletedFields.AddRange(referenceData.DeletedFields.Select(f => new DeletedField
                 {
-                    FieldName = FieldNameMappings.ContainsKey(f.FieldName) ? FieldNameMappings[f.FieldName] : f.FieldName,
+                    FieldName = f.FieldName != null && FieldNameMappings.ContainsKey(f.FieldName) ? FieldNameMappings[f.FieldName] : f.FieldName,
                     Value = f.Value
                 }));
             }

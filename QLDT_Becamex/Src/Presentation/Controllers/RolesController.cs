@@ -28,19 +28,20 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleDto request)
         {
             var result = await _mediator.Send(new CreateRoleCommand(request));
             return Ok(ApiResponse.Ok("Tạo thành công"));
         }
-        [Authorize(Roles = "ADMIN, HR")]
+        [Authorize(Roles = "ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRole(string id, [FromBody] CreateRoleDto request)
         {
             var result = await _mediator.Send(new UpdateRoleCommand(id, request));
             return Ok(ApiResponse.Ok("Cập nhật thành công"));
         }
-        [Authorize(Roles = "ADMIN, HR")]
+        [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(string id)
         {

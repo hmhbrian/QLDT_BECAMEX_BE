@@ -26,6 +26,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> CreateTypeDocument([FromBody] TypeDocumentRqDto dto)
         {
             var result = await _mediator.Send(new CreateTypeDocumentCommand(dto));

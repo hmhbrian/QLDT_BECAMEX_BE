@@ -23,6 +23,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Get paginated list of questions for a test
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetList([FromRoute] int testId, [FromQuery] BaseQueryParam queryParams)
         {
             var result = await _mediator.Send(new GetListQuestionQuery(testId, queryParams));

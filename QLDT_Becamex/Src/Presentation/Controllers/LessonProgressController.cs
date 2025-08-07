@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
@@ -23,6 +24,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Tạo tiến độ bài học cho người dùng.
         /// </summary>
         [HttpPost("upsert-lesson-progress")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> UpsertLessonProgressOfUser([FromBody] UpsertLessonProgressDto request)
         {
             if (!ModelState.IsValid)
@@ -37,6 +39,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Lấy danh sách tiến độ bài học của người dùng theo CourseId.
         /// </summary>
         [HttpGet("get-lesson-progress/{courseId}")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetListLessonProgressOfUser(string courseId)
         {
 

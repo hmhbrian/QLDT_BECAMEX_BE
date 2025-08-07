@@ -33,6 +33,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPost("courses")]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> CreateCourseStatus([FromBody] CreateStatusDto dto)
         {
             await _mediator.Send(new CreateCourseStatusCommand(dto));
@@ -67,6 +68,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPost("users")]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> CreateUserStatus([FromBody] UserStatusDtoRq dto)
         {
             var result = await _mediator.Send(new CreateUserStatusCommand(dto));
@@ -100,6 +102,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPost("department")]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> CreateDepartmentStatus([FromBody] CreateStatusDto dto)
         {
             await _mediator.Send(new CreateDepartmentStatusCommand(dto));

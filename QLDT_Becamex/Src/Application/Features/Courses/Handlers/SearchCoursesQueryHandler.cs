@@ -115,20 +115,36 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     _ => q.OrderBy(c => c.CreatedAt)
                 };
             };
+            var courses = (await _unitOfWork.CourseRepository.GetFlexibleAsync(
+                predicate: predicate, // Use the adjusted predicate here
+                orderBy: orderBy,
+                page: queryParam.Page,
+                pageSize: queryParam.Limit,
+                asNoTracking: true,
+                includes: q => q
+                    .Include(c => c.CourseDepartments)!
+                        .ThenInclude(cd => cd.Department)
+                    .Include(c => c.CourseELevels)!
+                        .ThenInclude(cp => cp.ELevel)
+                    .Include(c => c.Status)
+                    .Include(c => c.Category)
+                    .Include(c => c.Lecturer)
+                    .Include(c => c.CreateBy)
+                    .Include(c => c.UpdateBy)
+            )).ToList();
+            //var query = _unitOfWork.CourseRepository.GetQueryable()
+            //    .Include(c => c.CourseDepartments)!
+            //        .ThenInclude(cd => cd.Department)
+            //    .Include(c => c.CourseELevels)!
+            //        .ThenInclude(cp => cp.ELevel)
+            //    .Include(c => c.Status)
+            //    .Include(c => c.Category)
+            //    .Include(c => c.Lecturer)
+            //    .AsNoTracking();
 
-            var query = _unitOfWork.CourseRepository.GetQueryable()
-                .Include(c => c.CourseDepartments)!
-                    .ThenInclude(cd => cd.Department)
-                .Include(c => c.CourseELevels)!
-                    .ThenInclude(cp => cp.ELevel)
-                .Include(c => c.Status)
-                .Include(c => c.Category)
-                .Include(c => c.Lecturer)
-                .AsNoTracking();
+            //if (predicate != null) query = query.Where(predicate);
 
-            if (predicate != null) query = query.Where(predicate);
-
-            var courses = await query.ToListAsync();
+            //var courses = await query.ToListAsync();
 
             if (!string.IsNullOrEmpty(queryParam.Keyword))
             {

@@ -8,6 +8,7 @@ using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Shared.Helpers;
+using Xceed.Pdf.Layout.Shape;
 
 namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
 {
@@ -104,7 +105,8 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
                 return new AllLessonProgressDto
                 {
                     Id = lesson.Id,
-                    Title = lesson.Title,
+                    Title = string.IsNullOrEmpty(lesson.Title) ? ""
+                        : char.ToUpper(lesson.Title[0]) + lesson.Title.Substring(1),
                     UrlPdf = lesson.FileUrl,
                     ProgressPercentage = progressPercentage,
                     Type = lesson.TypeDoc?.NameType ?? "Unknown",

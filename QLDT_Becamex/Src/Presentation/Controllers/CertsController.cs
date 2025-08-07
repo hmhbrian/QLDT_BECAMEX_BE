@@ -25,7 +25,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet("{courseId}")]
-  
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCertByCourseId(string courseId)
         {
             var result = await _mediator.Send(new GetDetailCertQuery(courseId));
@@ -33,7 +33,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet()]
-      
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetListCert()
         {
             var result = await _mediator.Send(new GetListCertQuery());

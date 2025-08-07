@@ -45,6 +45,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// Lấy chi tiết khóa học theo Id.
         /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCourseById(string id)
         {
             var result = await _mediator.Send(new GetCourseByIdQuery(id));
@@ -55,6 +56,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// Lấy danh sách khóa học (dùng phân trang và sắp xếp).
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCourses([FromQuery] BaseQueryParam queryParam)
         {
             var result = await _mediator.Send(new GetListCourseQuery(queryParam));
@@ -80,7 +82,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpPost("{courseId}/enroll")]
-        [Authorize]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> EnrollCourse(string courseId)
         {
             var result = await _mediator.Send(new EnrollCourseCommand(courseId));
@@ -89,6 +91,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet("enroll-courses")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetListEnrollCourse([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetListEnrollCourseQuery(queryParams), cancellationToken);
@@ -96,6 +99,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet("progress/{id}")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCourseProgress(string id)
         {
             var result = await _mediator.Send(new GetCourseProgressQuery(id));
@@ -103,6 +107,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet("completed-count")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCompletedCoursesCount()
         {
             var result = await _mediator.Send(new GetCompletedCoursesCountQuery());
@@ -111,6 +116,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpGet("upcoming-courses")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetListUpcomingCourse(CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetListUpcomingCourseQuery(), cancellationToken);
@@ -118,6 +124,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
         
         [HttpGet("completed-enroll-courses")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCompletedEnrollCourses([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetCompletedCoursesQuery(queryParams), cancellationToken);

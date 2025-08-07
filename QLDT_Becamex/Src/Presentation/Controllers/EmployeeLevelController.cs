@@ -12,7 +12,6 @@ namespace QLDT_Becamex.Src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "ADMIN")]
     public class EmployeeLevelController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -23,6 +22,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetAll()
         {
             var result = await _mediator.Send(new GetAllELevelsQuery());
@@ -31,6 +31,7 @@ namespace QLDT_Becamex.Src.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create([FromBody] CreateELevelDto request)
         {
             var result = await _mediator.Send(new CreateELevelCommand(request));
@@ -38,6 +39,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateELevelDto request)
         {
             var result = await _mediator.Send(new UpdateELevelCommand(id, request));
@@ -45,6 +47,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteELevelCommand(id));

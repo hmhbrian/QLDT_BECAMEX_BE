@@ -20,6 +20,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetAllCourseCategory()
         {
             var result = await _mediator.Send(new GetAlCourseCategoryQuery());
@@ -27,7 +28,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "ADMIN,HR")]
 
         public async Task<IActionResult> CreateCourseCategory([FromBody] CourseCategoryRqDto dto)
         {
@@ -36,7 +37,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> UpdateCourseCategory(int id, [FromBody] CourseCategoryRqDto dto)
         {
             await _mediator.Send(new UpdateCourseCategoryCommand(id, dto));
@@ -45,7 +46,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
         [HttpDelete]
         [Authorize]
-
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> DeleteTypeDocument([FromBody] List<int> ids)
         {
             if (ids == null || !ids.Any())

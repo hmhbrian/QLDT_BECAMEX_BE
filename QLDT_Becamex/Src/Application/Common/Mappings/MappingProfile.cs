@@ -213,7 +213,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .AfterMap(ignoreNavigation);
 
             CreateMap<Test, DetailTestDto>()
-                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
+                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {(string.IsNullOrEmpty(src.Title) ? ""
+                        : char.ToUpper(src.Title[0]) + src.Title.Substring(1))}"))
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
                     .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold * 100.0))
                     .ForMember(dest => dest.Questions, opt => opt.MapFrom((src, dest, destMember, context) => src.Questions != null ? src.Questions.Select(q => context.Mapper.Map<QuestionDto>(q)).ToList() : new List<QuestionDto>()))
@@ -234,7 +235,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .AfterMap(ignoreNavigation);
 
             CreateMap<Test, AllTestDto>()
-                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {src.Title}"))
+                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài kiểm tra {src.Position}: {(string.IsNullOrEmpty(src.Title) ? ""
+                        : char.ToUpper(src.Title[0]) + src.Title.Substring(1))}"))
                     .ForMember(dest => dest.CountQuestion, opt => opt.MapFrom(src => src.Questions != null ? src.Questions.Count : 0))
                     .ForMember(dest => dest.PassThreshold, opt => opt.MapFrom(src => src.PassThreshold * 100.0))
                     .ForMember(dest => dest.CreatedBy,
@@ -248,7 +250,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             CreateMap<TestResult, TestResultDto>();
             CreateMap<TestResult, DetailTestResultDto>();
-            CreateMap<Test, TestSummaryDto>(); // 👈 Map từ entity Test → DTO TestSummaryDto
+            CreateMap<Test, TestSummaryDto>(); // Map từ entity Test → DTO TestSummaryDto
             
             //Question
             CreateMap<CreateQuestionDto, Question>()
@@ -263,11 +265,13 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             //Lesson
             CreateMap<Lesson, AllLessonDto>()
-                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {(string.IsNullOrEmpty(src.Title) ? ""
+                        : char.ToUpper(src.Title[0]) + src.Title.Substring(1))}"))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeDoc.NameType));
 
             CreateMap<Lesson, DetailLessonDto>()
-                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {src.Title}"))
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"Bài {src.Position}: {(string.IsNullOrEmpty(src.Title) ? ""
+                        : char.ToUpper(src.Title[0]) + src.Title.Substring(1))}"))
 
                 .ForMember(dest => dest.UserIdCreated, opt => opt.MapFrom(src => src.CreatedBy))
                 .ForMember(dest => dest.UserIdEdited, opt => opt.MapFrom(src => src.UpdatedBy))

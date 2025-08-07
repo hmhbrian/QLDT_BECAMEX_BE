@@ -28,8 +28,8 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <param name="model">Dữ liệu tạo file đính kèm (CourseId, Title, File hoặc Link)</param>
         /// <returns>Thông tin chi tiết của file đính kèm đã tạo.</returns>
         [HttpPost("{courseId}")]
+        [Authorize(Roles = "ADMIN,HR")]
         [Consumes("multipart/form-data")] // Quan trọng: Cho phép nhận dữ liệu form-data (bao gồm cả file)
-
         public async Task<IActionResult> CreateMultiple(
             [FromRoute] string courseId, // Lấy CourseId từ route
             [FromForm] List<CreateCourseAttachedFileDto> request // Lấy danh sách từ form
@@ -54,7 +54,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <param name="fileId">ID của file đính kèm cần xóa.</param>
         /// <returns>Thông báo xác nhận xóa thành công.</returns>
         [HttpDelete("{courseId}/{fileId}")] // Định tuyến cụ thể cho action DELETE
-
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> DeleteAttachedFile(
             [FromRoute] string courseId,
             [FromRoute] int fileId)
@@ -73,7 +73,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <param name="courseId">ID của khóa học.</param>
         /// <returns>Danh sách các file đính kèm của khóa học.</returns>
         [HttpGet("{courseId}")] // Định tuyến cụ thể cho action GET (không cần thêm gì vì route đã có courseId)
-
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetAllAttachedFiles(
             [FromRoute] string courseId) // Lấy courseId từ URL route
         {

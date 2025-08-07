@@ -70,6 +70,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPut("reorder")]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> UpdatePositionTest([FromRoute] string courseId, [FromForm] int TestId, [FromForm] int PreviousTestId)
         {
 

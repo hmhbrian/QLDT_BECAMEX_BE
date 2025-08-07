@@ -10,7 +10,6 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 {
     [Route("api/courses/{courseId}/lessons")]
     [ApiController]
-    [Authorize]
     public class LessonController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -23,6 +22,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// Lấy danh sách bài học của khóa học.HOCVIEN, HR, ADMIN có quyền truy cập
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetListLessonOfCourse([FromRoute] string courseId)
         {
             var result = await _mediator.Send(new GetListLessonOfCourseQuery(courseId));
@@ -36,6 +36,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         [HttpPost]
 
         [Consumes("multipart/form-data")] // Chỉ định rằng API mong đợi form-data (cho IFormFile)
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> CreateLessonOfCourse([FromRoute] string courseId, [FromForm] CreateLessonDto request)
         {
             if (!ModelState.IsValid)
@@ -53,6 +54,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         [HttpPut("{lessonId}")] // PUT api/Lesson/{id}
         // Yêu cầu xác thực người dùng
         [Consumes("multipart/form-data")] // Chỉ định rằng API mong đợi form-data (cho IFormFile)
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> UpdateLesson([FromRoute] string courseId, [FromRoute] int lessonId, [FromForm] UpdateLessonDto request)
         {
             // Gửi lệnh cập nhật đến MediatR.
@@ -70,6 +72,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <param name="courseId">ID của khoá học</param>
         /// <param name="lessonIds">Danh sách ID bài học cần xoá</param>
         [HttpDelete]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> DeleteLessons(
             [FromRoute] string courseId,
             [FromBody] List<int> lessonIds)
@@ -87,6 +90,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         /// <param name="LessonId">ID của bài học cần lấy thông tin.</param>
         /// <returns>ActionResult chứa thông tin chi tiết bài học hoặc lỗi nếu không tìm thấy.</returns>
         [HttpGet("{id}")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetLessonById(int id)
         {
             var result = await _mediator.Send(new GetLessonByIdQuery(id));
@@ -94,6 +98,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         }
 
         [HttpPut("reorder")]
+        [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> UpdatePositionLesson([FromRoute] string courseId, [FromForm] int LessonId, [FromForm] int? PreviousLessonId)
         {
 
@@ -101,6 +106,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             return Ok(ApiResponse.Ok("Position updated successfully."));
         }
         [HttpGet("count-completed")]
+        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCountCompletedLessonOfCourse([FromRoute] string courseId)
         {
             var result = await _mediator.Send(new GetCountCompletedLessonOfCourseQuery(courseId));

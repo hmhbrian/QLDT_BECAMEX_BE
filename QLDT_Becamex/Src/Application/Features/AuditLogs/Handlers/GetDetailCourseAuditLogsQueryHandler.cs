@@ -41,57 +41,74 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.Handlers
             var deletedCourseDepartmentIds = allRelatedAuditLogs
                 .Where(a => a.EntityName == "CourseDepartment" && a.Action == "Deleted" && a.Changes?.Contains($"\"CourseId\":\"{courseId}\"") == true)
                 .Select(a => a.EntityId)
+                .Where(id => id != null)
                 .ToList();
             var deletedCourseELevelIds = allRelatedAuditLogs
                 .Where(a => a.EntityName == "CourseELevel" && a.Action == "Deleted" && a.Changes?.Contains($"\"CourseId\":\"{courseId}\"") == true)
                 .Select(a => a.EntityId)
+                .Where(id => id != null)
                 .ToList();
             var deletedLessonIds = allRelatedAuditLogs
                 .Where(a => a.EntityName == "Lessons" && a.Action == "Deleted" && a.Changes?.Contains($"\"CourseId\":\"{courseId}\"") == true)
                 .Select(a => a.EntityId)
+                .Where(id => id != null)
                 .ToList();
             var deletedTestIds = allRelatedAuditLogs
                 .Where(a => a.EntityName == "Tests" && a.Action == "Deleted" && a.Changes?.Contains($"\"CourseId\":\"{courseId}\"") == true)
                 .Select(a => a.EntityId)
+                .Where(id => id != null)
                 .ToList();
             var deletedAttachFileIds = allRelatedAuditLogs
                 .Where(a => a.EntityName == "CourseAttachedFile" && a.Action == "Deleted" && a.Changes?.Contains($"\"CourseId\":\"{courseId}\"") == true)
                 .Select(a => a.EntityId)
+                .Where(id => id != null)
                 .ToList();
 
             // Lấy các Lesson, Test liên quan đến course
-            var lessonIds = (await _unitOfWork.LessonRepository.FindAndSelectAsync(
-                l => l.CourseId == courseId,
-                l => l.Id.ToString()))?.ToList() ?? new List<string>();
-            lessonIds.AddRange(deletedLessonIds);
+            var lessonIds = (await _unitOfWork.LessonRepository
+                .FindAndSelectAsync(
+                    l => l.CourseId == courseId,
+                    l => l.Id.ToString()))?
+                .Where(id => id != null).ToList() ?? new List<string>();
+            lessonIds.AddRange(deletedLessonIds!);
 
-            var testIds = (await _unitOfWork.TestRepository.FindAndSelectAsync(
-                t => t.CourseId == courseId,
-                t => t.Id.ToString()))?.ToList() ?? new List<string>();
-            testIds.AddRange(deletedTestIds);
+            var testIds = (await _unitOfWork.TestRepository
+                .FindAndSelectAsync(
+                    t => t.CourseId == courseId,
+                    t => t.Id.ToString()))?
+                .Where(id => id != null).ToList() ?? new List<string>();
+            testIds.AddRange(deletedTestIds!);
 
-            var attachFileIds = (await _unitOfWork.CourseAttachedFileRepository.FindAndSelectAsync(
+            var attachFileIds = (await _unitOfWork.CourseAttachedFileRepository
+                .FindAndSelectAsync(
                     a => a.CourseId == courseId,
-                    a => a.Id.ToString()))?.ToList() ?? new List<string>();
-            attachFileIds.AddRange(deletedAttachFileIds);
+                    a => a.Id.ToString()))?
+                .Where(id => id != null).ToList() ?? new List<string>();
+            attachFileIds.AddRange(deletedAttachFileIds!);
 
-            var courseDepartment = (await _unitOfWork.CourseDepartmentRepository.FindAndSelectAsync(
+            var courseDepartment = (await _unitOfWork.CourseDepartmentRepository
+                .FindAndSelectAsync(
                     a => a.CourseId == courseId,
-                    a => a.Id.ToString()))?.ToList() ?? new List<string>();
-            courseDepartment.AddRange(deletedCourseDepartmentIds);
+                    a => a.Id.ToString()))?
+                .Where(id => id != null)
+                .ToList() ?? new List<string>();
+            courseDepartment.AddRange(deletedCourseDepartmentIds!);
 
-            var courseELevel = (await _unitOfWork.CourseELevelRepository.FindAndSelectAsync(
+            var courseELevel = (await _unitOfWork.CourseELevelRepository
+                .FindAndSelectAsync(
                     a => a.CourseId == courseId,
-                    a => a.Id.ToString()))?.ToList() ?? new List<string>();
-            courseELevel.AddRange(deletedCourseELevelIds);
+                    a => a.Id.ToString()))?
+                .Where(id => id != null)
+                .ToList() ?? new List<string>();
+            courseELevel.AddRange(deletedCourseELevelIds!);
 
             var predicate = PredicateBuilder.New<AuditLog>(false);
             predicate = predicate.Or(a => a.EntityName == "Courses" && a.EntityId == courseId);
-            predicate = predicate.Or(a => a.EntityName == "Lessons" && lessonIds.Contains(a.EntityId));
-            predicate = predicate.Or(a => a.EntityName == "CourseDepartment" && courseDepartment.Contains(a.EntityId));
-            predicate = predicate.Or(a => a.EntityName == "CourseELevel" && courseELevel.Contains(a.EntityId));
-            predicate = predicate.Or(a => a.EntityName == "Tests" && testIds.Contains(a.EntityId));
-            predicate = predicate.Or(a => a.EntityName == "CourseAttachedFile" && attachFileIds.Contains(a.EntityId));
+            predicate = predicate.Or(a => a.EntityName == "Lessons" && a.EntityId != null && lessonIds.Contains(a.EntityId));
+            predicate = predicate.Or(a => a.EntityName == "CourseDepartment" && a.EntityId != null && courseDepartment.Contains(a.EntityId));
+            predicate = predicate.Or(a => a.EntityName == "CourseELevel" && a.EntityId != null && courseELevel.Contains(a.EntityId));
+            predicate = predicate.Or(a => a.EntityName == "Tests" && a.EntityId != null && testIds.Contains(a.EntityId));
+            predicate = predicate.Or(a => a.EntityName == "CourseAttachedFile" && a.EntityId != null && attachFileIds.Contains(a.EntityId));
 
             // Lấy audit logs
             var auditLogs = (await _unitOfWork.AuditLogRepository.GetFlexibleAsync(
@@ -129,8 +146,8 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.Handlers
                 // Loại bỏ CourseDepartment và CourseELevel có action là Deleted
                 if (!(new[] { "CourseDepartment", "CourseELevel" }.Contains(al.EntityName)))
                 {
-                    var referenceData = referenceDataProviders.ContainsKey(al.EntityName)
-                        ? await referenceDataProviders[al.EntityName].GetReferenceData(al) // Sử dụng await
+                    var referenceData = al.EntityName != null && referenceDataProviders.ContainsKey(al.EntityName)
+                        ? await referenceDataProviders[al.EntityName].GetReferenceData(al) 
                         : new ReferenceData();
                     auditLogDtos.Add(_auditLogMapper.MapToDto(al, userDict, referenceDataProviders).Result);
                 }

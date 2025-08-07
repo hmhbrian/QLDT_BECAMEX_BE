@@ -132,19 +132,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .Include(c => c.CreateBy)
                     .Include(c => c.UpdateBy)
             )).ToList();
-            //var query = _unitOfWork.CourseRepository.GetQueryable()
-            //    .Include(c => c.CourseDepartments)!
-            //        .ThenInclude(cd => cd.Department)
-            //    .Include(c => c.CourseELevels)!
-            //        .ThenInclude(cp => cp.ELevel)
-            //    .Include(c => c.Status)
-            //    .Include(c => c.Category)
-            //    .Include(c => c.Lecturer)
-            //    .AsNoTracking();
-
-            //if (predicate != null) query = query.Where(predicate);
-
-            //var courses = await query.ToListAsync();
 
             if (!string.IsNullOrEmpty(queryParam.Keyword))
             {

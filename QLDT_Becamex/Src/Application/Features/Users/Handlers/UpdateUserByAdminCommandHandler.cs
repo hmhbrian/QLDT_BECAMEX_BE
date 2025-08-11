@@ -1,10 +1,12 @@
-﻿using MediatR;
+﻿using Azure.Core;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Shared.Helpers;
 using System;
 using System.Linq;
 using System.Threading;
@@ -48,7 +50,10 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 
             // Các đoạn logic cập nhật y như bạn viết ở service:
             if (!string.IsNullOrWhiteSpace(rq.FullName))
+            {
                 userToUpdate.FullName = rq.FullName;
+                userToUpdate.NormalizedFullName = StringHelper.RemoveDiacritics(rq.FullName).ToUpperInvariant().Replace(" ", "");
+            }
 
             if (!string.IsNullOrWhiteSpace(rq.NumberPhone))
                 userToUpdate.PhoneNumber = rq.NumberPhone;

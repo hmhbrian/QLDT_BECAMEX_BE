@@ -9,8 +9,9 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
         public IQueryable<ApplicationUser> GetFlexible(
             Expression<Func<ApplicationUser, bool>> predicate,
             Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>>? orderBy,
-            int page,
-            bool asNoTracking,
-            Expression<Func<ApplicationUser, object>>[]? includes);
+            int? page = null,
+            int? pageSize = null,
+            bool asNoTracking = false,
+            Expression<Func<ApplicationUser, object>>[]? includes = null);
     }
 }

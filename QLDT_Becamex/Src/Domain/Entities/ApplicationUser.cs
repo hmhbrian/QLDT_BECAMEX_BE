@@ -6,6 +6,7 @@ namespace QLDT_Becamex.Src.Domain.Entities // Đảm bảo namespace này khớp
     public class ApplicationUser : IdentityUser
     {
         public string? FullName { get; set; }
+        public string? NormalizedFullName { get; set; }
         public string? UrlAvatar { get; set; }
         public string? IdCard { get; set; }
         public string? Code { get; set; } // mã nhân viên

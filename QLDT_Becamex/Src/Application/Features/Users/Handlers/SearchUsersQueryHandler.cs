@@ -40,8 +40,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 var keyword = StringHelper.RemoveDiacritics(request.Keyword).ToUpperInvariant().Replace(" ", "");
-                predicate = predicate.And(u => u.NormalizedUserName!.Contains(keyword) || u.Email!.Contains(keyword));
-                Console.WriteLine("KEYWORD:" + keyword);
+                predicate = predicate.And(u => u.NormalizedFullName!.Contains(keyword) || u.Email!.Contains(keyword));
             }
 
             //3. Đếm tổng số bản ghi
@@ -63,6 +62,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 predicate: predicate,
                 orderBy: orderBy,
                 page: request.QueryParam.Page,
+                pageSize: request.QueryParam.Limit,
                 asNoTracking: true,
                 includes: new[] { (Expression<Func<ApplicationUser, object>>)(q => q.UserStatus)});
 

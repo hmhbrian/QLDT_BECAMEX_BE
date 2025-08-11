@@ -2,17 +2,18 @@
 // This handler contains the core business logic for creating a user.
 // It interacts with Identity services and returns a FluentResults.Result object.
 
+using FluentResults; // FluentResults for rich result handling
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
-using FluentResults; // FluentResults for rich result handling
+using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Shared.Helpers;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using QLDT_Becamex.Src.Application.Features.Users.Commands;
-using QLDT_Becamex.Src.Application.Common.Dtos;
-using QLDT_Becamex.Src.Infrastructure.Services;
-using QLDT_Becamex.Src.Domain.Interfaces;
 
 namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
 {
@@ -77,6 +78,7 @@ namespace QLDT_Becamex.Src.Application.Commands.Users.CreateUser
                 StatusId = request.StatusId,
                 ManagerUId = request.ManagerUId,
                 CreateById = currentUserId,
+                NormalizedFullName = StringHelper.RemoveDiacritics(request.FullName).ToUpperInvariant().Replace(" ", "")
             };
 
             var createResult = await _userManager.CreateAsync(user, request.Password);

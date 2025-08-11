@@ -17,9 +17,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
         public IQueryable<ApplicationUser> GetFlexible(
             Expression<Func<ApplicationUser, bool>> predicate,
             Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>>? orderBy,
-            int page,
-            bool asNoTracking,
-            Expression<Func<ApplicationUser, object>>[]? includes)
+            int? page = null,
+            int? pageSize = null,
+            bool asNoTracking = false,
+            Expression<Func<ApplicationUser, object>>[]? includes = null)
         {
             var query = _dbContext.Users.AsQueryable();
 
@@ -40,9 +41,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories
             if (orderBy != null)
                 query = orderBy(query);
 
-            // Phân trang
-            int limit = 10; // Giả sử limit mặc định
-            query = query.Skip((page - 1) * limit).Take(limit);
+            if (page.HasValue && pageSize.HasValue)
+            {
+                int skip = (page.Value - 1) * pageSize.Value;
+                query = query.Skip(skip).Take(pageSize.Value);
+            }
 
             return query;
         }

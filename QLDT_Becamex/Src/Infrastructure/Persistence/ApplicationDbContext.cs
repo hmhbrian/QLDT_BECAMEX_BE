@@ -143,6 +143,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasColumnName("full_name")
                       .HasMaxLength(255);
 
+                entity.Property(u => u.NormalizedFullName)
+                      .HasColumnName("normalized_full_name")
+                      .HasMaxLength(255);
+
                 entity.Property(u => u.UrlAvatar)
                       .HasColumnName("url_avatar")
                       .HasMaxLength(500);
@@ -191,6 +195,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                    .HasColumnName("update_by_id")
                    .HasMaxLength(450);
 
+                entity.HasIndex(u => u.NormalizedFullName)
+                    .HasDatabaseName("IX_ApplicationUser_NormalizedFullName");
+                entity.HasIndex(u => u.Email)
+                    .HasDatabaseName("IX_ApplicationUser_Email");
                 // 🔗 Relationships
 
                 entity.HasOne(u => u.Department)
@@ -446,6 +454,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                    .HasColumnName("update_by_id")
                    .HasMaxLength(450);
 
+                entity.HasIndex(u => u.NormalizeCourseName)
+                    .HasDatabaseName("IX_Course_NormalizedCourseName");
+                entity.HasIndex(u => u.Code)
+                    .HasDatabaseName("IX_Course_Code");
                 // === Relations ===
 
                 entity.HasOne(p => p.Status)

@@ -28,70 +28,34 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var queryParam = request.QueryParam;
             Expression<Func<Course, bool>>? predicate = c => c.IsDeleted == false;
 
-            // Filter by StatusIds
-            if (!string.IsNullOrEmpty(queryParam.StatusIds))
-            {
-                var statusIds = queryParam.StatusIds.Split(',')
-                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
-                    .Where(id => id != -1).ToList();
-                if (statusIds.Any())
-                {
-                    Expression<Func<Course, bool>> statusPredicate = c => statusIds.Contains(c.Status!.Id);
-                    predicate = predicate == null ? statusPredicate : predicate.And(statusPredicate);
-                }
-            }
+            // StatusIds
+            var statusIds = !string.IsNullOrEmpty(queryParam.StatusIds)
+                ? new HashSet<int>(queryParam.StatusIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (statusIds?.Count > 0)
+                predicate = predicate.And(c => statusIds.Contains(c.Status!.Id));
 
-            // Filter by DepartmentIds
-            if (!string.IsNullOrEmpty(queryParam.DepartmentIds))
-            {
-                var deptIds = queryParam.DepartmentIds.Split(',')
-                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
-                    .Where(id => id != -1).ToList();
-                if (deptIds.Any())
-                {
-                    Expression<Func<Course, bool>> deptPredicate = c => c.CourseDepartments != null && c.CourseDepartments.Any(cd => deptIds.Contains(cd.DepartmentId));
-                    predicate = predicate == null ? deptPredicate : predicate.And(deptPredicate);
-                }
-            }
+            // DepartmentIds
+            var deptIds = !string.IsNullOrEmpty(queryParam.DepartmentIds)
+                ? new HashSet<int>(queryParam.DepartmentIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (deptIds?.Count > 0)
+                predicate = predicate.And(c => c.CourseDepartments != null && c.CourseDepartments.Any(cd => deptIds.Contains(cd.DepartmentId)));
 
-            // Filter by PositionIds
-            if (!string.IsNullOrEmpty(queryParam.ELevelIds))
-            {
-                var ELevelIds = queryParam.ELevelIds.Split(',')
-                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
-                    .Where(id => id != -1).ToList();
-                if (ELevelIds.Any())
-                {
-                    Expression<Func<Course, bool>> posPredicate = c => c.CourseELevels != null && c.CourseELevels.Any(cp => ELevelIds.Contains(cp.ELevelId));
-                    predicate = predicate == null ? posPredicate : predicate.And(posPredicate);
-                }
-            }
+            // ELevelIds
+            var eLevelIds = !string.IsNullOrEmpty(queryParam.ELevelIds)
+                ? new HashSet<int>(queryParam.ELevelIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (eLevelIds?.Count > 0)
+                predicate = predicate.And(c => c.CourseELevels != null && c.CourseELevels.Any(cp => eLevelIds.Contains(cp.ELevelId)));
 
-            // Filter by CategoryId
-            if (!string.IsNullOrEmpty(queryParam.CategoryIds))
-            {
-                var CategoryId = queryParam.CategoryIds.Split(',')
-                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
-                    .Where(id => id != -1).ToList();
-                if (CategoryId.Any())
-                {
-                    Expression<Func<Course, bool>> CategoryPredicate = c => CategoryId.Contains(c.Category!.Id);
-                    predicate = predicate == null ? CategoryPredicate : predicate.And(CategoryPredicate);
-                }
-            }
+            // CategoryIds
+            var categoryIds = !string.IsNullOrEmpty(queryParam.CategoryIds)
+                ? new HashSet<int>(queryParam.CategoryIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (categoryIds?.Count > 0)
+                predicate = predicate.And(c => categoryIds.Contains(c.Category!.Id));
 
-            // Filter by LecturerId
-            if (!string.IsNullOrEmpty(queryParam.LecturerIds))
-            {
-                var LecturerId = queryParam.LecturerIds.Split(',')
-                    .Select(s => int.TryParse(s.Trim(), out var id) ? id : -1)
-                    .Where(id => id != -1).ToList();
-                if (LecturerId.Any())
-                {
-                    Expression<Func<Course, bool>> LecturerPredicate = c => LecturerId.Contains(c.Lecturer!.Id);
-                    predicate = predicate == null ? LecturerPredicate : predicate.And(LecturerPredicate);
-                }
-            }
 
             // Filter by CreatedAt
             if (!string.IsNullOrEmpty(queryParam.FromDate) || !string.IsNullOrEmpty(queryParam.ToDate))
@@ -105,6 +69,13 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 predicate = predicate == null ? datePredicate : predicate.And(datePredicate);
             }
 
+            // Keyword
+            if (!string.IsNullOrEmpty(queryParam.Keyword))
+            {
+                var keyword = StringHelper.RemoveDiacritics(queryParam.Keyword).ToUpperInvariant().Replace(" ", "");
+                predicate = predicate.And(c => c.NormalizeCourseName.Contains(keyword) || c.Code.Contains(keyword));
+                Console.WriteLine("KEYWORD" + keyword);
+            }
 
             int totalItems = await _unitOfWork.CourseRepository.CountAsync(predicate);
 
@@ -130,28 +101,16 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                         .ThenInclude(cp => cp.ELevel)
                     .Include(c => c.Status)
                     .Include(c => c.Category)
-                    .Include(c => c.Lecturer)
                     .Include(c => c.CreateBy)
                     .Include(c => c.UpdateBy)
             )).ToList();
 
-            if (!string.IsNullOrEmpty(queryParam.Keyword))
-            {
-                var keyword = StringHelper.RemoveDiacritics(queryParam.Keyword).ToLowerInvariant().Trim();
-                courses = courses.Where(c =>
-                    StringHelper.RemoveDiacritics(c.Name ?? "").ToLowerInvariant().Contains(keyword) ||
-                    StringHelper.RemoveDiacritics(c.Code ?? "").ToLowerInvariant().Contains(keyword)
-                ).ToList();
-            }
-
-            int page = queryParam.Page;
-            int limit = queryParam.Limit > 0 ? queryParam.Limit : 10;
-            var paged = courses.Skip((page - 1) * limit).Take(limit).ToList();
 
             var courseDtos = _mapper.Map<List<CourseDto>>(courses);
+
             var pagination = new Pagination(
-                currentPage: page, 
-                itemsPerPage: limit, 
+                currentPage: queryParam.Page,
+                itemsPerPage: queryParam.Limit > 0 ? queryParam.Limit : 10,
                 totalItems: totalItems);
 
             var result = new PagedResult<CourseDto>(

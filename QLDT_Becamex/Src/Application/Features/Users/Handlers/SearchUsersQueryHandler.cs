@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using CloudinaryDotNet.Actions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@ using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Shared.Helpers;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 {
@@ -29,65 +32,71 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
         public async Task<PagedResult<UserDto>> Handle(SearchUsersQuery request, CancellationToken cancellationToken)
         {
             var queryParams = request.QueryParam;
-            var keyword = request.Keyword;
 
             // 1. Lấy user chưa xoá
-            var users = await _userManager.Users
-                .Where(u => !u.IsDeleted)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            Expression<Func<ApplicationUser, bool>>? predicate = c => c.IsDeleted == false;
 
             // 2. Lọc theo keyword (không dấu)
-            if (!string.IsNullOrWhiteSpace(keyword))
+            if (!string.IsNullOrEmpty(request.Keyword))
             {
-                var normalized = StringHelper.RemoveDiacritics(keyword).ToLowerInvariant();
-                users = users.Where(u =>
-                    StringHelper.RemoveDiacritics(u.FullName ?? "").ToLower().Contains(normalized) ||
-                    (u.Email ?? "").ToLower().Contains(normalized)
-                ).ToList();
+                var keyword = StringHelper.RemoveDiacritics(request.Keyword).ToUpperInvariant().Replace(" ", "");
+                predicate = predicate.And(u => u.NormalizedUserName!.Contains(keyword) || u.Email!.Contains(keyword));
+                Console.WriteLine("KEYWORD:" + keyword);
             }
 
-            int total = users.Count;
+            //3. Đếm tổng số bản ghi
+            int totalItems = await _unitOfWork.UserRepository.CountAsync(predicate);
 
-            // 3. Sắp xếp
-            users = queryParams.SortField?.ToLower() switch
+            // 4. Sắp xếp
+            Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>>? orderBy = q =>
             {
-                "createdat" => queryParams.SortType?.ToLower() == "asc"
-                    ? users.OrderBy(u => u.CreatedAt).ToList()
-                    : users.OrderByDescending(u => u.CreatedAt).ToList(),
-                _ => users.OrderByDescending(u => u.CreatedAt).ToList()
+                bool isDesc = request.QueryParam.SortType?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true;
+                return request.QueryParam.SortField?.ToLower() switch
+                {
+                    "created.at" => isDesc ? q.OrderByDescending(c => c.CreatedAt) : q.OrderBy(c => c.CreatedAt),
+                    _ => q.OrderBy(c => c.CreatedAt)
+                };
             };
 
-            // 4. Phân trang
-            var skip = (queryParams.Page - 1) * queryParams.Limit;
-            var pagedUsers = users.Skip(skip).Take(queryParams.Limit).ToList();
+            //5.Lấy ds User
+            var usersQuery = _unitOfWork.UserRepository.GetFlexible(
+                predicate: predicate,
+                orderBy: orderBy,
+                page: request.QueryParam.Page,
+                asNoTracking: true,
+                includes: new[] { (Expression<Func<ApplicationUser, object>>)(q => q.UserStatus)});
 
-            // 5. Map sang DTO
-            var userDtos = _mapper.Map<List<UserDto>>(pagedUsers);
+            // 6. Ánh xạ sang DTO với thông tin Role và Status
+            var userDtos = await usersQuery
+                .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
 
-            foreach (var dto in userDtos)
+            // 7.Lấy Role cho từng user
+            var userIds = userDtos.Select(dto => dto.Id).ToList();
+            var userRoles = new Dictionary<string, string>();
+            foreach (var userId in userIds)
             {
-                var user = pagedUsers.FirstOrDefault(u => u.Id == dto.Id);
+                var user = await _userManager.FindByIdAsync(userId);
                 if (user != null)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
-                    dto.Role = roles.FirstOrDefault();
-                    var status = await _unitOfWork.UserStatusRepository.GetByIdAsync(user.StatusId ?? 0);
-                    if (status == null)
-                        continue;
-                    var userStatus = new StatusDto
-                    {
-                        Id = user.StatusId ?? 0,
-                        Name = status.Name ?? "Unknown"
-                    };
-                    dto.UserStatus = userStatus;
+                    userRoles[userId] = roles.FirstOrDefault();
                 }
             }
 
-            var pagination = new Pagination(queryParams.Page, queryParams.Limit, total);
+            foreach (var dto in userDtos)
+            {
+                dto.Role = userRoles.GetValueOrDefault(dto.Id);
+            }
+
+
+            //8.Phân trang
+            var pagination = new Pagination(
+                currentPage: request.QueryParam.Page,
+                itemsPerPage: request.QueryParam.Limit > 0 ? request.QueryParam.Limit : 10,
+                totalItems: totalItems);
             var pagedResult = new PagedResult<UserDto>(userDtos, pagination);
             return pagedResult;
-
         }
     }
 }

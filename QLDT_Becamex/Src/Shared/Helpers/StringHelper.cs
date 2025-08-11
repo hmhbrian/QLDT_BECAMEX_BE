@@ -9,6 +9,8 @@ namespace QLDT_Becamex.Src.Shared.Helpers
     {
         public static string RemoveDiacritics(string text)
         {
+            text = text.Replace("đ", "d").Replace("Đ", "D");
+
             var normalized = text.Normalize(NormalizationForm.FormD);
             var sb = new StringBuilder();
 

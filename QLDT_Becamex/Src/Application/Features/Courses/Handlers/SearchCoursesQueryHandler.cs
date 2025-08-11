@@ -92,6 +92,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 predicate: predicate, // Use the adjusted predicate here
                 orderBy: orderBy,
                 page: queryParam.Page,
+                pageSize: queryParam.Limit,
                 asNoTracking: true,
                 includes: q => q
                     .Include(c => c.CourseDepartments)!

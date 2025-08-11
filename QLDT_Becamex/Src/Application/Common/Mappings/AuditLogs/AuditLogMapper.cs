@@ -9,7 +9,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
     public class AuditLogMapper : IAuditLogMapper
     {
         // Danh sách các trường cần loại bỏ (sử dụng HashSet để so sánh không phân biệt chữ hoa/thường)
-        private readonly HashSet<string> _fieldsToExclude = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Id", "CourseId","CreatedAt", "UpdatedAt", "CreatedById", "CreateById", "ModifiedAt", "UpdatedById", "UpdateById","StatusId","CategoryId","LecturerId","TypeDocId", "ModifiedTime", "UserId" };
+        private readonly HashSet<string> _fieldsToExclude = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Id", "CourseId","CreatedAt", "UpdatedAt", "CreatedById", "CreateById", "ModifiedAt", "UpdatedById", "UpdateById","StatusId","CategoryId","TypeDocId", "ModifiedTime", "UserId" };
 
         // Từ điển ánh xạ tên trường 
         private static readonly Dictionary<string, string> FieldNameMappings = new Dictionary<string, string>
@@ -24,7 +24,6 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs
             { "RegistrationStartDate", "Ngày mở đăng ký" },
             { "StartDate", "Ngày bắt đầu" },
             { "CategoryName", "Danh mục" },
-            { "LecturerName", "Giảng viên" },
             { "Code", "Mã khóa học" },
             { "Description", "Mô tả" },
             { "Format", "Hình thức" },

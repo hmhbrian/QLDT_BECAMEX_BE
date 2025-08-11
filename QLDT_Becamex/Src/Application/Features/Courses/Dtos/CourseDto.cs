@@ -1,7 +1,6 @@
 ﻿
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
-using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
 using QLDT_Becamex.Src.Application.Features.EmployeeLevels.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
@@ -35,7 +34,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public DateTime? ModifiedAt { get; set; }
         public StatusDto? Status { get; set; }
         public CourseCategoryDto? Category { get; set; }
-        public LecturerDto? Lecturer { get; set; }
         public ICollection<UserSumaryDto>? Students { get; set; } = new List<UserSumaryDto>();
         public ICollection<DepartmentShortenDto>? Departments { get; set; } = new List<DepartmentShortenDto>();
         public ICollection<ELevelDto>? ELevels { get; set; } = new List<ELevelDto>();

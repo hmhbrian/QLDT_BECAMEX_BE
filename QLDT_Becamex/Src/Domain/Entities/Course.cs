@@ -30,7 +30,6 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public int? CategoryId { get; set; }
         public CourseCategory? Category { get; set; }
         public int? LecturerId { get; set; }
-        public Lecturer? Lecturer { get; set; }
         public bool IsDeleted { get; set; } = false;
         public bool IsPrivate { get; set; } = false;
         public string? CreatedById { get; set; }

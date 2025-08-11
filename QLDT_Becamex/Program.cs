@@ -124,7 +124,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IEmployeeLevelRepository, EmployeeLevelRepository>();
-builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();
 builder.Services.AddScoped<ICourseCategoryRepository, CourseCategoryRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ITestRepository, TestRepository>();

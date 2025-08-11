@@ -30,7 +30,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .Include(c => c.UserCourses)!.ThenInclude(uc => uc.User)
                     .Include(c => c.Status)
                     .Include(c => c.Category)
-                    .Include(c => c.Lecturer)
                     .Include(c => c.CreateBy)
                     .Include(c => c.UpdateBy)
             );

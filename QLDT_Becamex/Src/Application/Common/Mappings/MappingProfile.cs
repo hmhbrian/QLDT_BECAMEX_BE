@@ -9,7 +9,6 @@ using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
 using QLDT_Becamex.Src.Application.Features.EmployeeLevels.Dtos;
 using QLDT_Becamex.Src.Application.Features.Feedbacks.Dtos;
-using QLDT_Becamex.Src.Application.Features.Lecturer.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
 using QLDT_Becamex.Src.Application.Features.Questions.Dtos;
 using QLDT_Becamex.Src.Application.Features.Roles.Dtos;
@@ -59,10 +58,6 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             //UserStatus
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();
             CreateMap<UserStatusDtoRq, UserStatus>();
-
-            //Lecturer
-            CreateMap<Lecturer, LecturerDto>().ReverseMap();
-            CreateMap<LecturerDtoRq, Lecturer>();
 
             //CourseCategory
             CreateMap<CourseCategory, CourseCategoryDto>().ReverseMap();
@@ -114,7 +109,6 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     ELevelName = cp.ELevel.ELevelName,
                 }).ToList()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.Lecturer))
                 .ForMember(dest => dest.Students, opt => opt.MapFrom(src =>
                     (src.UserCourses ?? Enumerable.Empty<UserCourse>())
                     .Where(cp => cp.User != null)

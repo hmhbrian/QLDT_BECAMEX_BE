@@ -56,7 +56,6 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 predicate: u => !u.IsDeleted,
                 orderBy: orderByFunc,
                 page: queryParams.Page,
-                pageSize: queryParams.Limit,
                 includes: q => q.Include(u => u.ELevel)
                                 .Include(u => u.Department)
                                 .Include(u => u.ManagerU)
@@ -85,13 +84,16 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 
                     userDto.Role = roles.FirstOrDefault();
                     filteredUsers.Add(userDto);
-
                 }
             }
-
-            var pagination = new Pagination(queryParams.Page, queryParams.Limit, totalItems);
+            totalItems = filteredUsers.Count;
+            var pagedUserDtos = filteredUsers
+                .Skip((queryParams.Page - 1) * queryParams.Limit)
+                .Take(queryParams.Limit)
+                .ToList();
+            var pagination = new Pagination(currentPage: queryParams.Page,itemsPerPage: queryParams.Limit,totalItems: totalItems);
             // 5. Tạo kết quả phân trang
-            var result = new PagedResult<UserDto>(filteredUsers,pagination);
+            var result = new PagedResult<UserDto>(items: pagedUserDtos, pagination: pagination);
             return result;
         }
     }

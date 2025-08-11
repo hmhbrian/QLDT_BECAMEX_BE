@@ -21,6 +21,7 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> GetAllRoles()
         {
             var result = await _mediator.Send(new GetAllRolesQuery());

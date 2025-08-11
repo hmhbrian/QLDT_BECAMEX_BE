@@ -92,7 +92,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 predicate: predicate, // Use the adjusted predicate here
                 orderBy: orderBy,
                 page: queryParam.Page,
-                pageSize: queryParam.Limit,
                 asNoTracking: true,
                 includes: q => q
                     .Include(c => c.CourseDepartments)!
@@ -105,7 +104,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .Include(c => c.UpdateBy)
             )).ToList();
 
-
             var courseDtos = _mapper.Map<List<CourseDto>>(courses);
 
             var pagination = new Pagination(
@@ -114,7 +112,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 totalItems: totalItems);
 
             var result = new PagedResult<CourseDto>(
-                items: courseDtos, 
+                items: pagedCourseDtos, 
                 pagination: pagination);
             return result;
 

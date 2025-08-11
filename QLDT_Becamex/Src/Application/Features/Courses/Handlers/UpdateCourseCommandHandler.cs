@@ -70,6 +70,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             // Kiểm tra tên khóa học có bị trùng với một khóa học khác không
             if (await _unitOfWork.CourseRepository.AnyAsync(c => c.Name == request.Name && c.Id != id))
                 throw new AppException("Tên khóa học đã tồn tại", 409); // Lỗi 409 Conflict
+            
 
             // Kiểm tra xem ID trạng thái khóa học có hợp lệ không (nếu được cung cấp)
             if (request.StatusId.HasValue && !await _unitOfWork.CourseStatusRepository.AnyAsync(s => s.Id == request.StatusId.Value))
@@ -169,6 +170,9 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             // Ghi nhận lại thông tin về lần cập nhật này
             updateCourse.UpdatedAt = DateTimeHelper.GetVietnamTimeNow();
             updateCourse.UpdatedById = currentUserId;
+
+            if (request.Name != null && course.Name != request.Name)
+                updateCourse.NormalizeCourseName = StringHelper.RemoveDiacritics(request.Name).ToUpperInvariant().Replace(" ", "");
 
             // Đánh dấu đối tượng course cần được cập nhật trong Unit of Work
             _unitOfWork.CourseRepository.Update(course, updateCourse);

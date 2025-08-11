@@ -1,5 +1,7 @@
 ﻿
 
+using System.Runtime.CompilerServices;
+
 namespace QLDT_Becamex.Src.Domain.Entities
 {
     public class Course
@@ -7,6 +9,7 @@ namespace QLDT_Becamex.Src.Domain.Entities
         public string Id { get; set; } = null!;
         public string Code { get; set; } = null!;
         public string Name { get; set; } = null!;
+        public string NormalizeCourseName { get; set; } = null!;
         public string? Description { get; set; }
         public string? Objectives { get; set; }
         public string? ThumbUrl { get; set; }

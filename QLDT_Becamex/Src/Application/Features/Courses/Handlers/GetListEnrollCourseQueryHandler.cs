@@ -70,7 +70,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             foreach (var courseDto in userEnrollCourseDtos)
             {
                 float lessonsProgress = await GetCourseProgress(courseDto.Id, userId);
-                courseDto.progressPercentage = lessonsProgress;
+                courseDto.progressPercentage = (float)Math.Round(lessonsProgress);
             }
             var result = new PagedResult<UserEnrollCourseDto>(userEnrollCourseDtos, pagination);
             return result;

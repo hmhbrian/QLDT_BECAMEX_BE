@@ -121,7 +121,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 predicate: predicate, // Use the adjusted predicate here
                 orderBy: orderBy,
                 page: queryParam.Page,
-                pageSize: queryParam.Limit,
                 asNoTracking: true,
                 includes: q => q
                     .Include(c => c.CourseDepartments)!
@@ -145,17 +144,21 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             }
 
             int page = queryParam.Page;
-            int limit = queryParam.Limit > 0 ? queryParam.Limit : 10;
-            var paged = courses.Skip((page - 1) * limit).Take(limit).ToList();
 
             var courseDtos = _mapper.Map<List<CourseDto>>(courses);
+
+            var pagedCourseDtos = courseDtos
+                .Skip((queryParam.Page - 1) * queryParam.Limit)
+                .Take(queryParam.Limit)
+                .ToList();
+            Console.WriteLine($"Total items after filtering: {pagedCourseDtos.Count}, limit: {queryParam.Limit}, page: {queryParam.Page}");
             var pagination = new Pagination(
                 currentPage: page, 
-                itemsPerPage: limit, 
+                itemsPerPage: queryParam.Limit, 
                 totalItems: totalItems);
 
             var result = new PagedResult<CourseDto>(
-                items: courseDtos, 
+                items: pagedCourseDtos, 
                 pagination: pagination);
             return result;
 

@@ -3,9 +3,11 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Queries;
 using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Shared.Helpers;
 using System.Linq;
 
@@ -15,11 +17,13 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SearchUsersQueryHandler(UserManager<ApplicationUser> userManager, IMapper mapper)
+        public SearchUsersQueryHandler(UserManager<ApplicationUser> userManager, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<PagedResult<UserDto>> Handle(SearchUsersQuery request, CancellationToken cancellationToken)
@@ -68,6 +72,15 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 {
                     var roles = await _userManager.GetRolesAsync(user);
                     dto.Role = roles.FirstOrDefault();
+                    var status = await _unitOfWork.UserStatusRepository.GetByIdAsync(user.StatusId ?? 0);
+                    if (status == null)
+                        continue;
+                    var userStatus = new StatusDto
+                    {
+                        Id = user.StatusId ?? 0,
+                        Name = status.Name ?? "Unknown"
+                    };
+                    dto.UserStatus = userStatus;
                 }
             }
 

@@ -41,6 +41,16 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                     throw new AppException("Phòng ban không tồn tại", 404);
                 }
 
+                foreach (var Department in departments)
+                {
+                    var user = await _unitOfWork.UserRepository.GetFirstOrDefaultAsync(u => u.DepartmentId == Department.DepartmentId);
+                    if (user != null)
+                    {
+                        throw new AppException("Không thể xóa vì còn tồn tại user trong phòng ban", 409);
+                    }
+                    
+                }
+
                 var department = departments.First();
 
                 // Lấy tất cả phòng ban để tra cứu

@@ -53,6 +53,10 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 
             if (result.Succeeded)
             {
+                if (user.StatusId == 2)
+                {
+                    throw new AppException("Bạn đã nghĩ việc, không thể đăng nhập.", 401);
+                }
                 var userDto = _mapper.Map<UserDto>(user);
                 var roles = await _userManager.GetRolesAsync(user);
                 userDto.Role = roles.FirstOrDefault();

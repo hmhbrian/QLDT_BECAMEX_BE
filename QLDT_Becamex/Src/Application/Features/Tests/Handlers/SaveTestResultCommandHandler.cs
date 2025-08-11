@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
-using QLDT_Becamex.Src.Application.Features.Tests.Events;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
@@ -15,14 +14,12 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
-    private readonly IMediator _mediator;
 
     public SaveTestResultCommandHandler(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IMediator mediator)
     {
         _unitOfWork = unitOfWork;
         _userService = userService;
         _mapper = mapper;
-        _mediator = mediator;
     }
 
     public async Task<TestResultDto> Handle(SaveTestResultCommand request, CancellationToken cancellationToken)
@@ -119,15 +116,8 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         await _unitOfWork.TestResultRepository.AddAsync(newTestResult);
         await _unitOfWork.CompleteAsync();
 
-        bool isFinish = await MeetTheStandards(currentUserId, test.CourseId);
-        // Kiểm tra nếu user đã hoàn thành khóa học (lessons + passed all tests)
-        if (isFinish)
-        {
-            await _mediator.Publish(new TestSubmittedEvent(currentUserId, test.CourseId));
-        }
         // --- B5: TRẢ KẾT QUẢ VỀ ---
         TestResultDto testResultDto = _mapper.Map<TestResultDto>(newTestResult);
-        testResultDto.IsFinish = isFinish;
         var user = await _unitOfWork.UserRepository.GetByIdAsync(currentUserId);
         testResultDto.User = user != null
             ? new UserSumaryDto() { Id = user.Id, Name = user.FullName }
@@ -140,39 +130,7 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         return testResultDto;
     }
 
-    private async Task<bool> MeetTheStandards(string userId, string courseId)
-    {
-        // 1. Lấy tất cả bài học thuộc khóa học
-        var lessons = await _unitOfWork.LessonRepository.GetQueryable()
-            .Where(l => l.CourseId == courseId)
-            .ToListAsync();
 
-        // 2. Lấy LessonProgress của user trong khóa học
-        var lessonProgresses = await _unitOfWork.LessonProgressRepository.GetQueryable()
-            .Where(lp => lp.UserId == userId && lessons.Select(l => l.Id).Contains(lp.LessonId))
-            .ToListAsync();
-
-        // 3. Kiểm tra xem user đã hoàn thành hết chưa
-        bool allLessonsCompleted = lessons.All(lesson =>
-            lessonProgresses.Any(lp => lp.LessonId == lesson.Id && lp.IsCompleted));
-
-        // 4. Lấy tất cả bài test thuộc khóa học
-        var tests = await _unitOfWork.TestRepository.GetQueryable()
-            .Where(t => t.CourseId == courseId)
-            .ToListAsync();
-
-        // 5. Lấy kết quả test của user
-        var testResults = await _unitOfWork.TestResultRepository.GetQueryable()
-            .Where(tr => tr.UserId == userId && tests.Select(t => t.Id).Contains(tr.TestId))
-            .ToListAsync();
-
-        // 6. Kiểm tra xem user đã làm và qua hết chưa
-        bool allTestsPassed = tests.All(test =>
-            testResults.Any(tr => tr.TestId == test.Id && tr.IsPassed));
-
-        // 7. Nếu hoàn thành hết và vượt qua hết thì đạt chuẩn
-        return allLessonsCompleted && allTestsPassed;
-    }
 
 
     private bool AreSelectionsCorrect(string userSelections, string? correctAnswers)

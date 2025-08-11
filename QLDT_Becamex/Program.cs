@@ -21,7 +21,6 @@ using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
 using QLDT_Becamex.Src.Infrastructure.Services.BackgroundServices;
 using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
-using QLDT_Becamex.Src.Application.Features.Tests.Events;
 
 
 var builder = WebApplication.CreateBuilder(args);

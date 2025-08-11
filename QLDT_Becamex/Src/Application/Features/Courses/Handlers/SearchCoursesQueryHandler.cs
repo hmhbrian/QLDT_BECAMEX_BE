@@ -112,7 +112,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 totalItems: totalItems);
 
             var result = new PagedResult<CourseDto>(
-                items: pagedCourseDtos, 
+                items: courseDtos, 
                 pagination: pagination);
             return result;
 

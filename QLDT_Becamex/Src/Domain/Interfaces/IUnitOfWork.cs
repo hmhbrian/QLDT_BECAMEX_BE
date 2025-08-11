@@ -15,7 +15,6 @@ namespace QLDT_Becamex.Src.Domain.Interfaces
         public ICourseRepository CourseRepository { get; }
         public IUserCourseRepository UserCourseRepository { get; }
         public ICourseCategoryRepository CourseCategoryRepository { get; }
-        public ILecturerRepository LecturerRepository { get; }
         public ITestRepository TestRepository { get; }
         public ICourseAttachedFileRepository CourseAttachedFileRepository { get; }
         public ILessonRepository LessonRepository { get; }

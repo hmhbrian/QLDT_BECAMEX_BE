@@ -27,7 +27,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
         public string? Location { get; set; }
         public int? StatusId { get; set; }
         public int? CategoryId { get; set; }
-        public int? LecturerId { get; set; }
         public bool? IsPrivate { get; set; }
         public List<int> DepartmentIds { get; set; } = new List<int>();
         public List<int> ELevelIds { get; set; } = new List<int>();

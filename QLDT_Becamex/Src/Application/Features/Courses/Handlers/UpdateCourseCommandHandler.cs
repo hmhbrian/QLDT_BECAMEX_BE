@@ -80,10 +80,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (request.CategoryId.HasValue && !await _unitOfWork.CourseCategoryRepository.AnyAsync(s => s.Id == request.CategoryId.Value))
                 throw new AppException("Loại khóa học không hợp lệ", 400); // Lỗi 400 Bad Request
 
-            // Kiểm tra xem ID giảng viên có hợp lệ không (nếu được cung cấp)
-            if (request.LecturerId.HasValue && !await _unitOfWork.LecturerRepository.AnyAsync(s => s.Id == request.LecturerId.Value))
-                throw new AppException("Giảng viên khóa học không hợp lệ", 400); // Lỗi 400 Bad Request
-
             // === BƯỚC 3: XỬ LÝ VÀ XÁC THỰC CÁC DANH SÁCH ID LIÊN QUAN ===
 
             // Xử lý danh sách phòng ban

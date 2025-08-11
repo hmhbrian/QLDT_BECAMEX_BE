@@ -31,16 +31,16 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
 
             // Lấy dữ liệu hiện tại và bao gồm cả ID từ bản ghi Deleted
             var (departmentDict, ELevelDict, userDict, previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds) = await GetCurrentReferenceDictionariesAsync(courseId, auditLog); 
-            var (statusName, categoryName, lecturerName, hasStatusChange) = await GetCurrentCourseDetailsAsync(courseId, auditLog);
+            var (statusName, categoryName, hasStatusChange) = await GetCurrentCourseDetailsAsync(courseId, auditLog);
 
 
             if (auditLog.Action == "Added")
             {
-                await AddFieldsForAddedActionAsync(referenceData, courseId, departmentDict, ELevelDict, userDict, statusName, categoryName, lecturerName, currentDepartmentIds, currentELevelIds);
+                await AddFieldsForAddedActionAsync(referenceData, courseId, departmentDict, ELevelDict, userDict, statusName, categoryName, currentDepartmentIds, currentELevelIds);
             }
             else if (auditLog.Action == "Modified")
             {
-                await AddFieldsForModifiedActionAsync(referenceData, auditLog, courseId, departmentDict, ELevelDict, userDict, statusName, categoryName, lecturerName, hasStatusChange, previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds);
+                await AddFieldsForModifiedActionAsync(referenceData, auditLog, courseId, departmentDict, ELevelDict, userDict, statusName, categoryName, hasStatusChange, previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds);
             }
 
             return referenceData;
@@ -120,18 +120,16 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             return (departmentDict, ELevelDict, userDict, previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds);
         }
 
-        private async Task<(string statusName, string categoryName, string lecturerName,bool hasStatusChange)> GetCurrentCourseDetailsAsync(string courseId, AuditLog auditLog)
+        private async Task<(string statusName, string categoryName,bool hasStatusChange)> GetCurrentCourseDetailsAsync(string courseId, AuditLog auditLog)
         {
             var course = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
                     predicate: c => c.Id.ToString() == courseId,
                     includes: p => p
                         .Include(a => a.Category)
                         .Include(a => a.Status)
-                        .Include(a => a.Lecturer)
                );
             string statusName = "Unknown";
             string categoryName = "Unknown";
-            string lecturerName = "Unknown";
 
             if (course != null)
             {
@@ -143,12 +141,6 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                     var category = await _unitOfWork.CourseCategoryRepository.GetFirstOrDefaultAsync(c => c.Id == course.CategoryId);
                     categoryName = category?.CategoryName ?? "Unknown";
                 }
-
-                if (course.LecturerId > 0)
-                {
-                    var lecturer = await _unitOfWork.LecturerRepository.GetFirstOrDefaultAsync(l => l.Id == course.LecturerId);
-                    lecturerName = lecturer?.FullName ?? "Unknown";
-                }
             }
 
             // Kiểm tra xem Status có thay đổi trong Changes không
@@ -156,7 +148,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 auditLog.Changes!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             bool hasStatusChange = changes?.OldValues?.ContainsKey("StatusId") == true || changes?.NewValues?.ContainsKey("StatusId") == true;
 
-            return (statusName, categoryName, lecturerName, hasStatusChange);
+            return (statusName, categoryName, hasStatusChange);
         }
 
         private async Task AddFieldsForAddedActionAsync(
@@ -167,7 +159,6 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             Dictionary<string, string> userDict,
             string statusName,
             string categoryName,
-            string lecturerName,
             List<string> currentDepartmentIds,
             List<string> currentELevelIds)
         {
@@ -218,7 +209,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                 });
             }
 
-            // Thêm StatusName, CategoryName, LecturerName vào AddedFields
+            // Thêm StatusName, CategoryName vào AddedFields
             if (statusName != "Unknown")
             {
                 referenceData.AddedFields.Add(new AddedField { FieldName = "StatusName", Value = statusName });
@@ -226,10 +217,6 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             if (categoryName != "Unknown")
             {
                 referenceData.AddedFields.Add(new AddedField { FieldName = "CategoryName", Value = categoryName });
-            }
-            if (lecturerName != "Unknown")
-            {
-                referenceData.AddedFields.Add(new AddedField { FieldName = "LecturerName", Value = lecturerName });
             }
         }
 
@@ -242,7 +229,7 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             Dictionary<string, string> userDict,
             string statusName,
             string categoryName,
-            string lecturerName, bool hasStatusChange,
+            bool hasStatusChange,
             List<string> previousDepartmentIds,
             List<string> currentDepartmentIds,
             List<string> previousELevelIds,
@@ -263,12 +250,12 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             var previousUserIds = ExtractIdsFromDeletedLogs(deletedUserLogs, "UserId");
 
             // Lấy thông tin trạng thái trước đó
-            var (previousStatusName, previousCategoryName, previousLecturerName) = await GetPreviousCourseDetailsAsync(auditLog, courseId);
+            var (previousStatusName, previousCategoryName) = await GetPreviousCourseDetailsAsync(auditLog, courseId);
 
             // So sánh và thêm vào ChangedFields
             await AddChangedFieldsAsync(referenceData, courseId, departmentDict, ELevelDict, userDict,
                 previousDepartmentIds, currentDepartmentIds, previousELevelIds, currentELevelIds, previousUserIds,
-                statusName, previousStatusName, categoryName, previousCategoryName, lecturerName, previousLecturerName, hasStatusChange);
+                statusName, previousStatusName, categoryName, previousCategoryName,  hasStatusChange);
         }
 
         private List<string> ExtractIdsFromAddedLogs(List<AuditLog> logs, string idFieldName)
@@ -339,25 +326,22 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             return ids;
         }
 
-        private async Task<(string statusName, string categoryName, string lecturerName)> GetPreviousCourseDetailsAsync(AuditLog auditLog, string courseId)
+        private async Task<(string statusName, string categoryName)> GetPreviousCourseDetailsAsync(AuditLog auditLog, string courseId)
         {
             string previousStatusName = "Unknown";
             string previousCategoryName = "Unknown";
-            string previousLecturerName = "Unknown";
 
             // Truy vấn bảng Courses để lấy trạng thái trước đó
             var previousCourse = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
                 predicate: c => c.Id.ToString() == courseId && c.UpdatedAt < auditLog.Timestamp,
                 includes: p => p
                     .Include(a => a.Category)
-                    .Include(a => a.Status)
-                    .Include(a => a.Lecturer));
+                    .Include(a => a.Status));
 
             if (previousCourse != null)
             {
                 previousStatusName = previousCourse.Status?.StatusName ?? "Unknown";
                 previousCategoryName = previousCourse.Category?.CategoryName ?? "Unknown";
-                previousLecturerName = previousCourse.Lecturer?.FullName ?? "Unknown";
             }
             else
             {
@@ -386,17 +370,10 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                         var previousCategory = await _unitOfWork.CourseCategoryRepository.GetFirstOrDefaultAsync(c => c.Id.ToString() == previousCategoryId);
                         previousCategoryName = previousCategory?.CategoryName ?? "Unknown";
                     }
-
-                    if (previousChanges?.NewValues?.ContainsKey("LecturerId") == true)
-                    {
-                        var previousLecturerId = previousChanges.NewValues["LecturerId"]?.ToString();
-                        var previousLecturer = await _unitOfWork.LecturerRepository.GetFirstOrDefaultAsync(l => l.Id.ToString() == previousLecturerId);
-                        previousLecturerName = previousLecturer?.FullName ?? "Unknown";
-                    }
                 }
             }
 
-            return (previousStatusName, previousCategoryName, previousLecturerName);
+            return (previousStatusName, previousCategoryName);
         }
 
         private async Task AddChangedFieldsAsync(
@@ -414,8 +391,6 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
             string previousStatusName,
             string categoryName,
             string previousCategoryName,
-            string lecturerName,
-            string previousLecturerName,
             bool hasStatusChange)
         {
             // Lấy danh sách tên hiện tại
@@ -507,16 +482,6 @@ namespace QLDT_Becamex.Src.Application.Features.AuditLogs.DataProvider
                     FieldName = "CategoryName",
                     OldValue = previousCategoryName,
                     NewValue = categoryName
-                });
-            }
-
-            if (lecturerName != previousLecturerName)
-            {
-                referenceData.ChangedFields.Add(new ChangedField
-                {
-                    FieldName = "LecturerName",
-                    OldValue = previousLecturerName,
-                    NewValue = lecturerName
                 });
             }
 

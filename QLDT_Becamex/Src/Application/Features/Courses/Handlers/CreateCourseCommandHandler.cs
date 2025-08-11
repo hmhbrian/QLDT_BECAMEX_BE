@@ -62,13 +62,6 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     throw new AppException("Loại khóa học không hợp lệ", 400);
             }
 
-            if (dto.LecturerId.HasValue)
-            {
-                var lecturerExists = await _unitOfWork.LecturerRepository.AnyAsync(s => s.Id == dto.LecturerId.Value);
-                if (!lecturerExists)
-                    throw new AppException("Giảng viên khóa học không hợp lệ", 400);
-            }
-
             if (dto.DepartmentIds != null && dto.DepartmentIds.Any())
             {
                 var allDepartmentIds = new HashSet<int>();

@@ -108,7 +108,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 userName = user?.FullName ?? "Unknown User",
                 courseId = course.Id.ToString(),
                 courseName = course.Name,
-                progressPercentage = (float)Math.Round(await GetCourseProgress(courseId, userId), 1),
+                progressPercentage = (float)Math.Round(await GetCourseProgress(courseId, userId)),
                 Status = userCourse.Status != null ? userCourse.Status : "Assigned",
                 LessonProgress = lessonsProgressDtos,
                 TestScore = testsProgressDtos

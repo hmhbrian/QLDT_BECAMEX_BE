@@ -60,7 +60,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 };
             };
             var courses = (await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                predicate: predicate, // Use the adjusted predicate here
+                predicate: predicate,
                 orderBy: orderBy,
                 page: queryParam.Page,
                 pageSize: queryParam.Limit,

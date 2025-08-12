@@ -40,8 +40,8 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             else
             {
                 // Default for unknown roles or no role: same as USER (or stricter if needed)
-                basePredicate = c => c.IsDeleted == false && c.IsPrivate == false && c.Status.Key > 0
-                && !c.UserCourses.Any();
+                basePredicate = c => c.IsDeleted == false && c.IsPrivate == false && c.Status.Key == 1
+                && !c.UserCourses.Any(uc => uc.UserId == currentUserId);
             }
 
             int totalItems = await _unitOfWork.CourseRepository.CountAsync(basePredicate);

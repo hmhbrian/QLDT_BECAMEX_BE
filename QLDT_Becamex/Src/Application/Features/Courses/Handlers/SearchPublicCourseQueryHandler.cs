@@ -37,7 +37,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (role == ConstantRole.HOCVIEN)
             {
                 // Default for unknown roles or no role: same as USER (or stricter if needed)
-                predicate = predicate.And( c => c.IsDeleted == false && c.IsPrivate == false && c.Status!.Key == 1
+                predicate = predicate.And( c => c.IsDeleted == false && c.IsPrivate == false && c.Status!.Key > 0
                 && !c.UserCourses!.Any(uc => uc.UserId == currentUserId));
             }
 

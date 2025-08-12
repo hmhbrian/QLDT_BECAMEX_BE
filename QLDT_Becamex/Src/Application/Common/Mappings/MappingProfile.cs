@@ -54,6 +54,9 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
 
             CreateMap<ApplicationUser, UserSumaryDto>();
+            CreateMap<ApplicationUser, ManagerDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
             //UserStatus
             CreateMap<UserStatus, UserStatusDto>().ReverseMap();

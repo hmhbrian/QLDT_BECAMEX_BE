@@ -89,6 +89,12 @@ namespace QLDT_Becamex.Src.Controllers
             return Ok(ApiResponse.Ok(result));
 
         }
+        [HttpPost("{courseId}/cancel-enroll")]
+        public async Task<IActionResult> CancelEnrollCourse(string courseId)
+        {
+            var result = await _mediator.Send(new CancelEnrollCourseCommand(courseId));
+            return Ok(ApiResponse.Ok(result));
+        }
 
         [HttpGet("enroll-courses")]
         [Authorize(Roles = "ADMIN,HR,HOCVIEN")]

@@ -46,6 +46,7 @@ namespace QLDT_Becamex.Src.Application.Features.Departments.Handlers
                     var user = await _unitOfWork.UserRepository.GetFirstOrDefaultAsync(u => u.DepartmentId == Department.DepartmentId);
                     if (user != null)
                     {
+                        Console.WriteLine("Không thể xóa vì còn tồn tại user trong phòng ban");
                         throw new AppException("Không thể xóa vì còn tồn tại user trong phòng ban", 409);
                     }
                     

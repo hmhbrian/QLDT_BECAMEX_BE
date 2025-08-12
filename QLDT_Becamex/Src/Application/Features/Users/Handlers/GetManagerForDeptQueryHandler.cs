@@ -32,7 +32,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
 
             //Lấy user là Manager và chưa có trong department
             var users = (await _unitOfWork.UserRepository.GetFlexibleAsync(
-                predicate: u => u.ELevelId >= 4 && !departmentUserIds.Contains(u.Id),
+                predicate: u => u.ELevelId >= 4 && u.IsDeleted == false && !departmentUserIds.Contains(u.Id),
                 asNoTracking: true
             )).ToList();
 

@@ -49,17 +49,24 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             {
                 throw new AppException("Bạn chưa ghi danh khóa học này.", 400); // Conflict
             }
+            else
+            {
+                if (enrollCourse.Optional == 1)
+                {
+                    throw new AppException("Bạn là học viên bắt buộc của khóa học này nên không thể hủy đăng ký.", 400);
+                }
+            }
 
             // 4. Check enrollment conditions (e.g., registration date, max participants)
             if (course.RegistrationClosingDate.HasValue && course.RegistrationClosingDate.Value < DateTime.Now)
             {
                 throw new AppException("Đã hết thời gian hủy đăng ký cho khóa học này.", 400);
             }
-            
+
             _unitOfWork.UserCourseRepository.Remove(enrollCourse);
             await _unitOfWork.CompleteAsync(); // Commit the transaction
 
-            return "Hủy tham gia khóa học thành công";
+            return "Hủy đăng kí khóa học thành công";
         }
     }
 }

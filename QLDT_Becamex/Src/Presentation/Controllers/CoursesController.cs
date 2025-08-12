@@ -151,5 +151,15 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new GetDetailUserCoursesProgressQuery(userId, courseId));
             return Ok(ApiResponse<DetailedUserCourseProgressDto>.Ok(result));
         }
+
+        /// <summary>
+        /// Tìm kiếm khóa học công khai theo tên.
+        /// </summary>
+        [HttpGet("search-public-course")]
+        public async Task<IActionResult> SearchPublicCourses([FromQuery] BaseQueryParamSearch queryParam)
+        {
+            var result = await _mediator.Send(new SearchPublicCourseQuery(queryParam));
+            return Ok(ApiResponse<PagedResult<CourseDto>>.Ok(result));
+        }
     }
 }

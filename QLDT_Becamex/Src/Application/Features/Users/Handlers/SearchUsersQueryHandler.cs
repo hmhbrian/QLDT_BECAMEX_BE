@@ -8,8 +8,10 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Status.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Queries;
+using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Shared.Helpers;
 using System.Linq;
 using System.Linq.Expressions;
@@ -21,16 +23,19 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
 
-        public SearchUsersQueryHandler(UserManager<ApplicationUser> userManager, IMapper mapper, IUnitOfWork unitOfWork)
+        public SearchUsersQueryHandler(UserManager<ApplicationUser> userManager, IMapper mapper, IUnitOfWork unitOfWork, IUserService userService)
         {
             _userManager = userManager;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _userService = userService;
         }
 
         public async Task<PagedResult<UserDto>> Handle(SearchUsersQuery request, CancellationToken cancellationToken)
         {
+            var (_,role) = _userService.GetCurrentUserAuthenticationInfo();
             var queryParams = request.QueryParam;
 
             // 1. Lấy user chưa xoá
@@ -40,7 +45,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 var keyword = StringHelper.RemoveDiacritics(request.Keyword).ToUpperInvariant().Replace(" ", "");
-                predicate = predicate.And(u => u.NormalizedFullName!.Contains(keyword) || u.Email!.Contains(keyword));
+                predicate = predicate.And(u => u.NormalizedFullName!.Contains(keyword) || u.Email!.Contains(keyword) || u.FullName!.Contains(request.Keyword));
             }
 
             //3. Đếm tổng số bản ghi
@@ -80,13 +85,24 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Handlers
                 if (user != null)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
+
+                    if (role == ConstantRole.ADMIN && roles.Contains(ConstantRole.ADMIN))
+                        continue; // Bỏ qua ADMIN nếu người dùng hiện tại là ADMIN
+                    if (role == ConstantRole.MANAGER && (roles.Contains(ConstantRole.MANAGER) || roles.Contains(ConstantRole.ADMIN)))
+                        continue; // Bỏ qua HR và ADMIN nếu người dùng hiện tại là HR
+
                     userRoles[userId] = roles.FirstOrDefault();
                 }
             }
 
+            // Lọc userDtos và gán Role
+            userDtos = userDtos
+                .Where(dto => userRoles.ContainsKey(dto.Id))
+                .ToList();
+
             foreach (var dto in userDtos)
             {
-                dto.Role = userRoles.GetValueOrDefault(dto.Id);
+                dto.Role = userRoles[dto.Id];
             }
 
 

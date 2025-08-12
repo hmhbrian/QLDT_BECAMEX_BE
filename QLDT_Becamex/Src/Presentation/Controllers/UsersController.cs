@@ -131,6 +131,15 @@ namespace QLDT_Becamex.Src.Controllers
 
         }
 
+        [HttpGet("manager-dept")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> GetListManager()
+        {
+            var result = await _mediator.Send(new GetManagerForDeptQuery());
+            return Ok(ApiResponse<List<ManagerDto>>.Ok(result));
+
+        }
+
         /// <summary>
         /// Đổi mật khẩu của người dùng đang đăng nhập.
         /// </summary>

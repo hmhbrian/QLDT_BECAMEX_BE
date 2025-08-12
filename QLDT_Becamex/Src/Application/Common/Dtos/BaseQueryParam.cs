@@ -49,4 +49,9 @@ namespace QLDT_Becamex.Src.Application.Common.Dtos
         public string? FromDate { get; set; }
         public string? ToDate { get; set; }
     }
+
+    public class BaseQueryParamSearch : BaseQueryParam
+    {
+        public string? Keyword { get; set; }
+    }
 }

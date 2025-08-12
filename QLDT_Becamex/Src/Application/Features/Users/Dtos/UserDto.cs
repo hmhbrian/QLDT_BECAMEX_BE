@@ -27,7 +27,7 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
         public DateTime? StartWork { get; set; }
         public DateTime? EndWork { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public DateTime? ModifedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
         public string? AccessToken { get; set; } = null;
     }
 

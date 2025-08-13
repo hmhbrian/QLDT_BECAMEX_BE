@@ -26,48 +26,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         public async Task<PagedResult<CourseDto>> Handle(SearchCoursesQuery request, CancellationToken cancellationToken)
         {
             var queryParam = request.QueryParam;
-            Expression<Func<Course, bool>>? predicate = c => c.IsDeleted == false;
-
-            // StatusIds
-            var statusIds = !string.IsNullOrEmpty(queryParam.StatusIds)
-                ? new HashSet<int>(queryParam.StatusIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
-                : null;
-            if (statusIds?.Count > 0)
-                predicate = predicate.And(c => statusIds.Contains(c.Status!.Id));
-
-            // DepartmentIds
-            var deptIds = !string.IsNullOrEmpty(queryParam.DepartmentIds)
-                ? new HashSet<int>(queryParam.DepartmentIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
-                : null;
-            if (deptIds?.Count > 0)
-                predicate = predicate.And(c => c.CourseDepartments != null && c.CourseDepartments.Any(cd => deptIds.Contains(cd.DepartmentId)));
-
-            // ELevelIds
-            var eLevelIds = !string.IsNullOrEmpty(queryParam.ELevelIds)
-                ? new HashSet<int>(queryParam.ELevelIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
-                : null;
-            if (eLevelIds?.Count > 0)
-                predicate = predicate.And(c => c.CourseELevels != null && c.CourseELevels.Any(cp => eLevelIds.Contains(cp.ELevelId)));
-
-            // CategoryIds
-            var categoryIds = !string.IsNullOrEmpty(queryParam.CategoryIds)
-                ? new HashSet<int>(queryParam.CategoryIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
-                : null;
-            if (categoryIds?.Count > 0)
-                predicate = predicate.And(c => categoryIds.Contains(c.Category!.Id));
-
-
-            // Filter by CreatedAt
-            if (!string.IsNullOrEmpty(queryParam.FromDate) || !string.IsNullOrEmpty(queryParam.ToDate))
-            {
-                DateTime.TryParseExact(queryParam.FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fromDate);
-                DateTime.TryParseExact(queryParam.ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var toDate);
-                toDate = toDate == default ? DateTime.MaxValue : toDate.AddDays(1).AddTicks(-1);
-                fromDate = fromDate == default ? DateTime.MinValue : fromDate;
-
-                Expression<Func<Course, bool>> datePredicate = c => c.CreatedAt >= fromDate && c.CreatedAt <= toDate;
-                predicate = predicate == null ? datePredicate : predicate.And(datePredicate);
-            }
+            var predicate = BuildPredicate(queryParam);
 
             // Keyword
             if (!string.IsNullOrEmpty(queryParam.Keyword))
@@ -117,6 +76,55 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 pagination: pagination);
             return result;
 
+        }
+
+        private Expression<Func<Course, bool>> BuildPredicate(BaseQueryParamFilter queryParam)
+        {
+            // Khởi tạo predicate cơ bản: chỉ lấy các Course chưa bị xóa (IsDeleted = false)
+            Expression<Func<Course, bool>>? predicate = c => c.IsDeleted == false;
+
+            // StatusIds
+            var statusIds = !string.IsNullOrEmpty(queryParam.StatusIds)
+                ? new HashSet<int>(queryParam.StatusIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (statusIds?.Count > 0)
+                predicate = predicate.And(c => statusIds.Contains(c.Status!.Id));
+
+            // DepartmentIds
+            var deptIds = !string.IsNullOrEmpty(queryParam.DepartmentIds)
+                ? new HashSet<int>(queryParam.DepartmentIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (deptIds?.Count > 0)
+                predicate = predicate.And(c => c.CourseDepartments != null && c.CourseDepartments.Any(cd => deptIds.Contains(cd.DepartmentId)));
+
+            // ELevelIds
+            var eLevelIds = !string.IsNullOrEmpty(queryParam.ELevelIds)
+                ? new HashSet<int>(queryParam.ELevelIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (eLevelIds?.Count > 0)
+                predicate = predicate.And(c => c.CourseELevels != null && c.CourseELevels.Any(cp => eLevelIds.Contains(cp.ELevelId)));
+
+            // CategoryIds
+            var categoryIds = !string.IsNullOrEmpty(queryParam.CategoryIds)
+                ? new HashSet<int>(queryParam.CategoryIds.Split(',').Select(s => int.TryParse(s.Trim(), out var id) ? id : -1).Where(id => id != -1))
+                : null;
+            if (categoryIds?.Count > 0)
+                predicate = predicate.And(c => categoryIds.Contains(c.Category!.Id));
+
+
+            // Filter by CreatedAt
+            if (!string.IsNullOrEmpty(queryParam.FromDate) || !string.IsNullOrEmpty(queryParam.ToDate))
+            {
+                DateTime.TryParseExact(queryParam.FromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fromDate);
+                DateTime.TryParseExact(queryParam.ToDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var toDate);
+                toDate = toDate == default ? DateTime.MaxValue : toDate.AddDays(1).AddTicks(-1);
+                fromDate = fromDate == default ? DateTime.MinValue : fromDate;
+
+                Expression<Func<Course, bool>> datePredicate = c => c.CreatedAt >= fromDate && c.CreatedAt <= toDate;
+                predicate = predicate == null ? datePredicate : predicate.And(datePredicate);
+            }
+
+            return predicate;
         }
     }
 }

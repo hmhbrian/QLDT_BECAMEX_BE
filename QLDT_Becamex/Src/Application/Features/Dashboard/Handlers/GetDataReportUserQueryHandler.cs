@@ -62,7 +62,7 @@ namespace QLDT_Becamex.Src.Application.Features.Dashboard.Handlers
             {
                 NumberRegisteredCourse = numberregisteredcourse,
                 NumberCompletedCourse = numbercompletedcourse,
-                AverangeCompletedPercentage = AverangeCompleted / 100
+                AverangeCompletedPercentage = AverangeCompleted
             };
         }
 
@@ -110,7 +110,7 @@ namespace QLDT_Becamex.Src.Application.Features.Dashboard.Handlers
                 totalProgress += lessonProgress;
             }
 
-            float overallProgress = totalProgress / totalLessons * 100f;
+            float overallProgress = totalProgress / totalLessons;
             return overallProgress;
         }
         private async Task<float> CalculateTestsProgressAsync(string courseId, string userId)
@@ -141,7 +141,7 @@ namespace QLDT_Becamex.Src.Application.Features.Dashboard.Handlers
                 }
             }
 
-            float overallProgress = (totalProgress / totalTests) * 100f;
+            float overallProgress = totalProgress / totalTests;
             return overallProgress;
         }
 

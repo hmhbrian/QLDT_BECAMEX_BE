@@ -26,7 +26,8 @@ namespace QLDT_Becamex.Src.Application.Features.Users.Dtos
 
         public int? StatusId { get; set; }
 
-        [StringLength(50, ErrorMessage = "Number phone cannot exceed 50 characters.")]
+        [Required(ErrorMessage = "PhoneNumber is require")]
+        [StringLength(10, ErrorMessage = "Number phone cannot exceed 10 characters.")]
         public string? NumberPhone { get; set; } = null;
         public DateTime? StartWork { get; set; } = DateTime.Now;
         public DateTime? EndWork { get; set; }

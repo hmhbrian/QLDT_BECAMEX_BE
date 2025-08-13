@@ -7,6 +7,7 @@ using QLDT_Becamex.Src.Application.Features.Certificates.Commands;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
+using QLDT_Becamex.Src.Shared.Helpers;
 using SelectPdf;
 
 namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
@@ -63,7 +64,7 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
                 {
                     UserId = currentUser.Id,
                     CourseId = course.Id,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.GetVietnamTimeNow(),
                     CertificateUrl = certificateUrl
                 };
 

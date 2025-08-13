@@ -51,7 +51,7 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
             // Kiểm tra nếu user đã hoàn thành khóa học (lessons + passed all tests)
             if (isFinish)
             {
-                var isExistCert = await _unitOfWork.CertificatesRepository.AnyAsync(c => c.CourseId == course.Id);
+                var isExistCert = await _unitOfWork.CertificatesRepository.AnyAsync(c => c.CourseId == course.Id && c.UserId == currentUserId);
 
                 if (isExistCert)
                 {

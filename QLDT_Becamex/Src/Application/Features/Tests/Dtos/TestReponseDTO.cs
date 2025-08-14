@@ -14,6 +14,8 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Dtos
         public int TimeTest { get; set; }
         public int CountQuestion { get; set; }
         public bool IsDone { get; set; }
+        public float Score { get; set; }
+        public bool IsPassed { get; set; }
         public UserSumaryDto? CreatedBy { get; set; }
         public UserSumaryDto? UpdatedBy { get; set; }
     }

@@ -36,7 +36,7 @@ namespace QLDT_Becamex.Src.Application.Features.LessonProgresses.Handlers
 
                 if (currentPage > 0 && currentPage == existingLesson.TotalPages)
                     isCompleted = true; // Nếu CurrentPage bằng tổng số trang thì đánh dấu là hoàn thành
-                else if (currentTime > 0 && Math.Abs((existingLesson.TotalDurationSeconds ?? 0) - (currentTime ?? 0)) < 3)
+                else if (currentTime > 0 && Math.Abs((existingLesson.TotalDurationSeconds ?? 0) - (currentTime ?? 0)) < 5)
                     isCompleted = true; // Nếu CurrentTimeSecond lớn hơn hoặc bằng tổng thời gian thì đánh dấu là hoàn thành
             }
             else

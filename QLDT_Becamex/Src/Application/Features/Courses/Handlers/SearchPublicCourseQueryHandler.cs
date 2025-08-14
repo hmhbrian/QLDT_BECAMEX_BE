@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,11 +35,33 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var queryParam = request.QueryParam;
             Expression<Func<Course, bool>>? predicate = c => c.IsDeleted == false;
 
+            if(currentUserId ==  null)
+                throw new AppException($"Người dùng không tồn tại", 404);
+            var currentUser = await _unitOfWork.UserRepository.GetByIdAsync(currentUserId);
+            
             if (role == ConstantRole.HOCVIEN)
             {
                 // Default for unknown roles or no role: same as USER (or stricter if needed)
                 predicate = predicate.And( c => c.IsDeleted == false && c.IsPrivate == false && c.Status!.Key > 0
                 && !c.UserCourses!.Any(uc => uc.UserId == currentUserId));
+            }
+
+            if (currentUser?.DepartmentId != null)
+            {
+                predicate = predicate.And(c =>
+                    c.CourseDepartments == null
+                    || !c.CourseDepartments.Any() // không gán phòng ban nào
+                    || c.CourseDepartments.Any(cd => cd.DepartmentId == currentUser.DepartmentId)
+                );
+            }
+
+            if (currentUser?.ELevelId != null)
+            {
+                predicate = predicate.And(c =>
+                    c.CourseELevels == null
+                    || !c.CourseELevels.Any() // không gán ELevel nào
+                    || c.CourseELevels.Any(ce => ce.ELevelId == currentUser.ELevelId)
+                );
             }
 
             // Keyword
@@ -50,30 +73,15 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             int totalItems = await _unitOfWork.CourseRepository.CountAsync(predicate);
 
-            Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderBy = q =>
-            {
-                bool isDesc = queryParam.SortType?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true;
-                return queryParam.SortField?.ToLower() switch
-                {
-                    "created.at" => isDesc ? q.OrderByDescending(c => c.CreatedAt) : q.OrderBy(c => c.CreatedAt),
-                    _ => q.OrderBy(c => c.CreatedAt)
-                };
-            };
+
             var courses = (await _unitOfWork.CourseRepository.GetFlexibleAsync(
                 predicate: predicate,
-                orderBy: orderBy,
+                orderBy: q => q.OrderByDescending(c => c.RegistrationClosingDate),
                 page: queryParam.Page,
                 pageSize: queryParam.Limit,
                 asNoTracking: true,
                 includes: q => q
-                    .Include(c => c.CourseDepartments)!
-                        .ThenInclude(cd => cd.Department)
-                    .Include(c => c.CourseELevels)!
-                        .ThenInclude(cp => cp.ELevel)
                     .Include(c => c.Status)
-                    .Include(c => c.Category)
-                    .Include(c => c.CreateBy)
-                    .Include(c => c.UpdateBy)
             )).ToList();
 
             var courseDtos = _mapper.Map<List<CourseDto>>(courses);

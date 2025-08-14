@@ -67,10 +67,15 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 
             foreach (var testDto in dto)
             {
-                bool isExist = await _unitOfWork.TestResultRepository
-                    .AnyAsync(tr => tr.UserId == currentUserId && tr.TestId == testDto.Id);
-
-                testDto.IsDone = isExist; // ✅ Gán thẳng vào DTO
+                var isExist = await _unitOfWork.TestResultRepository
+                    .GetFirstOrDefaultAsync(tr => tr.UserId == currentUserId && tr.TestId == testDto.Id);
+                if(isExist != null)
+                {
+                    testDto.IsDone = true; // ✅ Gán thẳng vào DTO
+                    testDto.IsPassed = isExist.IsPassed;
+                    testDto.Score = isExist.Score > 0 ? (float)isExist.Score : 0;
+                }    
+                   
             }
 
 

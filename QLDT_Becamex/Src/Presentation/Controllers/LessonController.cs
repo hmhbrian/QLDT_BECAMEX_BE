@@ -106,7 +106,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
             return Ok(ApiResponse.Ok("Position updated successfully."));
         }
         [HttpGet("count-completed")]
-        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
+        [Authorize(Roles = "HOCVIEN")]
         public async Task<IActionResult> GetCountCompletedLessonOfCourse([FromRoute] string courseId)
         {
             var result = await _mediator.Send(new GetCountCompletedLessonOfCourseQuery(courseId));

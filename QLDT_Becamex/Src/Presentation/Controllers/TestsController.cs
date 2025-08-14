@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lessons.Commands;
+using QLDT_Becamex.Src.Application.Features.Lessons.Queries;
 using QLDT_Becamex.Src.Application.Features.Tests.Commands;
 using QLDT_Becamex.Src.Application.Features.Tests.Dtos;
 using QLDT_Becamex.Src.Application.Features.Tests.Queries;
@@ -109,6 +110,14 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
         {
             var result = await _mediator.Send(new GetTestNoAnswerQuery(courseId, testId));
             return Ok(ApiResponse<List<QuestionNoAnswerDto>>.Ok(result));
+        }
+
+        [HttpGet("count-completed")]
+        [Authorize(Roles = "HOCVIEN")]
+        public async Task<IActionResult> GetCountCompletedTestOfCourse([FromRoute] string courseId)
+        {
+            var result = await _mediator.Send(new GetCountCompletedTestOfCourseQuery(courseId));
+            return Ok(ApiResponse<int>.Ok(result));
         }
     }
 }

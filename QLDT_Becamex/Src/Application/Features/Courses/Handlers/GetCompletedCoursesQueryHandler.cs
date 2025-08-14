@@ -58,7 +58,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             };
             // 3. Lấy dữ liệu có phân trang
             var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                predicate: c => c.UserCourses != null && c.UserCourses.Any(uc => uc.UserId == userId && uc.Status == "Completed") && !c.IsDeleted,
+                predicate: c => c.UserCourses != null && c.UserCourses.Any(uc => uc.UserId == userId && uc.Status == 3) && !c.IsDeleted,
                 orderBy: courseOrderByFunc,
                 page: queryParams.Page,
                 pageSize: queryParams.Limit,

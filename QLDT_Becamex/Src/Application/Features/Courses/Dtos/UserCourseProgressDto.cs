@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
     {
         public string courseId { get; set; } = null!;
         public string courseName { get; set; } = null!;
-        public string Status { get; set; } = null!;
+        public int Status { get; set; }
         public List<LessonProgressDto> LessonProgress { get; set; } = new List<LessonProgressDto>();
         public List<TestScoreDto> TestScore { get; set; } = new List<TestScoreDto>();
     }

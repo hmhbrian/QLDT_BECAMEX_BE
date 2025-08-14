@@ -2,6 +2,7 @@ using AutoMapper;
 using MediatR;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
+using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 
@@ -33,7 +34,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 throw new AppException("Người dùng không hợp lệ", 400);
             }
             // Tính toán tiến độ bài học
-            return await GetCourseProgress(request, userId);
+            return await GetCourseProgress(request.Id, userId);
         }
         private async Task<float> CalculateLessonsProgressAsync(string courseId, string userId)
         {
@@ -111,25 +112,25 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             float overallProgress = (totalProgress / totalTests) * 100f;
             return overallProgress;
         }
-        public async Task<float> GetCourseProgress(GetCourseProgressQuery request, string userId)
+        public async Task<float> GetCourseProgress(string courseId, string userId)
         {
-            var lessonsProgress = await CalculateLessonsProgressAsync(request.Id, userId);
+            var lessonsProgress = await CalculateLessonsProgressAsync(courseId, userId);
             // Tính toán tiến độ bài kiểm tra
-            var testsProgress = await CalculateTestsProgressAsync(request.Id, userId);
+            var testsProgress = await CalculateTestsProgressAsync(courseId, userId);
+            var lessons = await _unitOfWork.LessonRepository
+                .GetFlexibleAsync(c => c.CourseId == courseId);
+            var tests = await _unitOfWork.TestRepository
+                .GetFlexibleAsync(t => t.CourseId == courseId);
+            float count = (float)lessons.Count() + (float)tests.Count();
+            Console.WriteLine($"Lessons Progress: {lessonsProgress}, Tests Progress: {testsProgress}, Count: {count}, Course Count: {lessons.Count()}, Test Count: {tests.Count()}");
             // Tính toán tổng tiến độ
-            float overallProgress = 0.0f;
-            if (lessonsProgress == 0.0f) 
-                overallProgress = testsProgress;
-            else if (testsProgress == 0.0f)
-                overallProgress = lessonsProgress;
-            else
-                overallProgress = (lessonsProgress + testsProgress) / 2.0f;
+            float overallProgress = (lessonsProgress * (float)lessons.Count() + testsProgress * (float)tests.Count()) / count;
             if (float.IsNaN(overallProgress) || float.IsInfinity(overallProgress))
             {
                 return 0.0f; // Trả về 0 nếu tiến độ không hợp lệ
             }
             var userCourse = await _unitOfWork.UserCourseRepository
-                .GetFirstOrDefaultAsync(uc => uc.UserId == userId && uc.CourseId == request.Id);
+                .GetFirstOrDefaultAsync(uc => uc.UserId == userId && uc.CourseId == courseId);
             if (userCourse == null)
             {   
                 throw new AppException("Khóa học không tồn tại cho người dùng", 404);
@@ -137,19 +138,31 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (overallProgress == 100.0f)
             {
                 // Nếu tiến độ là 100%, đánh dấu khóa học là hoàn thành
-                userCourse.Status = "Completed";
+                userCourse.Status = ConstantStatus.COMPLETED;
                 await _unitOfWork.CompleteAsync();
             }
             else if (overallProgress > 0.0f && overallProgress < 100.0f)
             {
                 // Nếu tiến độ từ 0 đến 100, đánh dấu khóa học là đang tiến hành
-                userCourse.Status = "In Progress";
-                await _unitOfWork.CompleteAsync();
+                var lessonProgresses = await _unitOfWork.LessonProgressRepository
+                        .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseId);
+                var testResults = await _unitOfWork.TestResultRepository
+                        .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test!.CourseId == courseId);
+                if (lessonProgresses.Count() == lessons.Count() && testResults.Count() == tests.Count())
+                {
+                    userCourse.Status = ConstantStatus.FAILED;
+                    await _unitOfWork.CompleteAsync();
+                }
+                else
+                {
+                    userCourse.Status = ConstantStatus.INPROGRESS;
+                    await _unitOfWork.CompleteAsync();
+                }
             }
             else if (overallProgress == 0.0f)
             {
                 // Nếu tiến độ là 0, đánh dấu khóa học là chưa bắt đầu
-                userCourse.Status = "Assigned";
+                userCourse.Status = ConstantStatus.ASSIGNED;
                 await _unitOfWork.CompleteAsync();
             }
             return overallProgress;

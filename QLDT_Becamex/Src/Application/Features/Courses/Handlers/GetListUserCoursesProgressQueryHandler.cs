@@ -7,6 +7,7 @@ using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
+using QLDT_Becamex.Src.Constant;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -172,19 +173,31 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (overallProgress == 100.0f)
             {
                 // Nếu tiến độ là 100%, đánh dấu khóa học là hoàn thành
-                userCourse.Status = "Completed";
+                userCourse.Status = ConstantStatus.COMPLETED;
                 await _unitOfWork.CompleteAsync();
             }
             else if (overallProgress > 0.0f && overallProgress < 100.0f)
             {
                 // Nếu tiến độ từ 0 đến 100, đánh dấu khóa học là đang tiến hành
-                userCourse.Status = "In Progress";
-                await _unitOfWork.CompleteAsync();
+                var lessonProgresses = await _unitOfWork.LessonProgressRepository
+                        .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseId);
+                var testResults = await _unitOfWork.TestResultRepository
+                        .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test!.CourseId == courseId);
+                if (lessonProgresses.Count() == lessons.Count() && testResults.Count() == tests.Count())
+                {
+                    userCourse.Status = ConstantStatus.FAILED;
+                    await _unitOfWork.CompleteAsync();
+                }
+                else
+                {
+                    userCourse.Status = ConstantStatus.INPROGRESS;
+                    await _unitOfWork.CompleteAsync();
+                }
             }
             else if (overallProgress == 0.0f)
             {
                 // Nếu tiến độ là 0, đánh dấu khóa học là chưa bắt đầu
-                userCourse.Status = "Assigned";
+                userCourse.Status = ConstantStatus.ASSIGNED;
                 await _unitOfWork.CompleteAsync();
             }
             return overallProgress;

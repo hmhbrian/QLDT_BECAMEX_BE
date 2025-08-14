@@ -40,7 +40,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 {
                     continue;
                 }
-                if (userCourse.Status == "Completed")
+                if (userCourse.Status == 3)
                     count++;
             }
             return count;

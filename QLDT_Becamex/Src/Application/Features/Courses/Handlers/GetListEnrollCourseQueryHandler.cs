@@ -71,6 +71,20 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             {
                 float lessonsProgress = await GetCourseProgress(courseDto.Id, userId);
                 courseDto.progressPercentage = (float)Math.Round(lessonsProgress);
+
+                var lessons = await _unitOfWork.LessonRepository
+                    .GetFlexibleAsync(l => l.CourseId == courseDto.Id);
+                var lessonProgresses = await _unitOfWork.LessonProgressRepository
+                    .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseDto.Id);
+                courseDto.TotalLessonCount = lessons.Count();
+                courseDto.LessonCompletedCount = lessonProgresses.Count(lp => lp.IsCompleted);
+                
+                var tests = await _unitOfWork.TestRepository
+                    .GetFlexibleAsync(t => t.CourseId == courseDto.Id);
+                var testResults = await _unitOfWork.TestResultRepository
+                    .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test != null && tr.Test.CourseId == courseDto.Id);
+                courseDto.TotalTestCount = tests.Count();
+                courseDto.TestCompletedCount = testResults.Count(tr => tr.IsPassed);
             }
             var result = new PagedResult<UserEnrollCourseDto>(userEnrollCourseDtos, pagination);
             return result;
@@ -179,19 +193,31 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             if (overallProgress == 100.0f)
             {
                 // Nếu tiến độ là 100%, đánh dấu khóa học là hoàn thành
-                userCourse.Status = "Completed";
+                userCourse.Status = 3;
                 await _unitOfWork.CompleteAsync();
             }
             else if (overallProgress > 0.0f && overallProgress < 100.0f)
             {
                 // Nếu tiến độ từ 0 đến 100, đánh dấu khóa học là đang tiến hành
-                userCourse.Status = "In Progress";
-                await _unitOfWork.CompleteAsync();
+                var lessonProgresses = await _unitOfWork.LessonProgressRepository
+                        .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseId);
+                var testResults = await _unitOfWork.TestResultRepository
+                        .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test!.CourseId == courseId);
+                if (lessonProgresses.Count() == lessons.Count() && testResults.Count() == tests.Count())
+                {
+                    userCourse.Status = 4;
+                    await _unitOfWork.CompleteAsync();
+                }
+                else
+                {
+                    userCourse.Status = 2;
+                    await _unitOfWork.CompleteAsync();
+                }
             }
             else if (overallProgress == 0.0f)
             {
                 // Nếu tiến độ là 0, đánh dấu khóa học là chưa bắt đầu
-                userCourse.Status = "Assigned";
+                userCourse.Status = 1;
                 await _unitOfWork.CompleteAsync();
             }
             return overallProgress;

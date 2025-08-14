@@ -378,9 +378,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                       .HasColumnName("NormalizeCourseName")
                       .HasMaxLength (255);
 
-                entity.Property(p => p.Description)
-                      .HasColumnName("description")
-                      .HasMaxLength(1000);
+                  entity.Property(p => p.Description)
+                        .HasColumnName("description")
+                        .HasColumnType("NVARCHAR(MAX)");
 
                 entity.Property(p => p.ThumbUrl)
                       .HasColumnName("thumb_url")

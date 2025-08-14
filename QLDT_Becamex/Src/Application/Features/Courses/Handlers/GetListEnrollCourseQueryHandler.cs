@@ -78,13 +78,17 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseDto.Id);
                 courseDto.TotalLessonCount = lessons.Count();
                 courseDto.LessonCompletedCount = lessonProgresses.Count(lp => lp.IsCompleted);
-                
+
                 var tests = await _unitOfWork.TestRepository
                     .GetFlexibleAsync(t => t.CourseId == courseDto.Id);
                 var testResults = await _unitOfWork.TestResultRepository
                     .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test != null && tr.Test.CourseId == courseDto.Id);
                 courseDto.TotalTestCount = tests.Count();
                 courseDto.TestCompletedCount = testResults.Count(tr => tr.IsPassed);
+
+                var userCourse = await _unitOfWork.UserCourseRepository
+                    .GetFirstOrDefaultAsync(uc => uc.UserId == userId && uc.CourseId == courseDto.Id);
+                courseDto.Status = userCourse!.Status;
             }
             var result = new PagedResult<UserEnrollCourseDto>(userEnrollCourseDtos, pagination);
             return result;

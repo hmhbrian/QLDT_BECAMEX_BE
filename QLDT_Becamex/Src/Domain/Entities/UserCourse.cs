@@ -8,7 +8,7 @@
         public int Optional { get; set; } = 0; // 0 = tùy chọn && 1 = bắt buộc
         public DateTime? AssignedAt { get; set; }
         public bool IsMandatory { get; set; } = false;// Đánh dấu là bắt buộc
-        public string? Status { get; set; } = null;
+        public int Status { get; set; }
         public ApplicationUser? User { get; set; }
         public Course? Course { get; set; }
         public DateTime CreatedAt { get; set; }

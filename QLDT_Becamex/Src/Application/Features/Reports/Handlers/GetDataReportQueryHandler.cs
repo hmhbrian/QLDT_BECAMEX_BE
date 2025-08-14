@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QLDT_Becamex.Src.Application.Features.Reports.Dtos;
 using QLDT_Becamex.Src.Application.Features.Reports.Queries;
+using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 
@@ -115,7 +116,7 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
                 orderBy: null
             );
             var completedCourses = await _unitOfWork.UserCourseRepository.GetFlexibleAsync(
-                uc => uc.Course != null && !uc.Course.IsDeleted && uc.Status == "Completed",
+                uc => uc.Course != null && !uc.Course.IsDeleted && uc.Status == ConstantStatus.COMPLETED,
                 orderBy: null
             );
 

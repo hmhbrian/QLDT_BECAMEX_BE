@@ -150,7 +150,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     AssignedAt = now,
                     Optional = 1,
                     IsMandatory = true,
-                    Status = "Assigned",
+                    Status = 1,
                     CreatedAt = now,
                     ModifiedAt = now
                 }).ToList();

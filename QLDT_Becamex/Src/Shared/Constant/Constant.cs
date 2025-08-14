@@ -12,9 +12,10 @@
 
     public static class ConstantStatus
     {
-        public const string ASSIGNED = "Assigned";
-        public const string INPROGRESS = "InProgress";
-        public const string COMPLETED = "Completed";
+        public const int ASSIGNED = 1;
+        public const int INPROGRESS = 2;
+        public const int COMPLETED = 3;
+        public const int FAILED = 4;
     }
 
     public static class ConstantRole

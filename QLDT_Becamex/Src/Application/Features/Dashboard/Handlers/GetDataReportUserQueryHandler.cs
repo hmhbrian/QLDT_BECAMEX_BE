@@ -4,6 +4,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Dashboard.Dtos;
 using QLDT_Becamex.Src.Application.Features.Dashboard.Queries;
+using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
@@ -46,7 +47,7 @@ namespace QLDT_Becamex.Src.Application.Features.Dashboard.Handlers
             var userEnrollCourseDtos = _mapper.Map<List<UserEnrollCourseDto>>(courses);
 
             var numberregisteredcourse = (await _unitOfWork.UserCourseRepository.GetFlexibleAsync(p => p.UserId == userId)).ToList().Count();
-            var numbercompletedcourse = (await _unitOfWork.UserCourseRepository.GetFlexibleAsync(p => p.UserId == userId && p.Status == "Completed")).ToList().Count;
+            var numbercompletedcourse = (await _unitOfWork.UserCourseRepository.GetFlexibleAsync(p => p.UserId == userId && p.Status == ConstantStatus.COMPLETED)).ToList().Count;
 
             float progressPercentage = 0;
             foreach (var courseDto in userEnrollCourseDtos)

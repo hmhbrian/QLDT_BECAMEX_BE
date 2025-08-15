@@ -4,9 +4,7 @@ using QLDT_Becamex.Src.Application.Features.Users.Dtos;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using MediatR;
-using System.Threading;
 using QLDT_Becamex.Src.Application.Features.Users.Queries;
-using QLDT_Becamex.Src.Domain.Entities;
 
 
 namespace QLDT_Becamex.Src.Controllers
@@ -101,7 +99,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <param name="rq">Đối tượng chứa thông tin cập nhật.</param>
         /// <returns>ActionResult chứa kết quả của thao tác cập nhật.</returns>
         [HttpPut("admin/{userId}/update")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> UpdateUserByAdmin(string userId, [FromBody] UserAdminUpdateDto rq)
         {
             if (string.IsNullOrEmpty(userId))
@@ -204,7 +202,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <param name="userId">ID của người dùng cần xóa mềm.</param>
         /// <returns>ActionResult chứa kết quả của thao tác xóa mềm.</returns>
         [HttpDelete("{userId}/soft-delete")] // Sửa lại tên endpoint để khớp với mô tả
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> SoftDeleteUser(string userId) // Đổi tên phương thức cho rõ ràng hơn
         {
             if (string.IsNullOrEmpty(userId))
@@ -224,7 +222,7 @@ namespace QLDT_Becamex.Src.Controllers
         /// <param name="userId">ID của người dùng cần xóa mềm.</param>
         /// <returns>ActionResult chứa kết quả của thao tác xóa mềm.</returns>
         [HttpDelete("{userId}/force-delete")] // Sửa lại tên endpoint để khớp với mô tả
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN, HR")]
         public async Task<IActionResult> ForceDeleteUser(string userId) // Đổi tên phương thức cho rõ ràng hơn
         {
             if (string.IsNullOrEmpty(userId))

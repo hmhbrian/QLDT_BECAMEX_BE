@@ -9,6 +9,7 @@
         public DateTime? AssignedAt { get; set; }
         public bool IsMandatory { get; set; } = false;// Đánh dấu là bắt buộc
         public int Status { get; set; }
+        public float PercentComplete { get; set; }
         public ApplicationUser? User { get; set; }
         public Course? Course { get; set; }
         public DateTime CreatedAt { get; set; }

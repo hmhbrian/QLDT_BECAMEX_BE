@@ -9,17 +9,20 @@ using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
 
 public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultCommand, TestResultDto>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserService _userService;
+    private readonly ICourseService _courseService;
     private readonly IMapper _mapper;
 
-    public SaveTestResultCommandHandler(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IMediator mediator)
+    public SaveTestResultCommandHandler(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IMediator mediator, ICourseService courseService)
     {
         _unitOfWork = unitOfWork;
         _userService = userService;
+        _courseService = courseService;
         _mapper = mapper;
     }
 
@@ -127,7 +130,8 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         {
             throw new AppException("Bài kiểm tra không thuộc khóa học nào", 404);
         }
-        await IsCompletedCourse(test.CourseId, currentUserId);
+
+        await _courseService.CalculateAndPersistAsync(test.CourseId, currentUserId, cancellationToken);
         return testResultDto;
     }
     private bool AreSelectionsCorrect(string userSelections, string? correctAnswers)
@@ -140,64 +144,5 @@ public class SaveTestResultCommandHandler : IRequestHandler<SaveTestResultComman
         var userSet = new HashSet<string>(userSelections.Split(','));
         var correctSet = new HashSet<string>(correctAnswers.Split(','));
         return userSet.SetEquals(correctSet);
-    }
-    private async Task IsCompletedCourse(string courseId, string userId)
-    {
-        var userCourse = await _unitOfWork.UserCourseRepository.GetFirstOrDefaultAsync(uc => uc.UserId == userId && uc.CourseId == courseId);
-        if (userCourse == null)
-        {
-            throw new AppException("Khóa học không tồn tại cho người dùng", 404);
-        }
-        var lessons = await _unitOfWork.LessonRepository
-            .GetFlexibleAsync(c => c.CourseId == courseId);
-        var lessonsProgress = await _unitOfWork.LessonProgressRepository
-            .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseId);
-        if (lessonsProgress.Count() != lessons.Count())
-        {
-            Console.WriteLine($"Not all lessons completed for user {userId} in course {courseId}");
-            userCourse.Status = ConstantStatus.INPROGRESS;
-            await _unitOfWork.CompleteAsync();
-            return;
-        }
-        foreach (var lesson in lessonsProgress)
-        {
-            if (!lesson.IsCompleted)
-            {
-                Console.WriteLine($"Lesson {lesson.LessonId} is not completed for user {userId}");
-                userCourse.Status = ConstantStatus.INPROGRESS;
-                await _unitOfWork.CompleteAsync();
-                return;
-            }
-            Console.WriteLine($"Lesson {lesson.LessonId} is completed for user {userId}");
-        }
-        var tests = await _unitOfWork.TestRepository
-            .GetFlexibleAsync(t => t.CourseId == courseId);
-        var testResults = await _unitOfWork.TestResultRepository
-            .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test != null && tr.Test.CourseId == courseId);
-        var highestScorePerTest = testResults
-            .GroupBy(tr => tr.TestId)
-            .Select(g => g.OrderByDescending(tr => tr.Score).First())
-            .ToList();
-        if (highestScorePerTest.Count() < tests.Count())
-        {
-            Console.WriteLine($"Not all tests completed for user {userId} in course {courseId}");
-            userCourse.Status = ConstantStatus.INPROGRESS;
-            await _unitOfWork.CompleteAsync();
-            return;
-        }
-        foreach (var test in highestScorePerTest)
-        {
-            if (!test.IsPassed)
-            {
-                Console.WriteLine($"Test {test.TestId} is not passed for user {userId}");
-                userCourse.Status = ConstantStatus.FAILED;
-                await _unitOfWork.CompleteAsync();
-                return;
-            }
-            Console.WriteLine($"Test {test.TestId} is passed for user {userId}");
-        }
-        userCourse.Status = ConstantStatus.COMPLETED;
-        Console.WriteLine($"Course {courseId} is completed for user {userId}");
-        await _unitOfWork.CompleteAsync();
     }
 }

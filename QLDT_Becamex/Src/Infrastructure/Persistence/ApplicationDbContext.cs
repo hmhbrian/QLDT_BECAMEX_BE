@@ -687,6 +687,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                 entity.Property(s => s.Status)
                       .HasColumnName("status");
 
+                entity.Property(s => s.PercentComplete)
+                      .HasColumnName("percent_complete");
+
                 entity.Property(s => s.CreatedAt)
                       .HasColumnName("created_at");
 

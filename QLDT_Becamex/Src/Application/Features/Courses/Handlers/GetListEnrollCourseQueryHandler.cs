@@ -69,9 +69,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             var userEnrollCourseDtos = _mapper.Map<List<UserEnrollCourseDto>>(courses);
             foreach (var courseDto in userEnrollCourseDtos)
             {
-                float lessonsProgress = await GetCourseProgress(courseDto.Id, userId);
-                courseDto.progressPercentage = (float)Math.Round(lessonsProgress);
-
+                //Đếm số lượng bài học hoàn thành
                 var lessons = await _unitOfWork.LessonRepository
                     .GetFlexibleAsync(l => l.CourseId == courseDto.Id);
                 var lessonProgresses = await _unitOfWork.LessonProgressRepository
@@ -79,6 +77,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 courseDto.TotalLessonCount = lessons.Count();
                 courseDto.LessonCompletedCount = lessonProgresses.Count(lp => lp.IsCompleted);
 
+                //Đếm số lượng bài kiểm tra hoàn thành
                 var tests = await _unitOfWork.TestRepository
                     .GetFlexibleAsync(t => t.CourseId == courseDto.Id);
                 var testResults = await _unitOfWork.TestResultRepository
@@ -86,145 +85,15 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 courseDto.TotalTestCount = tests.Count();
                 courseDto.TestCompletedCount = testResults.Count(tr => tr.IsPassed);
 
+                //Lấy trạng thái hoàn thành khóa học của user
                 var userCourse = await _unitOfWork.UserCourseRepository
                     .GetFirstOrDefaultAsync(uc => uc.UserId == userId && uc.CourseId == courseDto.Id);
+
                 courseDto.Status = userCourse!.Status;
+                courseDto.progressPercentage = (float)Math.Round(userCourse.PercentComplete);
             }
             var result = new PagedResult<UserEnrollCourseDto>(userEnrollCourseDtos, pagination);
             return result;
-        }
-        private async Task<float> CalculateLessonsProgressAsync(string courseId, string userId)
-        {
-            // Lấy tất cả bài học trong khóa học
-            var lessons = await _unitOfWork.LessonRepository
-                .GetFlexibleAsync(l => l.CourseId == courseId);
-
-            if (lessons == null || !lessons.Any()) return 0.0f;
-
-            int totalLessons = lessons.Count();
-
-            // Lấy tiến độ học tập của người dùng với các bài học đó
-            var lessonProgresses = await _unitOfWork.LessonProgressRepository
-                .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseId);
-
-            float totalProgress = 0;
-
-            foreach (var lesson in lessons)
-            {
-                var progress = lessonProgresses.FirstOrDefault(lp => lp.LessonId == lesson.Id);
-
-                float lessonProgress = 0f;
-
-                if (progress != null)
-                {
-                    if (progress.IsCompleted)
-                    {
-                        lessonProgress = 1.0f;
-                    }
-                    else if (lesson.TotalDurationSeconds.HasValue && progress.CurrentTimeSeconds.HasValue && lesson.TotalDurationSeconds > 0)
-                    {
-                        lessonProgress = (float)progress.CurrentTimeSeconds.Value / lesson.TotalDurationSeconds.Value;
-                    }
-                    else if (lesson.TotalPages.HasValue && progress.CurrentPage.HasValue && lesson.TotalPages > 0)
-                    {
-                        lessonProgress = (float)progress.CurrentPage.Value / lesson.TotalPages.Value;
-                    }
-
-                    // Đảm bảo không vượt quá 1.0f
-                    lessonProgress = Math.Clamp(lessonProgress, 0f, 1f);
-                }
-
-                totalProgress += lessonProgress;
-            }
-
-            float overallProgress = totalProgress / totalLessons * 100f;
-            return overallProgress;
-        }
-        private async Task<float> CalculateTestsProgressAsync(string courseId, string userId)
-        {
-            // Lấy tất cả bài kiểm tra trong khóa học
-            var tests = await _unitOfWork.TestRepository
-                .GetFlexibleAsync(t => t.CourseId == courseId);
-
-            if (tests == null || !tests.Any()) return 0.0f;
-
-            int totalTests = tests.Count();
-
-            // Lấy kết quả bài kiểm tra của người dùng
-            var testResults = await _unitOfWork.TestResultRepository.GetFlexibleAsync(
-                tr => tr.UserId == userId && tr.Test != null && tr.Test.CourseId == courseId,
-                orderBy: tr => tr.OrderByDescending(r => r.Score)
-            );
-
-            float totalProgress = 0;
-
-            foreach (var test in tests)
-            {
-                var result = testResults.FirstOrDefault(tr => tr.TestId == test.Id);
-
-                if (result != null)
-                {
-                    totalProgress += result.IsPassed ? 1.0f : 0f;
-                }
-            }
-
-            float overallProgress = (totalProgress / totalTests) * 100f;
-            return overallProgress;
-        }
-        public async Task<float> GetCourseProgress(string courseId, string userId)
-        {
-            var lessonsProgress = await CalculateLessonsProgressAsync(courseId, userId);
-            // Tính toán tiến độ bài kiểm tra
-            var testsProgress = await CalculateTestsProgressAsync(courseId, userId);
-            var lessons = await _unitOfWork.LessonRepository
-                .GetFlexibleAsync(c => c.CourseId == courseId);
-            var tests = await _unitOfWork.TestRepository
-                .GetFlexibleAsync(t => t.CourseId == courseId);
-            float count = (float)lessons.Count() + (float)tests.Count();
-            Console.WriteLine($"Lessons Progress: {lessonsProgress}, Tests Progress: {testsProgress}, Count: {count}, Course Count: {lessons.Count()}, Test Count: {tests.Count()}");
-            // Tính toán tổng tiến độ
-            float overallProgress = (lessonsProgress * (float)lessons.Count() + testsProgress * (float)tests.Count()) / count;
-            if (float.IsNaN(overallProgress) || float.IsInfinity(overallProgress))
-            {
-                return 0.0f; // Trả về 0 nếu tiến độ không hợp lệ
-            }
-            var userCourse = await _unitOfWork.UserCourseRepository
-                .GetFirstOrDefaultAsync(uc => uc.UserId == userId && uc.CourseId == courseId);
-            if (userCourse == null)
-            {   
-                throw new AppException("Khóa học không tồn tại cho người dùng", 404);
-            }
-            if (overallProgress == 100.0f)
-            {
-                // Nếu tiến độ là 100%, đánh dấu khóa học là hoàn thành
-                userCourse.Status = 3;
-                await _unitOfWork.CompleteAsync();
-            }
-            else if (overallProgress > 0.0f && overallProgress < 100.0f)
-            {
-                // Nếu tiến độ từ 0 đến 100, đánh dấu khóa học là đang tiến hành
-                var lessonProgresses = await _unitOfWork.LessonProgressRepository
-                        .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseId);
-                var testResults = await _unitOfWork.TestResultRepository
-                        .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test!.CourseId == courseId);
-                if (lessonProgresses.Count() == lessons.Count() && testResults.Count() == tests.Count())
-                {
-                    userCourse.Status = 4;
-                    await _unitOfWork.CompleteAsync();
-                }
-                else
-                {
-                    userCourse.Status = 2;
-                    await _unitOfWork.CompleteAsync();
-                }
-            }
-            else if (overallProgress == 0.0f)
-            {
-                // Nếu tiến độ là 0, đánh dấu khóa học là chưa bắt đầu
-                userCourse.Status = 1;
-                await _unitOfWork.CompleteAsync();
-            }
-            return overallProgress;
         }
     }
 }

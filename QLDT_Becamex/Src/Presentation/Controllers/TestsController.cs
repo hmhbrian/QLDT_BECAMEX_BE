@@ -96,6 +96,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             return Ok(ApiResponse<TestResultDto>.Ok(result, "Làm bài kiểm tra thành công!"));
         }
+
         [HttpGet("detail-test-result/{id}")]
         public async Task<IActionResult> GetDetailTestResult([FromRoute] string courseId, int id)
         {
@@ -105,6 +106,7 @@ namespace QLDT_Becamex.Src.Presentation.Controllers
 
             return Ok(ApiResponse<DetailTestResultDto>.Ok(result));
         }
+
         [HttpGet("no-answer/{testId}")]
         public async Task<IActionResult> GetListQuestionNoAnswer([FromRoute] string courseId, [FromRoute] int testId)
         {

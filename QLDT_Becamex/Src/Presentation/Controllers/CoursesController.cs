@@ -96,6 +96,9 @@ namespace QLDT_Becamex.Src.Controllers
             return Ok(ApiResponse.Ok(result));
         }
 
+        /// <summary>
+        /// Tìm kiếm khóa học theo nhiều tiêu chí.
+        /// </summary>
         [HttpGet("enroll-courses")]
         [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetListEnrollCourse([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
@@ -104,6 +107,9 @@ namespace QLDT_Becamex.Src.Controllers
             return Ok(ApiResponse<PagedResult<UserEnrollCourseDto>>.Ok(result)); // Bao kết quả tại đây
         }
 
+        /// <summary>
+        /// chưa sử dụng
+        /// </summary>
         [HttpGet("progress/{id}")]
         [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCourseProgress(string id)
@@ -112,6 +118,9 @@ namespace QLDT_Becamex.Src.Controllers
             return Ok(ApiResponse<float>.Ok(result));
         }
 
+        /// <summary>
+        /// Đếm số lượng khóa học hoàn thành
+        /// </summary>
         [HttpGet("completed-count")]
         [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCompletedCoursesCount()
@@ -120,15 +129,21 @@ namespace QLDT_Becamex.Src.Controllers
             return Ok(ApiResponse<int>.Ok(result));
         }
 
-
+        /// <summary>
+        /// Hiển thị các khóa học sắp tới
+        /// </summary>
         [HttpGet("upcoming-courses")]
-        [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
+        [Authorize(Roles = "HR,HOCVIEN")]
         public async Task<IActionResult> GetListUpcomingCourse(CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetListUpcomingCourseQuery(), cancellationToken);
             return Ok(ApiResponse<List<UserUpcomingCourseDto>>.Ok(result));
         }
-        
+
+
+        /// <summary>
+        ///Hiển thị ds khóa học đã hoàn thành trong hố sơ học viên
+        /// </summary>
         [HttpGet("completed-enroll-courses")]
         [Authorize(Roles = "ADMIN,HR,HOCVIEN")]
         public async Task<IActionResult> GetCompletedEnrollCourses([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
@@ -136,7 +151,10 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new GetCompletedCoursesQuery(queryParams), cancellationToken);
             return Ok(ApiResponse<PagedResult<UserEnrollCompletedCourseDto>>.Ok(result));
         }
-        
+
+        /// <summary>
+        ///Hiển thị danh sách tiến độ của các học viên trong khóa học
+        /// </summary>
         [HttpGet("progress-list/{courseId}")]
         [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> GetListUserCoursesProgress(string courseId, [FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
@@ -144,6 +162,10 @@ namespace QLDT_Becamex.Src.Controllers
             var result = await _mediator.Send(new GetListUserCoursesProgressQuery(queryParams, courseId), cancellationToken);
             return Ok(ApiResponse<PagedResult<UserCourseProgressDto>>.Ok(result));
         }
+
+        /// <summary>
+        /// Hiển thị chi tiết tiến độ của 1 học viên trong khóa học
+        /// </summary>
         [HttpGet("progress-detail/{courseId}/{userId}")]
         [Authorize(Roles = "ADMIN,HR")]
         public async Task<IActionResult> GetUserCourseProgressDetail(string courseId, string userId)

@@ -3,5 +3,5 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 namespace QLDT_Becamex.Src.Application.Features.Courses.Queries
 {
-    public record GetListEnrollCourseQuery(BaseQueryParam baseQueryParam) : IRequest<PagedResult<UserEnrollCourseDto>>;
+    public record GetListEnrollCourseQuery(BaseQueryParamMyCourse baseQueryParamMyCourse) : IRequest<PagedResult<UserEnrollCourseDto>>;
 }

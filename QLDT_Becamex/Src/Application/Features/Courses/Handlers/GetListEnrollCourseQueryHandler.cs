@@ -1,12 +1,14 @@
 using AutoMapper;
+using LinqKit;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using QLDT_Becamex.Src.Application.Common.Dtos;
-using QLDT_Becamex.Src.Domain.Interfaces;
-using QLDT_Becamex.Src.Domain.Entities;
-using QLDT_Becamex.Src.Infrastructure.Services;
-using QLDT_Becamex.Src.Application.Features.Courses.Queries;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
+using QLDT_Becamex.Src.Application.Features.Courses.Queries;
+using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Services;
+using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
@@ -32,15 +34,24 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
         public async Task<PagedResult<UserEnrollCourseDto>> Handle(GetListEnrollCourseQuery request, CancellationToken cancellationToken)
         {
-            var queryParams = request.baseQueryParam;
+            var queryParams = request.baseQueryParamMyCourse;
             var (userId, _) = _userService.GetCurrentUserAuthenticationInfo();
             if (string.IsNullOrEmpty(userId))
             {
                 throw new AppException("User not authenticated", 401);
             }
+
+            // Khởi tạo predicate cơ bản: chỉ lấy các Course chưa bị xóa (IsDeleted = false)
+            Expression<Func<Course, bool>>? predicate = c => c.UserCourses != null && c.UserCourses.Any(uc => uc.UserId == userId) && !c.IsDeleted;
+
+            // lọc theo status
+            if (queryParams.status == 2)
+                predicate = predicate.And(c => c.UserCourses.Any(uc => uc.UserId == userId && uc.Status <= 2));
+            else if(queryParams.status > 2)
+                predicate = predicate.And(c => c.UserCourses.Any(uc => uc.UserId == userId && uc.Status == queryParams.status));
+
             // 1. Tổng số bản ghi
-            int totalItems = await _unitOfWork.CourseRepository.CountAsync(c =>
-                c.UserCourses != null && c.UserCourses.Any(uc => uc.UserId == userId) && !c.IsDeleted);
+            int totalItems = await _unitOfWork.CourseRepository.CountAsync(predicate);
 
             // 2. Hàm sắp xếp cho Course
             Func<IQueryable<Course>, IOrderedQueryable<Course>> courseOrderByFunc = query =>
@@ -56,7 +67,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             };
             // 3. Lấy dữ liệu có phân trang
             var courses = await _unitOfWork.CourseRepository.GetFlexibleAsync(
-                predicate: c => c.UserCourses != null && c.UserCourses.Any(uc => uc.UserId == userId) && !c.IsDeleted,
+                predicate: predicate,
                 orderBy: courseOrderByFunc,
                 page: queryParams.Page,
                 pageSize: queryParams.Limit,

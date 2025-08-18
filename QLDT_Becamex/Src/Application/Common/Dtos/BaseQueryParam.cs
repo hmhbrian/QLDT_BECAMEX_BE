@@ -54,4 +54,9 @@ namespace QLDT_Becamex.Src.Application.Common.Dtos
     {
         public string? Keyword { get; set; }
     }
+
+    public class BaseQueryParamMyCourse : BaseQueryParam
+    {
+        public int? status { get; set; }
+    }
 }

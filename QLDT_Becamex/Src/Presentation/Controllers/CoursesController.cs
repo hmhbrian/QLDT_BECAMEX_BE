@@ -99,11 +99,11 @@ namespace QLDT_Becamex.Src.Controllers
         }
 
         /// <summary>
-        /// Tìm kiếm khóa học theo nhiều tiêu chí.
+        /// Lấy danh sách khóa học của tôi(Học Viên)
         /// </summary>
         [HttpGet("enroll-courses")]
-        [Authorize]
-        public async Task<IActionResult> GetListEnrollCourse([FromQuery] BaseQueryParam queryParams, CancellationToken cancellationToken)
+        [Authorize(Roles = "HR,HOCVIEN")]
+        public async Task<IActionResult> GetListEnrollCourse([FromQuery] BaseQueryParamMyCourse queryParams, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetListEnrollCourseQuery(queryParams), cancellationToken);
             return Ok(ApiResponse<PagedResult<UserEnrollCourseDto>>.Ok(result)); // Bao kết quả tại đây

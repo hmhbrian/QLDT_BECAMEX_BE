@@ -284,7 +284,8 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                 .AfterMap(ignoreNavigation);
             CreateMap<Feedback, CreateFeedbackDto>();
 
-            CreateMap<Feedback, FeedbacksDto>();
+            CreateMap<Feedback, FeedbacksDto>()
+                     .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.FullName != null ? src.User.FullName : "Unknown"));
             CreateMap<FeedbacksDto, Feedback>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore())

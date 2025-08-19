@@ -14,6 +14,7 @@ namespace QLDT_Becamex.Src.Application.Features.Feedbacks.Dtos
     }
     public class FeedbacksDto
     {
+        public string? Username { get; set; }
         public int Q1_relevance { get; set; }
         public int Q2_clarity { get; set; }
         public int Q3_structure { get; set; }

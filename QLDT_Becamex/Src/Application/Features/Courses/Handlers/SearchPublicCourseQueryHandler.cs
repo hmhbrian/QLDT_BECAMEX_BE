@@ -44,26 +44,27 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 // Default for unknown roles or no role: same as USER (or stricter if needed)
                 predicate = predicate.And( c => c.IsDeleted == false && c.IsPrivate == false && c.Status!.Key > 0
                 && !c.UserCourses!.Any(uc => uc.UserId == currentUserId));
+
+                if (currentUser?.DepartmentId != null)
+                {
+                    predicate = predicate.And(c =>
+                        c.CourseDepartments == null
+                        || !c.CourseDepartments.Any() // không gán phòng ban nào
+                        || c.CourseDepartments.Any(cd => cd.DepartmentId == currentUser.DepartmentId)
+                    );
+                }
+
+                if (currentUser?.ELevelId != null)
+                {
+                    predicate = predicate.And(c =>
+                        c.CourseELevels == null
+                        || !c.CourseELevels.Any() // không gán ELevel nào
+                        || c.CourseELevels.Any(ce => ce.ELevelId == currentUser.ELevelId)
+                    );
+                }
             }
 
-            if (currentUser?.DepartmentId != null)
-            {
-                predicate = predicate.And(c =>
-                    c.CourseDepartments == null
-                    || !c.CourseDepartments.Any() // không gán phòng ban nào
-                    || c.CourseDepartments.Any(cd => cd.DepartmentId == currentUser.DepartmentId)
-                );
-            }
-
-            if (currentUser?.ELevelId != null)
-            {
-                predicate = predicate.And(c =>
-                    c.CourseELevels == null
-                    || !c.CourseELevels.Any() // không gán ELevel nào
-                    || c.CourseELevels.Any(ce => ce.ELevelId == currentUser.ELevelId)
-                );
-            }
-
+          
             // Keyword
             if (!string.IsNullOrEmpty(queryParam.Keyword))
             {

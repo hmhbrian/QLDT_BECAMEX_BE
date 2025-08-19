@@ -9,6 +9,7 @@ using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using System.Linq.Expressions;
 using LinqKit;
+using Microsoft.EntityFrameworkCore;
 
 namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
 {
@@ -44,7 +45,8 @@ namespace QLDT_Becamex.Src.Application.Features.Tests.Handlers
             }
             var feedbacks = await _unitOfWork.FeedbackRepository.GetFlexibleAsync(
                 predicate: predicate,
-                orderBy: null
+                orderBy: null,
+                includes: f => f.Include(p => p.User)
             );
             var dto = _mapper.Map<List<FeedbacksDto>>(feedbacks);
 

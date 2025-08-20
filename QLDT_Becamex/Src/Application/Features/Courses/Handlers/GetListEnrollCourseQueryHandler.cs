@@ -94,7 +94,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 var testResults = await _unitOfWork.TestResultRepository
                     .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test != null && tr.Test.CourseId == courseDto.Id);
                 courseDto.TotalTestCount = tests.Count();
-                courseDto.TestCompletedCount = testResults.Count(tr => tr.IsPassed);
+                courseDto.TestCompletedCount = testResults.Count();
 
                 //Lấy trạng thái hoàn thành khóa học của user
                 var userCourse = await _unitOfWork.UserCourseRepository

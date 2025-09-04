@@ -184,8 +184,19 @@ namespace QLDT_Becamex.Src.Controllers
         [Authorize]
         public async Task<IActionResult> SearchPublicCourses([FromQuery] BaseQueryParamSearch queryParam)
         {
-            var result = await _mediator.Send(new SearchPublicCourseQuery(queryParam));
+            var result = await _mediator.Send(new SearchPublicCourseQuery<CourseDto>(queryParam));
             return Ok(ApiResponse<PagedResult<CourseDto>>.Ok(result));
+        }
+
+        /// <summary>
+        /// Tìm kiếm khóa học công khai theo tên trên mobile.
+        /// </summary>
+        [HttpGet("search-public-course-mobile")]
+        [Authorize]
+        public async Task<IActionResult> SearchPublicCoursesMobile([FromQuery] BaseQueryParamSearch queryParam)
+        {
+            var result = await _mediator.Send(new SearchPublicCourseQuery<CourseMobileDto>(queryParam));
+            return Ok(ApiResponse<PagedResult<CourseMobileDto>>.Ok(result));
         }
     }
 }

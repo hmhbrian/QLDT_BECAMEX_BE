@@ -4,5 +4,5 @@ using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Queries
 {
-    public record SearchPublicCourseQuery(BaseQueryParamSearch QueryParam) : IRequest<PagedResult<CourseDto>>;
+    public record SearchPublicCourseQuery<TDto>(BaseQueryParamSearch QueryParam) : IRequest<PagedResult<TDto>>;
 }

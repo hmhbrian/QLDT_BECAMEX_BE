@@ -1,26 +1,30 @@
 ﻿
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QLDT_Becamex.Src.Application;
+using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Common.Mappings;
+using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
+using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
+using QLDT_Becamex.Src.Application.Features.Courses.Handlers;
+using QLDT_Becamex.Src.Application.Features.Courses.Queries;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
-using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
 using QLDT_Becamex.Src.Infrastructure.Services;
-
-
-using System.Text;
-using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
-using QLDT_Becamex.Src.Infrastructure.Services.UserServices;
-using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
-using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
-using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
 using QLDT_Becamex.Src.Infrastructure.Services.BackgroundServices;
-using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
+using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
+using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
+using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
+using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
+using QLDT_Becamex.Src.Infrastructure.Services.UserServices;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -114,8 +118,19 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 // 6. Cấu hình MediatR
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly);
+    //cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly);
+    //cfg.RegisterServicesFromAssembly(typeof(SearchCoursesQuery).Assembly);
+    cfg.RegisterServicesFromAssemblies(
+        typeof(AssemblyMarker).Assembly,   // Application (chứa handlers, queries, commands)
+        typeof(Program).Assembly         // API (nếu có behaviors handlers ở API) - optional
+    );
+
 });
+
+// Đăng ký thủ công các handler cụ thể
+builder.Services.AddTransient<IRequestHandler<SearchPublicCourseQuery<CourseDto>, PagedResult<CourseDto>>, SearchPublicCourseQueryHandler<CourseDto>>();
+builder.Services.AddTransient<IRequestHandler<SearchPublicCourseQuery<CourseMobileDto>, PagedResult<CourseMobileDto>>, SearchPublicCourseQueryHandler<CourseMobileDto>>();
+
 
 // 4. Đăng ký Unit of Work, Repositories và Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -191,12 +206,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors("AllowSpecificOrigin"); // 🔥 Bật CORS ở middleware
+    app.UseCors("AllowSpecificOrigin"); // Bật CORS ở middleware
 }
 
 // 2. Middleware chuyển hướng HTTPS (Tùy chọn, hiện đang bị comment)
 // app.UseHttpsRedirection();
-// --- 🔥 2. Exception Handling Middleware (custom) ---
+// --- 2. Exception Handling Middleware (custom) ---
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // 👈 THÊM Ở ĐÂY
 // 3. Middleware định tuyến
 app.UseRouting(); // Cần thiết nếu bạn muốn các middleware Authorization/Authentication hoạt động trước khi chọn endpoint

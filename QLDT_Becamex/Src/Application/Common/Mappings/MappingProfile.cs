@@ -131,6 +131,10 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     ? new UserSumaryDto { Id = src.UpdateBy.Id, Name = src.UpdateBy.FullName }
                     : null));
 
+            // Map cho MOBILE
+            CreateMap<Course, CourseMobileDto>()
+                .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status!.StatusName ?? "Unknown"));
+
             CreateMap<CourseDto, Course>()
                 .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>
                   src.RegistrationStartDate.HasValue 

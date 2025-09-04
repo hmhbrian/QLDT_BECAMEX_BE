@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using MediatR;
@@ -16,7 +17,7 @@ using System.Linq.Expressions;
 
 namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 {
-    public class SearchPublicCourseQueryHandler : IRequestHandler<SearchPublicCourseQuery, PagedResult<CourseDto>>
+    public class SearchPublicCourseQueryHandler<TDto> : IRequestHandler<SearchPublicCourseQuery<TDto>, PagedResult<TDto>> where TDto : class
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -29,16 +30,20 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
             _userService = userService;
         }
 
-        public async Task<PagedResult<CourseDto>> Handle(SearchPublicCourseQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<TDto>> Handle(SearchPublicCourseQuery<TDto> request, CancellationToken cancellationToken)
         {
             var (currentUserId, role) = _userService.GetCurrentUserAuthenticationInfo();
-            var queryParam = request.QueryParam;
-            Expression<Func<Course, bool>>? predicate = c => c.IsDeleted == false;
-
-            if(currentUserId ==  null)
+            if (currentUserId == null)
                 throw new AppException($"Người dùng không tồn tại", 404);
             var currentUser = await _unitOfWork.UserRepository.GetByIdAsync(currentUserId);
-            
+
+            var queryParam = request.QueryParam;
+            var page = queryParam.Page <= 0 ? 1 : queryParam.Page;
+            var limit = queryParam.Limit > 0 ? queryParam.Limit : 10;
+
+            // 1) Build predicate 
+            Expression<Func<Course, bool>>? predicate = c => c.IsDeleted == false;
+
             if (role == ConstantRole.HOCVIEN)
             {
                 // Default for unknown roles or no role: same as USER (or stricter if needed)
@@ -85,14 +90,14 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                     .Include(c => c.Status)
             )).ToList();
 
-            var courseDtos = _mapper.Map<List<CourseDto>>(courses);
+            var courseDtos = _mapper.Map<List<TDto>>(courses);
 
             var pagination = new Pagination(
-                currentPage: queryParam.Page,
-                itemsPerPage: queryParam.Limit > 0 ? queryParam.Limit : 10,
+                currentPage: page,
+                itemsPerPage: limit,
                 totalItems: totalItems);
 
-            var result = new PagedResult<CourseDto>(
+            var result = new PagedResult<TDto>(
                 items: courseDtos,
                 pagination: pagination);
             return result;

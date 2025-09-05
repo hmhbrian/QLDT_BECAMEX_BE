@@ -133,7 +133,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             // Map cho MOBILE
             CreateMap<Course, CourseMobileDto>()
-                .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status!.StatusName ?? "Unknown"));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
             CreateMap<CourseDto, Course>()
                 .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>

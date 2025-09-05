@@ -119,7 +119,6 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddMediatR(cfg =>
 {
     //cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly);
-    //cfg.RegisterServicesFromAssembly(typeof(SearchCoursesQuery).Assembly);
     cfg.RegisterServicesFromAssemblies(
         typeof(AssemblyMarker).Assembly,   // Application (chứa handlers, queries, commands)
         typeof(Program).Assembly         // API (nếu có behaviors handlers ở API) - optional

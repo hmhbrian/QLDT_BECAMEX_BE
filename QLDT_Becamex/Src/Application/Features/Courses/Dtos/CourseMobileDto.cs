@@ -1,4 +1,6 @@
-﻿namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
+﻿using QLDT_Becamex.Src.Application.Features.Status.Dtos;
+
+namespace QLDT_Becamex.Src.Application.Features.Courses.Dtos
 {
     public class CourseMobileDto
     {
@@ -8,6 +10,6 @@
         public string? ThumbUrl { get; set; }
         public DateTime? RegistrationStartDate { get; set; }
         public DateTime? RegistrationClosingDate { get; set; }
-        public string? StatusName { get; set; }
+        public StatusDto? Status { get; set; }
     }
 }

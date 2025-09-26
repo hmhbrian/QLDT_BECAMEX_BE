@@ -32,8 +32,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public IUserAnswerRepository UserAnswerRepository { get; }
         public IAuditLogRepository AuditLogRepository { get; }
         public ICertificatesRepository CertificatesRepository { get; }
-
-
+        public ITopicSubscriptionsRepository TopicSubscriptionsRepository { get; }
+        public IDevicesRepository DevicesRepository { get; }
+        public ITopicsRepository TopicsRepository { get; }
+        public IMessagesRepository MessagesRepository { get; }
+        public IMessageLogsRepository MessageLogsRepository { get; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -59,6 +62,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             UserAnswerRepository = new UserAnswerRepository(dbContext);
             AuditLogRepository = new AuditLogRepository(dbContext);
             CertificatesRepository = new CertificatesRepository(dbContext);
+            TopicSubscriptionsRepository = new TopicSubscriptionsRepository(dbContext);
+            DevicesRepository = new DevicesRepository(dbContext);
+            TopicsRepository = new TopicsRepository(dbContext);
+            MessagesRepository = new MessagesRepository(dbContext);
+            MessageLogsRepository = new MessageLogsRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

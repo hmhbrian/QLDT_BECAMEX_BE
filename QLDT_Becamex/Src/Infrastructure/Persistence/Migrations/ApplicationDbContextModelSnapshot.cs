@@ -773,6 +773,41 @@ namespace QLDT_Becamex.Migrations
                     b.ToTable("DepartmentStatus", (string)null);
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Device", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeviceToken")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("device_token");
+
+                    b.Property<string>("Platform")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("platform");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Devices", (string)null);
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.EmployeeLevel", b =>
                 {
                     b.Property<int>("ELevelId")
@@ -963,6 +998,96 @@ namespace QLDT_Becamex.Migrations
                         {
                             t.HasCheckConstraint("CK_Progress_Type", "(current_time_seconds IS NOT NULL AND current_page IS NULL) OR (current_time_seconds IS NULL AND current_page IS NOT NULL) OR (current_time_seconds IS NULL AND current_page IS NULL)");
                         });
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.MessageLogs", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("DeviceId")
+                        .HasColumnType("int")
+                        .HasColumnName("device_id");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("error_message");
+
+                    b.Property<int?>("MessageId")
+                        .HasColumnType("int")
+                        .HasColumnName("message_id");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("received_at");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("sent_at");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("status");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int")
+                        .HasColumnName("topic_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("MessageId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("MessageLogs", (string)null);
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Messages", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Data")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("data");
+
+                    b.Property<string>("SendType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("send_type");
+
+                    b.Property<string>("SentBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("sent_by");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Question", b =>
@@ -1158,6 +1283,63 @@ namespace QLDT_Becamex.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TestResults", (string)null);
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TopicSubscriptions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("DeviceId")
+                        .HasColumnType("int")
+                        .HasColumnName("device_id");
+
+                    b.Property<DateTime>("SubscribeAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("subscribe_at");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int")
+                        .HasColumnName("topic_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("TopicSubscriptions", (string)null);
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Topics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Topics", (string)null);
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TypeDocument", b =>
@@ -1545,6 +1727,15 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Status");
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Device", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Feedback", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.Course", "Course")
@@ -1617,6 +1808,30 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.MessageLogs", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Device", "devices")
+                        .WithMany()
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Messages", "messages")
+                        .WithMany()
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Topics", "topics")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("devices");
+
+                    b.Navigation("messages");
+
+                    b.Navigation("topics");
+                });
+
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.Question", b =>
                 {
                     b.HasOne("QLDT_Becamex.Src.Domain.Entities.ApplicationUser", "CreateBy")
@@ -1687,6 +1902,23 @@ namespace QLDT_Becamex.Migrations
                     b.Navigation("Test");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.TopicSubscriptions", b =>
+                {
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Device", "devices")
+                        .WithMany()
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("QLDT_Becamex.Src.Domain.Entities.Topics", "topics")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("devices");
+
+                    b.Navigation("topics");
                 });
 
             modelBuilder.Entity("QLDT_Becamex.Src.Domain.Entities.UserAnswer", b =>

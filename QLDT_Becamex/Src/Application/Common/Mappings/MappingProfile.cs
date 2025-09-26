@@ -7,6 +7,7 @@ using QLDT_Becamex.Src.Application.Features.CourseAttachedFile.Dtos;
 using QLDT_Becamex.Src.Application.Features.CourseCategory.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Departments.Dtos;
+using QLDT_Becamex.Src.Application.Features.Devices.Dtos;
 using QLDT_Becamex.Src.Application.Features.EmployeeLevels.Dtos;
 using QLDT_Becamex.Src.Application.Features.Feedbacks.Dtos;
 using QLDT_Becamex.Src.Application.Features.Lessons.Dtos;
@@ -137,7 +138,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
 
             CreateMap<CourseDto, Course>()
                 .ForMember(dest => dest.RegistrationStartDate, opt => opt.MapFrom((src, dest) =>
-                  src.RegistrationStartDate.HasValue 
+                  src.RegistrationStartDate.HasValue
                       ? DateTimeHelper.ToVietnamTime(DateTime.SpecifyKind(src.RegistrationStartDate.Value, DateTimeKind.Utc))
                       : (DateTime?)null))
                 .ForMember(dest => dest.RegistrationClosingDate, opt => opt.MapFrom((src, dest) =>
@@ -252,7 +253,7 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
             CreateMap<TestResult, TestResultDto>();
             CreateMap<TestResult, DetailTestResultDto>();
             CreateMap<Test, TestSummaryDto>(); // Map từ entity Test → DTO TestSummaryDto
-            
+
             //Question
             CreateMap<CreateQuestionDto, Question>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -320,6 +321,11 @@ namespace QLDT_Becamex.Src.Application.Common.Mappings
                     ? new UserSumaryDto { Id = src.User.Id, Name = src.User.FullName }
                     : null));
 
+            //Devices
+            CreateMap<CreateDeviceDto, Device>();
+            CreateMap<Device, CreateDeviceDto>();
+            CreateMap<Device, DeviceDto>();
+            
         }
     }
 }

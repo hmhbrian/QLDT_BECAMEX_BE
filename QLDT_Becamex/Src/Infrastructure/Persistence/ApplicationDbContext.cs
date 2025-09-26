@@ -37,38 +37,49 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Certificates> Certificates { get; set; }
+        public DbSet<Device> Device { get; set; }
+        public DbSet<Messages> Messages { get; set; }
+        public DbSet<Topics> Topics { get; set; }
+        public DbSet<TopicSubscriptions> TopicSubscripttions { get; set; }
+        public DbSet<MessageLogs> MessageLogs { get; set; }
 
-        // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
-            base.OnModelCreating(modelBuilder);
+            // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                  // LUÔN LUÔN gọi phương thức OnModelCreating của lớp cơ sở cho IdentityDbContext
+                  base.OnModelCreating(modelBuilder);
 
-            // --- Cấu hình Fluent API ở đây ---
-            // Gọi các phương thức cấu hình riêng biệt để giữ cho OnModelCreating gọn gàng và dễ đọc
-            ConfigureApplicationUser(modelBuilder);
-            ConfigureDepartment(modelBuilder);
-            ConfigureEmployeeLevel(modelBuilder);
-            ConfigureUserStatus(modelBuilder);
-            ConfigureCourse(modelBuilder);
-            ConfigureCourseStatus(modelBuilder);
-            ConfigureCourseDepartment(modelBuilder);
-            ConfigureCourseELevel(modelBuilder);
-            ConfigureCourseAttachedFile(modelBuilder);
-            ConfigureUserCourse(modelBuilder);
-            ConfigureCourseCategory(modelBuilder);
-            ConfigureLesson(modelBuilder);
-            ConfigureTest(modelBuilder);
-            ConfigureQuestion(modelBuilder);
-            ConfigureTypeDocument(modelBuilder);
-            ConfigureLessonProgress(modelBuilder);
-            ConfigureFeedback(modelBuilder);
-            ConfigureDepartmentStatus(modelBuilder);
-            ConfigureTestResult(modelBuilder);
-            ConfigureUserAnswer(modelBuilder);
-            ConfigureAuditLog(modelBuilder);
-            ConfigureCertificates(modelBuilder);
-        }
+                  // --- Cấu hình Fluent API ở đây ---
+                  // Gọi các phương thức cấu hình riêng biệt để giữ cho OnModelCreating gọn gàng và dễ đọc
+                  ConfigureApplicationUser(modelBuilder);
+                  ConfigureDepartment(modelBuilder);
+                  ConfigureEmployeeLevel(modelBuilder);
+                  ConfigureUserStatus(modelBuilder);
+                  ConfigureCourse(modelBuilder);
+                  ConfigureCourseStatus(modelBuilder);
+                  ConfigureCourseDepartment(modelBuilder);
+                  ConfigureCourseELevel(modelBuilder);
+                  ConfigureCourseAttachedFile(modelBuilder);
+                  ConfigureUserCourse(modelBuilder);
+                  ConfigureCourseCategory(modelBuilder);
+                  ConfigureLesson(modelBuilder);
+                  ConfigureTest(modelBuilder);
+                  ConfigureQuestion(modelBuilder);
+                  ConfigureTypeDocument(modelBuilder);
+                  ConfigureLessonProgress(modelBuilder);
+                  ConfigureFeedback(modelBuilder);
+                  ConfigureDepartmentStatus(modelBuilder);
+                  ConfigureTestResult(modelBuilder);
+                  ConfigureUserAnswer(modelBuilder);
+                  ConfigureAuditLog(modelBuilder);
+                  ConfigureCertificates(modelBuilder);
+                  ConfigureDevices(modelBuilder);
+                  ConfigureMessages(modelBuilder);
+                  ConfigureTopics(modelBuilder);
+                  ConfigureTopicSubscriptions(modelBuilder);
+                  ConfigureMessageLogs(modelBuilder);
+
+            }
 
         private void ConfigureTestResult(ModelBuilder modelBuilder)
         {
@@ -1166,19 +1177,171 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                     .OnDelete(DeleteBehavior.Restrict);
             });
         }
+        private void ConfigureDevices(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Device>(entity =>
+            {
+                entity.ToTable("Devices");
 
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
 
+                entity.Property(e => e.UserId)
+                    .HasMaxLength(450)
+                    .HasColumnName("user_id");
+            
+                entity.Property(e => e.DeviceToken)
+                    .HasMaxLength(500)
+                    .HasColumnName("device_token");
+
+                entity.Property(e => e.Platform)
+                    .HasMaxLength(100)
+                    .HasColumnName("platform");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at");
+            });
+        }
+
+        private void ConfigureMessages(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Messages>(entity =>
+            {
+            entity.ToTable("Messages");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Title)
+                  .HasMaxLength(255)
+                  .HasColumnName("title");
+
+            entity.Property(e => e.Body)
+                  .HasColumnName("body");
+
+            entity.Property(e => e.Data)
+                  .HasColumnName("data");
+
+            entity.Property(e => e.SendType)
+                  .HasMaxLength(100)
+                  .HasColumnName("send_type");
+
+            entity.Property(e => e.SentBy)
+                  .HasMaxLength(450)
+                  .HasColumnName("sent_by");
+
+            entity.Property(e => e.CreatedAt)
+                  .HasColumnName("created_at");
+            });
+        }
+        private void ConfigureTopics(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Topics>(entity =>
+            {
+            entity.ToTable("Topics");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Name)
+                  .HasMaxLength(255)
+                  .HasColumnName("name");
+
+            entity.Property(e => e.Description)
+                  .HasColumnName("description");
+
+            entity.Property(e => e.CreatedAt)
+                  .HasColumnName("created_at");
+            });
+        }
+        private void ConfigureTopicSubscriptions(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TopicSubscriptions>(entity =>
+            {
+            entity.ToTable("TopicSubscriptions");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+
+            entity.Property(e => e.TopicId)
+                  .HasColumnName("topic_id");
+
+            entity.Property(e => e.DeviceId)
+                  .HasColumnName("device_id");
+
+            entity.Property(e => e.SubscribeAt)
+                  .HasColumnName("subscribe_at");
+
+            entity.HasOne(e => e.topics)
+                  .WithMany()
+                  .HasForeignKey(e => e.TopicId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.devices)
+                  .WithMany()
+                  .HasForeignKey(e => e.DeviceId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+        
+        public void ConfigureMessageLogs(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MessageLogs>(entity =>
+            {
+            entity.ToTable("MessageLogs");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+
+            entity.Property(e => e.MessageId)
+                  .HasColumnName("message_id");
+
+            entity.Property(e => e.DeviceId)
+                  .HasColumnName("device_id");
+
+            entity.Property(e => e.TopicId)
+                  .HasColumnName("topic_id");
+
+            entity.Property(e => e.Status)
+                  .HasMaxLength(100)
+                  .HasColumnName("status");
+
+            entity.Property(e => e.ErrorMessage)
+                  .HasColumnName("error_message");
+
+            entity.Property(e => e.SentAt)
+                  .HasColumnName("sent_at");
+
+            entity.Property(e => e.ReceivedAt)
+                  .HasColumnName("received_at");
+
+            entity.HasOne(e => e.messages)
+                  .WithMany()
+                  .HasForeignKey(e => e.MessageId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.devices)
+                  .WithMany()
+                  .HasForeignKey(e => e.DeviceId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.topics)
+                  .WithMany()
+                  .HasForeignKey(e => e.TopicId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            var auditEntries = OnBeforeSaveChanges();
-            var result = await base.SaveChangesAsync(cancellationToken);
-            if (auditEntries.Any())
             {
-                await OnAfterSaveChanges(auditEntries);
+                  var auditEntries = OnBeforeSaveChanges();
+                  var result = await base.SaveChangesAsync(cancellationToken);
+                  if (auditEntries.Any())
+                  {
+                        await OnAfterSaveChanges(auditEntries);
+                  }
+                  return result;
             }
-            return result;
-        }
 
         private List<AuditEntry> OnBeforeSaveChanges()
         {

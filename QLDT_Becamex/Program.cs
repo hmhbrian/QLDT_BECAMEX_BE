@@ -12,9 +12,12 @@ using QLDT_Becamex.Src.Application.Common.Mappings.AuditLogs;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Handlers;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
+using QLDT_Becamex.Src.Application.Features.Notifications.Abstractions;
+using QLDT_Becamex.Src.Application.Features.Notifications.Services;
 using QLDT_Becamex.Src.Application.Features.Users.Commands;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
+using QLDT_Becamex.Src.Infrastructure.Fcm;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
 using QLDT_Becamex.Src.Infrastructure.Services;
@@ -24,7 +27,9 @@ using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
 using QLDT_Becamex.Src.Infrastructure.Services.UserServices;
+using Quartz;
 using System.Text;
+using Xceed.Document.NET;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -155,6 +160,12 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IAuditLogMapper, AuditLogMapper>();
 builder.Services.AddHostedService<CourseStatusUpdateBackgroundService>();
+
+builder.Services.AddScoped<ITopicConditionBuilder, TopicConditionBuilder>();
+builder.Services.AddScoped<INotificationComposer, NotificationComposer>();
+builder.Services.AddScoped<IFcmSender, FcmSender>();
+
+//builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);
 
 builder.Services.AddHttpContextAccessor();
 

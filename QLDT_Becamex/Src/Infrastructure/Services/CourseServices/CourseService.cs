@@ -1,4 +1,5 @@
 ﻿using QLDT_Becamex.Src.Application.Common.Dtos;
+using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 
@@ -139,7 +140,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CourseServices
             if (overallProgress == 100.0f)
             {
                 // Nếu tiến độ là 100%, đánh dấu khóa học là hoàn thành
-                userCourse.Status = 3;
+                userCourse.Status = ConstantStatus.COMPLETED;
             }
             else if (overallProgress > 0.0f && overallProgress < 100.0f)
             {
@@ -148,19 +149,19 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CourseServices
                         .GetFlexibleAsync(lp => lp.UserId == userId && lp.Lesson.CourseId == courseId);
                 var testResults = await _unitOfWork.TestResultRepository
                         .GetFlexibleAsync(tr => tr.UserId == userId && tr.Test!.CourseId == courseId);
-                if (lessonProgresses.Count() == lessons.Count() && testResults.Count() == tests.Count())
+                if (lessonProgresses.Count(l => l.IsCompleted) == lessons.Count() && testResults.Count() == tests.Count())
                 {
-                    userCourse.Status = 4;
+                    userCourse.Status = ConstantStatus.FAILED;
                 }
                 else
                 {
-                    userCourse.Status = 2;
+                    userCourse.Status = ConstantStatus.INPROGRESS;
                 }
             }
             else if (overallProgress == 0.0f)
             {
                 // Nếu tiến độ là 0, đánh dấu khóa học là chưa bắt đầu
-                userCourse.Status = 1;
+                userCourse.Status = ConstantStatus.ASSIGNED;
             }
             userCourse.PercentComplete = overallProgress;
             await _unitOfWork.CompleteAsync();

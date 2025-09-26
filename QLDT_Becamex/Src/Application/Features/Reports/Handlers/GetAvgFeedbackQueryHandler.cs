@@ -18,6 +18,17 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
                 f => f.Course != null && !f.Course.IsDeleted,
                 orderBy: null
             );
+            if (feedbacks == null || !feedbacks.Any())
+            {
+                return new AvgFeedbackDto
+                {
+                    Q1_relevanceAvg = 0,
+                    Q2_clarityAvg = 0,
+                    Q3_structureAvg = 0,
+                    Q4_durationAvg = 0,
+                    Q5_materialAvg = 0
+                };
+            }
             var avgFeedback = new AvgFeedbackDto();
 
             foreach (var feedback in feedbacks)

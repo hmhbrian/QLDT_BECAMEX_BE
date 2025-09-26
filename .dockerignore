@@ -1,0 +1,28 @@
+# Build output
+bin/
+obj/
+publish/
+
+# VS / Rider / JetBrains
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Logs
+*.log
+
+# Node (nếu có frontend)
+node_modules/
+
+# Temp
+tmp/
+*.tmp
+
+xUnitQLDT_Becamex.Tests/

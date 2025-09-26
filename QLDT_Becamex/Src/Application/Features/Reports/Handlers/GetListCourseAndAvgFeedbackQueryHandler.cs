@@ -21,7 +21,10 @@ namespace QLDT_Becamex.Src.Application.Features.Reports.Handlers
                 orderBy: null,
                 asNoTracking: true
             );
-
+            if (courses == null || !courses.Any())
+            {
+                return new List<CourseAndAvgFeedbackDto>();
+            }
             var courseAndAvgFeedbackDtos = new List<CourseAndAvgFeedbackDto>();
             foreach (var course in courses)
             {

@@ -4,3 +4,5 @@ obj/
 appsettings.json
 ../xUnitQLDT_Becamex.Tests/bin/
 ../xUnitQLDT_Becamex.Tests/obj/
+secrets/
+*.json

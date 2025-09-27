@@ -4,11 +4,13 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
 using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Domain.Events;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 using QLDT_Becamex.Src.Shared.Helpers;
+using System.Security.Policy;
 using Xceed.Pdf.Layout.Shape;
 
 
@@ -21,16 +23,17 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IDepartmentService _departmentService;
         private readonly IUserService _userService;
+        private readonly IPublisher _publisher;
 
 
-
-        public CreateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService, IUserService userService)
+        public CreateCourseCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService, IDepartmentService departmentService, IUserService userService, IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;
             _departmentService = departmentService;
             _userService = userService;
+            _publisher = publisher;
         }
 
         public async Task<string> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
@@ -163,6 +166,12 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
 
             await _unitOfWork.CompleteAsync();
 
+            await _publisher.Publish(new CourseCreatedEvent(
+                CourseId: course.Id,
+                DepartmentIds: (dto.DepartmentIds ?? Enumerable.Empty<int>()).Select(x => x.ToString()).ToArray(),
+                Levels: (dto.ELevelIds ?? Enumerable.Empty<int>()).Select(x => x.ToString()).ToArray(),
+                CreatedBy: currentUserId
+            ));
             return course.Id;
         }
     }

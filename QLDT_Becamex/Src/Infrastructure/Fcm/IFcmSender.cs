@@ -1,8 +1,15 @@
-﻿namespace QLDT_Becamex.Src.Infrastructure.Fcm
+﻿
+namespace QLDT_Becamex.Src.Infrastructure.Fcm
 {
     public interface IFcmSender
     {
-        Task<(bool Success, string? Error)> SendByConditionAsync(
-            string title, string body, IDictionary<string, string> data, string condition, CancellationToken ct);
+        Task<IReadOnlyList<PerTokenResult>> SendMulticastAsync(
+            string title,
+            string body,
+            IDictionary<string, string> data,
+            IReadOnlyList<(int DeviceId, string Token)> tokens,
+            CancellationToken ct);
     }
+
+    public sealed record PerTokenResult(int DeviceId, string Token, bool Success, string? Error);
 }

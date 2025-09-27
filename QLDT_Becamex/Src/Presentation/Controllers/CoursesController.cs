@@ -5,6 +5,7 @@ using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Commands;
 using QLDT_Becamex.Src.Application.Features.Courses.Dtos;
 using QLDT_Becamex.Src.Application.Features.Courses.Queries;
+using QLDT_Becamex.Src.Domain.Events;
 
 namespace QLDT_Becamex.Src.Controllers
 {

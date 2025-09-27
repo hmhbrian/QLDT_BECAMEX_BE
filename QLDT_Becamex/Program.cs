@@ -1,4 +1,7 @@
 ﻿
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +23,7 @@ using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Fcm;
 using QLDT_Becamex.Src.Infrastructure.Persistence;
 using QLDT_Becamex.Src.Infrastructure.Persistence.Repostitories;
+using QLDT_Becamex.Src.Infrastructure.Quartz;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.BackgroundServices;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
@@ -162,11 +166,17 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IAuditLogMapper, AuditLogMapper>();
 builder.Services.AddHostedService<CourseStatusUpdateBackgroundService>();
 
-builder.Services.AddScoped<ITopicConditionBuilder, TopicConditionBuilder>();
+// Notifications
 builder.Services.AddScoped<INotificationComposer, NotificationComposer>();
+builder.Services.AddScoped<ITopicConditionBuilder, TopicConditionBuilder>();
+builder.Services.AddScoped<IRecipientResolver, RecipientResolver>();
+
+// FCM
+builder.Services.AddFcm(builder.Configuration);
 builder.Services.AddScoped<IFcmSender, FcmSender>();
 
-//builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);
+// Quartz
+builder.Services.AddQuartzJobs();
 
 builder.Services.AddHttpContextAccessor();
 

@@ -44,9 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Src\Application\Features\Courses\Events\" />
     <Folder Include="Src\Infrastructure\Persistence\Migrations\" />
-    <Folder Include="Src\Infrastructure\Quartz\Jobs\" />
     <Folder Include="wwwroot\certificates\" />
   </ItemGroup>
 

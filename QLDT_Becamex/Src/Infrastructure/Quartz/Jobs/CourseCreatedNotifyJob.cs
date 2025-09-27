@@ -51,7 +51,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
                 Title = title,
                 Body = body,
                 Data = System.Text.Json.JsonSerializer.Serialize(data),
-                SendType = "Topic",
+                SendType = "Token",
                 SentBy = "System",
                 CreatedAt = DateTime.UtcNow 
             };

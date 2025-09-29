@@ -42,6 +42,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
         public DbSet<Topics> Topics { get; set; }
         public DbSet<TopicSubscriptions> TopicSubscripttions { get; set; }
         public DbSet<MessageLogs> MessageLogs { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
             // DbSet cho ApplicationUser đã được kế thừa từ IdentityDbContext
             protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -78,6 +79,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                   ConfigureTopics(modelBuilder);
                   ConfigureTopicSubscriptions(modelBuilder);
                   ConfigureMessageLogs(modelBuilder);
+                  ConfigureUserNotification(modelBuilder);
 
             }
 
@@ -1329,6 +1331,45 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                   .WithMany()
                   .HasForeignKey(e => e.TopicId)
                   .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+
+        public void ConfigureUserNotification(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserNotification>(entity =>
+            {
+                entity.ToTable("UserNotification");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+
+                entity.Property(e => e.MessageId)
+                      .HasColumnName("message_id");
+
+                entity.Property(e => e.UserId)
+                      .HasColumnName("user_id");
+
+                entity.Property(e => e.SentAt)
+                      .HasColumnName("sent_at");
+
+                entity.Property(e => e.ReadAt)
+                      .HasColumnName("read_at");
+
+                entity.Property(e => e.IsRead)
+                      .HasColumnName("is_read");
+
+                entity.Property(e => e.IsHidden)
+                      .HasColumnName("is_hidden");
+
+                entity.HasOne(e => e.Message)
+                      .WithMany()
+                      .HasForeignKey(e => e.MessageId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
 

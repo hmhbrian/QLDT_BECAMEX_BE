@@ -37,6 +37,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
         public ITopicsRepository TopicsRepository { get; }
         public IMessagesRepository MessagesRepository { get; }
         public IMessageLogsRepository MessageLogsRepository { get; }
+        public IUserNotificationRepository UserNotificationRepository { get; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -67,6 +68,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence
             TopicsRepository = new TopicsRepository(dbContext);
             MessagesRepository = new MessagesRepository(dbContext);
             MessageLogsRepository = new MessageLogsRepository(dbContext);
+            UserNotificationRepository = new UserNotificationRepository(dbContext);
         }
 
         public async Task<int> CompleteAsync()

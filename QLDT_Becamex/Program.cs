@@ -168,7 +168,6 @@ builder.Services.AddHostedService<CourseStatusUpdateBackgroundService>();
 
 // Notifications
 builder.Services.AddScoped<INotificationComposer, NotificationComposer>();
-builder.Services.AddScoped<ITopicConditionBuilder, TopicConditionBuilder>();
 builder.Services.AddScoped<IRecipientResolver, RecipientResolver>();
 
 // FCM

@@ -72,7 +72,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
                 );
             var userIds = devices.Select(d => d.UserId).Distinct().ToList();
 
-            // chunk để AddRange theo lô lớn
+            // chunk để AddRange theo số lượng lớn
             const int chunkSize = 1000;
             foreach (var chunk in userIds.Chunk(chunkSize))
             {

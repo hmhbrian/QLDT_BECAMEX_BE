@@ -9,10 +9,11 @@ using QLDT_Becamex.Src.Application.Features.Notifications.Queries;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace QLDT_Becamex.Src.Application.Features.Notifications.Handlers
 {
-    public class GetNotificationOfUserQueryHandler : IRequestHandler<GetNotificationOfUserQuery, List<NotificationDto>>
+    public class GetNotificationOfUserQueryHandler : IRequestHandler<GetNotificationOfUserQuery, NotificationDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -23,7 +24,7 @@ namespace QLDT_Becamex.Src.Application.Features.Notifications.Handlers
             _mapper = mapper;
             _userService = userService;
         }
-        public async Task<List<NotificationDto>> Handle(GetNotificationOfUserQuery request, CancellationToken cancellationToken)
+        public async Task<NotificationDto> Handle(GetNotificationOfUserQuery request, CancellationToken cancellationToken)
         {
             var (userId, role) = _userService.GetCurrentUserAuthenticationInfo();
 
@@ -34,11 +35,47 @@ namespace QLDT_Becamex.Src.Application.Features.Notifications.Handlers
             }
 
             var notification = await _unitOfWork.UserNotificationRepository.GetFlexibleAsync(
-                predicate: l => l.IsRead == request.IsRead,
-                includes: q => q.Include(l => l.Message)
+                predicate: l => l.UserId == userId && !l.IsHidden,
+                includes: q => q.Include(l => l.Message),
+                asNoTracking: true
             );
-            var dto = _mapper.Map<List<NotificationDto>>(notification);
-            return dto;
+
+            switch (request.IsRead.Filter)
+            {
+                case NotificationFilter.Unread:
+                    notification = notification.Where(x => !x.IsRead);
+                    break;
+                case NotificationFilter.Read:
+                    notification = notification.Where(x => x.IsRead);
+                    break;
+                case NotificationFilter.All:
+                default:
+                    break;
+            }
+
+            var items = notification
+                .OrderByDescending(x => x.SentAt)
+                .ThenByDescending(x => x.Id)
+                .Select(x => new NotificationItemDto
+                {
+                    Id = x.Id,
+                    Title = x.Message!.Title,
+                    Body = x.Message.Body,
+                    DataJson = x.Message.Data,
+                    SentAt = x.SentAt,
+                    IsRead = x.IsRead,
+                    ReadAt = x.ReadAt
+                }).ToList();
+
+            var unreadCount = (await _unitOfWork.UserNotificationRepository.GetFlexibleAsync(
+                    predicate: x => x.UserId == userId && !x.IsHidden && !x.IsRead
+                 )).ToList().Count();
+
+            return new NotificationDto
+            {
+                Items = items,
+                UnreadCount = unreadCount
+            };
         }
     }
 }

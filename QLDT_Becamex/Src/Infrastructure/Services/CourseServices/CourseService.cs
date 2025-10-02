@@ -145,6 +145,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CourseServices
             {
                 // Nếu tiến độ là 100%, đánh dấu khóa học là hoàn thành
                 userCourse.Status = ConstantStatus.COMPLETED;
+                // Gửi sự kiện hoàn thành khóa học
                 await _publisher.Publish(new CompletedCourseEvent(
                     CourseId: courseId
                 ));

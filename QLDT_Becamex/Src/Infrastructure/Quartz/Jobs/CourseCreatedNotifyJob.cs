@@ -1,9 +1,12 @@
-﻿using QLDT_Becamex.Src.Application.Features.Notifications.Abstractions;
+﻿using Newtonsoft.Json.Linq;
+using QLDT_Becamex.Src.Application.Features.Notifications.Abstractions;
 using QLDT_Becamex.Src.Domain.Entities;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Fcm;
+using QLDT_Becamex.Src.Shared.Helpers;
 using Quartz;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
 {
@@ -38,15 +41,41 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
             var levels = (map.GetString("Levels") ?? "")
                             .Split(',', StringSplitOptions.RemoveEmptyEntries)
                             .ToList();
-            // 0) Resolve tokens (3 TH: Dept&Level / Dept / Level). Nếu cả 2 rỗng -> không gửi.
-            var tokens = await _resolver.ResolveStudentDeviceTokensAsync(deptIds, levels, context.CancellationToken);
-            if (tokens.Count == 0)
-                return;
+            var mandatoryUserIds = (map.GetString("MandatoryUserIds") ?? "")
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .ToList();
+            // -------- 1) Resolve recipients
+            var mandatoryTokens = await _resolver.ResolveByUserIdsAsync(mandatoryUserIds, context.CancellationToken);
+            var generalTokens = await _resolver.ResolveByDeptLevelAsync(deptIds, levels, context.CancellationToken);
 
-            // 1) Soạn payload
-            var (title, body, data) = await _notificationComposer.CourseCreatedAsync(courseId, context.CancellationToken);
+            // Loại token trùng: ưu tiên nội dung Mandatory
+            var mandatorySet = new HashSet<string>(mandatoryTokens.Select(t => t.Token));
+            generalTokens = generalTokens.Where(t => !mandatorySet.Contains(t.Token)).ToList();
 
-            var now = DateTime.UtcNow;
+            // Nếu tất cả đều trống thì kết thúc
+            if (mandatoryTokens.Count == 0 && generalTokens.Count == 0) return;
+
+            //---Gửi Mandatory (nếu có)
+            if (mandatoryTokens.Count > 0)
+            {
+                // 1) Soạn payload
+                var (title, body, data) = await _notificationComposer.CourseCreated_MandatoryAsync(courseId, context.CancellationToken);
+
+                await SendNotification(title, body, data, mandatoryTokens, context);
+            }
+
+            //---Gửi General
+            if (generalTokens.Count > 0)
+            {
+                var (title, body, data) = await _notificationComposer.CourseCreated_GeneralAsync(courseId, context.CancellationToken);
+
+                await SendNotification(title, body, data, generalTokens, context);
+            }
+        }
+
+        public async Task SendNotification(string title, string body, Dictionary<string, string> data, List<(int DeviceId, string Token)> tokens, IJobExecutionContext context)
+        {
+            DateTime now = DateTimeHelper.GetVietnamTimeNow();
             var dataJson = JsonSerializer.Serialize(data);
 
             //2)Tạo message
@@ -57,7 +86,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
                 Data = dataJson,
                 SendType = "Token",
                 SentBy = "System",
-                CreatedAt = now 
+                CreatedAt = now
             };
             await _unitOfWork.MessagesRepository.AddAsync(msg);
             await _unitOfWork.CompleteAsync();
@@ -93,10 +122,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
             // 4) Gửi theo batch (IFcmSender đã tự chunk 500 token/lần)
             var perTokenResults = await _fcmSender.SendMulticastAsync(title, body, data, tokens, context.CancellationToken);
 
-            // 4) Ghi log từng device
+            // 5) Ghi log từng device
             foreach (var r in perTokenResults)
             {
-                await _unitOfWork.MessageLogsRepository.AddAsync(new MessageLogs 
+                await _unitOfWork.MessageLogsRepository.AddAsync(new MessageLogs
                 {
                     MessageId = msg.Id,
                     DeviceId = r.DeviceId,
@@ -112,7 +141,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
                     var device = await _unitOfWork.DevicesRepository.GetByIdAsync(r.DeviceId);
                     if (device != null)
                         Console.WriteLine(r.DeviceId + "không hoạt động");
-                        _unitOfWork.DevicesRepository.Remove(device);
+                    _unitOfWork.DevicesRepository.Remove(device);
                 }
             }
             await _unitOfWork.CompleteAsync();

@@ -1,6 +1,8 @@
-﻿using QLDT_Becamex.Src.Application.Common.Dtos;
+﻿using MediatR;
+using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Constant;
 using QLDT_Becamex.Src.Domain.Entities;
+using QLDT_Becamex.Src.Domain.Events;
 using QLDT_Becamex.Src.Domain.Interfaces;
 
 namespace QLDT_Becamex.Src.Infrastructure.Services.CourseServices
@@ -8,9 +10,11 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CourseServices
     public class CourseService : ICourseService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public CourseService(IUnitOfWork unitOfWork)
+        private readonly IPublisher _publisher;
+        public CourseService(IUnitOfWork unitOfWork, IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
+            _publisher = publisher;
         }
 
         public void UpdateCourseStatus(Course course)
@@ -141,6 +145,9 @@ namespace QLDT_Becamex.Src.Infrastructure.Services.CourseServices
             {
                 // Nếu tiến độ là 100%, đánh dấu khóa học là hoàn thành
                 userCourse.Status = ConstantStatus.COMPLETED;
+                await _publisher.Publish(new CompletedCourseEvent(
+                    CourseId: courseId
+                ));
             }
             else if (overallProgress > 0.0f && overallProgress < 100.0f)
             {

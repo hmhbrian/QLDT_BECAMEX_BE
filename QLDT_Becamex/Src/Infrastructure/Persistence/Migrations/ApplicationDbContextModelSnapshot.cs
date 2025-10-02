@@ -801,6 +801,11 @@ namespace QLDT_Becamex.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasColumnName("user_id");
 
+                    b.Property<string>("Version")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("version");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");

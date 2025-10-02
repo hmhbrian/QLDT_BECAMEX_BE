@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chứng chỉ Becamex</title>
+    <style>
+        @font-face {
+            font-family: 'Playfair Display';
+            src: url('/fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf') format('truetype');
+            font-weight: 700;
+        }
+
+        @font-face {
+            font-family: 'Dancing Script';
+            src: url('/fonts/DancingScript-SemiBold.ttf') format('woff');
+            font-weight: 600;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src: url('/fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+            font-weight: 400;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(145deg, #ff7e5f, #feb47b);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .certificate-container {
+            background: #ffffff;
+            width: 900px;
+            height: 640px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            border: 3px solid #ff7e5f;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-image: url('https://res.cloudinary.com/df8rbkeib/image/upload/v1754362878/background_LE_upscale_strong_x4_qro0sj.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #ffffff;
+        }
+
+            .certificate-container::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle at 50% 50%, rgba(255, 126, 95, 0.1), transparent 70%);
+                z-index: 1;
+            }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .decorative-accent {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+            .decorative-accent::before,
+            .decorative-accent::after {
+                content: '';
+                position: absolute;
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(45deg, #ff7e5f, #feb47b);
+                opacity: 0.2;
+                border-radius: 10px;
+            }
+
+            .decorative-accent::before {
+                top: 20px;
+                left: 20px;
+                transform: rotate(45deg);
+            }
+
+            .decorative-accent::after {
+                bottom: 20px;
+                right: 20px;
+                transform: rotate(45deg);
+            }
+
+        .header {
+            margin-bottom: 35px;
+        }
+
+        .logo-section img {
+            height: 80px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .company-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #718096;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .certificate-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 44px;
+            font-weight: bold;
+            font-style: italic;
+            margin-top: 20px;
+            color: #E04826;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(224, 72, 38, 0.3);
+            line-height: 1.2;
+        }
+
+        .main-content {
+            margin: 25px 0 30px;
+        }
+
+        .awarded-text,
+        .completion-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 19px;
+            color: #4a5568;
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+            margin: 8px 0;
+        }
+
+        .recipient-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            color: #2d3748;
+            font-weight: bold;
+            font-style: italic;
+            margin: 20px 0;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+            .recipient-name::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50%;
+                height: 4px;
+                background: linear-gradient(90deg, transparent, #ff7e5f, transparent);
+                border-radius: 2px;
+            }
+
+
+        .course-name {
+            font-family: 'Dancing Script', serif;
+            font-size: 30px;
+            color: #ff7e5f;
+            font-weight: bold;
+            font-style: italic;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+            .course-name:hover {
+                transform: scale(1.02);
+            }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: auto;
+            padding: 0 30px;
+        }
+
+        .date-section,
+        .signature-section {
+            text-align: center;
+            flex: 1;
+        }
+
+        .date-label,
+        .signature-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+        }
+
+        .date-value,
+        .signature-line {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            color: #2d3748;
+            border-bottom: 2px solid #feb47b;
+            padding-bottom: 8px;
+            display: inline-block;
+            min-width: 200px;
+            font-weight: 500;
+            font-style: italic;
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+
+            .date-value:hover,
+            .signature-line:hover {
+                border-color: #ff7e5f;
+                color: #ff7e5f;
+            }
+
+        .seal {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 90px;
+            height: 90px;
+            border: 2px solid #ff7e5f;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255, 126, 95, 0.15), rgba(254, 180, 123, 0.15));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            color: #ff7e5f;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            transform: rotate(-10deg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .inner-border {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid rgba(255, 126, 95, 0.3);
+            border-radius: 16px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.03;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+            .watermark img {
+                max-width: 600px;
+            }
+
+
+
+        @media (max-width: 1024px) {
+            .certificate-container {
+                width: 95vw;
+                height: auto;
+                min-height: 600px;
+                padding: 40px 30px;
+            }
+
+            .certificate-title {
+                font-size: 36px;
+            }
+
+            .recipient-name {
+                font-size: 40px;
+            }
+
+            .course-name {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .certificate-container {
+                width: 100%;
+                padding: 30px 20px;
+                border-radius: 15px;
+            }
+
+            .certificate-title {
+                font-size: 28px;
+            }
+
+            .recipient-name {
+                font-size: 32px;
+                margin: 15px 0;
+            }
+
+            .course-name {
+                font-size: 20px;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: 20px;
+                padding: 0 10px;
+            }
+        }
+
+
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .certificate-container {
+                box-shadow: none;
+                border: none;
+                transform: none !important;
+            }
+
+            .inner-border {
+                border: 1px solid #ccc !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="certificate-container">
+        <div class="decorative-accent"></div>
+        <div class="watermark">
+            <img src="https://forbes.vn/wp-content/uploads/2021/08/Becamex_Logo-01.png" alt="Watermark" />
+        </div>
+        <div class="inner-border"></div>
+        <div class="content-wrapper">
+            <div class="header">
+                <div class="logo-section">
+                    <img src="https://forbes.vn/wp-content/uploads/2021/08/Becamex_Logo-01.png" alt="BECAMEX Logo" />
+                    <div class="company-subtitle">Educational Excellence Center</div>
+                </div>
+                <div class="certificate-title">Chứng Nhận Hoàn Thành</div>
+            </div>
+
+            <div class="main-content">
+                <div class="awarded-text">Trao tặng cho</div>
+                <div class="recipient-name" id="username">{{Name}}</div>
+                <div class="completion-text">vì đã hoàn thành khóa học</div>
+                <div class="course-name" id="courseName">{{Course}}</div>
+            </div>
+
+            <div class="footer">
+                <div class="date-section">
+                    <div class="date-label">Ngày cấp</div>
+                    <div class="date-value" id="issueDate">{{Date}}</div>
+                </div>
+                <div class="signature-section">
+                    <div class="signature-label">Chữ ký</div>
+                    <div class="signature-line">Giám đốc đào tạo</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+
+</html> 

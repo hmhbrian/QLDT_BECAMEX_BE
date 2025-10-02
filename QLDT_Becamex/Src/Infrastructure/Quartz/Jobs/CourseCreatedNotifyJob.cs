@@ -49,7 +49,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz.Jobs
             var now = DateTime.UtcNow;
             var dataJson = JsonSerializer.Serialize(data);
 
-            //2)Tạo message
+            // 2) Tạo message
             var msg = new Messages
             {
                 Title = title,

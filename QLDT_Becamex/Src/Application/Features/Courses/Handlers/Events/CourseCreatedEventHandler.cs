@@ -18,6 +18,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers.Events
                 .UsingJobData("CourseId", e.CourseId.ToString())
                 .UsingJobData("DepartmentIds", string.Join(",", e.DepartmentIds ?? Array.Empty<string>()))
                 .UsingJobData("Levels", string.Join(",", e.Levels ?? Array.Empty<string>()))
+                .UsingJobData("MandatoryUserIds", string.Join(",", e.MandatoryUserIds ?? Array.Empty<string>()))
                 .Build();
 
             var trigger = TriggerBuilder.Create()

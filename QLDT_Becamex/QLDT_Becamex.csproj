@@ -39,6 +39,7 @@
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.15.0" />
     <PackageReference Include="Select.HtmlToPdf.NetCore" Version="25.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="TimeZoneConverter" Version="7.0.0" />
     <PackageReference Include="Xceed.Words.NET" Version="5.0.25228.6154" />
     <PackageReference Include="xunit" Version="2.9.3" />
   </ItemGroup>

@@ -30,6 +30,7 @@ using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
 using QLDT_Becamex.Src.Infrastructure.Services.CourseServices;
 using QLDT_Becamex.Src.Infrastructure.Services.DepartmentServices;
 using QLDT_Becamex.Src.Infrastructure.Services.JwtServices;
+using QLDT_Becamex.Src.Infrastructure.Services.NotificationService;
 using QLDT_Becamex.Src.Infrastructure.Services.UserServices;
 using Quartz;
 using System.Text;
@@ -167,8 +168,11 @@ builder.Services.AddScoped<IAuditLogMapper, AuditLogMapper>();
 builder.Services.AddHostedService<CourseStatusUpdateBackgroundService>();
 
 // Notifications
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationComposer, NotificationComposer>();
 builder.Services.AddScoped<IRecipientResolver, RecipientResolver>();
+builder.Services.AddScoped<IReviewReminderComposer, ReviewReminderComposer>();
+
 
 // FCM
 builder.Services.AddFcm(builder.Configuration);
@@ -176,7 +180,6 @@ builder.Services.AddScoped<IFcmSender, FcmSender>();
 
 // Quartz
 builder.Services.AddQuartzJobs();
-
 builder.Services.AddHttpContextAccessor();
 
 
@@ -216,7 +219,6 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
 
 // --- Cấu hình HTTP Request Pipeline (Middleware) ---
 // Thứ tự của các middleware rất quan trọng.

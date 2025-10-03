@@ -40,6 +40,7 @@ namespace QLDT_Becamex.Src.Application.Features.Notifications.Services
                 (
                     predicate: d => userIds.Contains(d.User.Id)
                 )).ToList();
+
             return devices.Select(x => (x.Id, x.DeviceToken!)).ToList();
         }
     }

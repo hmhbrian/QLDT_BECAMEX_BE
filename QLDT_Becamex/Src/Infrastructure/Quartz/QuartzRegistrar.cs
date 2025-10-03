@@ -1,4 +1,6 @@
-﻿using Quartz;
+﻿using QLDT_Becamex.Src.Infrastructure.Quartz.Jobs;
+using Quartz;
+using TimeZoneConverter;
 
 namespace QLDT_Becamex.Src.Infrastructure.Quartz
 {
@@ -8,10 +10,19 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz
         {
             services.AddQuartz(q =>
             {
-                // Với Quartz >= 3.3.x, job factory mặc định đã scoped (có thể không cần gọi UseMicrosoftDependencyInjectionJobFactory)
-                // q.UseMicrosoftDependencyInjectionJobFactory(); // nếu muốn giữ như các ví dụ quen thuộc
+                //Đăng ký ReviewReminderJob
+                var tz = TZConvert.GetTimeZoneInfo("Asia/Ho_Chi_Minh");
 
-                // (Tuỳ chọn) add job keys dùng lại; ở đây mình schedule động nên không cần add sẵn.
+                var reviewJobKey = new JobKey("ReviewReminderJob");
+                q.AddJob<ReviewReminderJob>(opts => opts.WithIdentity(reviewJobKey));
+
+                q.AddTrigger(t => t
+                    .ForJob(reviewJobKey)
+                    .WithIdentity("ReviewReminderJob-Trigger")
+                    .WithCronSchedule("0 0 9 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
+                );
+
+                // Nếu có job khác, add tiếp ở đây
             });
 
             services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);

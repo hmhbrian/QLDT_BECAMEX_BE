@@ -1200,6 +1200,10 @@ namespace QLDT_Becamex.Src.Infrastructure.Persistence // Ví dụ: bạn có th�
                     .HasMaxLength(100)
                     .HasColumnName("platform");
 
+                entity.Property(e => e.Version)
+                    .HasMaxLength(50)
+                    .HasColumnName("version");
+
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at");
             });

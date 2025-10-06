@@ -22,6 +22,23 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz
                     .WithCronSchedule("0 0 8 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
                 );
 
+                var startingJobKey = new JobKey("CourseStartingNotifyJob");
+                q.AddJob<CourseStartingNotifyJob>(opts => opts.WithIdentity(startingJobKey));
+
+                q.AddTrigger(t => t
+                    .ForJob(startingJobKey)
+                    .WithIdentity("CourseStartingNotifyJob-Trigger")
+                    .WithCronSchedule("0 19 10 * * ?", x => x.InTimeZone(tz))
+                );
+
+                var endingJobKey = new JobKey("CourseEndingNotifyJob");
+                q.AddJob<CourseEndingNotifyJob>(opts => opts.WithIdentity(endingJobKey));
+                
+                q.AddTrigger(t => t
+                    .ForJob(endingJobKey)
+                    .WithIdentity("CourseEndingNotifyJob-Trigger")
+                    .WithCronSchedule("0 0 9 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
+                );
                 // Nếu có job khác, add tiếp ở đây
             });
 

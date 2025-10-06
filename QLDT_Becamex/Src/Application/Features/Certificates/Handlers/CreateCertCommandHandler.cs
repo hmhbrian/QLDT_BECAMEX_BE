@@ -1,9 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Security.Policy;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using QLDT_Becamex.Src.Application.Common.Dtos;
 using QLDT_Becamex.Src.Application.Features.Certificates.Commands;
+using QLDT_Becamex.Src.Domain.Events;
 using QLDT_Becamex.Src.Domain.Interfaces;
 using QLDT_Becamex.Src.Infrastructure.Services;
 using QLDT_Becamex.Src.Infrastructure.Services.CloudinaryServices;
@@ -31,7 +33,6 @@ namespace QLDT_Becamex.Src.Application.Features.Certificates.Handlers
             _mediator = mediator;
             _env = env;
             _cloudinaryService = cloudinaryService;
-
         }
 
         public async Task<string> Handle(CreateCertCommand request, CancellationToken cancellationToken)

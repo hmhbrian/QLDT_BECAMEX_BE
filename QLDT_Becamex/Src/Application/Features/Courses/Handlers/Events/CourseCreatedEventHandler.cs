@@ -11,6 +11,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers.Events
 
         public async Task Handle(CourseCreatedEvent e, CancellationToken ct)
         {
+            Console.WriteLine($"[Event] CourseCreatedEvent for course {e.CourseId}");
             var scheduler = await _schedulerFactory.GetScheduler(ct);
 
             var job = JobBuilder.Create<Infrastructure.Quartz.Jobs.CourseCreatedNotifyJob>()

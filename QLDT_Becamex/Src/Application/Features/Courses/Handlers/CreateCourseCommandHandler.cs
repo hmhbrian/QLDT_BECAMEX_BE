@@ -173,6 +173,17 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 MandatoryUserIds: (dto.UserIds ?? Enumerable.Empty<string>()).Select(x => x.ToString()).ToArray(),
                 CreatedBy: currentUserId
             ));
+
+            await _publisher.Publish(new CourseStartingEvent(
+                CourseId: course.Id,
+                startDate: course.StartDate
+            ));
+
+            await _publisher.Publish(new CourseEndingEvent(
+                CourseId: course.Id,
+                endDate: course.EndDate
+            ));
+
             return course.Id;
         }
     }

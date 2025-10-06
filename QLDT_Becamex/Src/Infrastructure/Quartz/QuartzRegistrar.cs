@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz
                 q.AddTrigger(t => t
                     .ForJob(reviewJobKey)
                     .WithIdentity("ReviewReminderJob-Trigger")
-                    .WithCronSchedule("0 0 9 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
+                    .WithCronSchedule("0 0 8 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
                 );
 
                 // Nếu có job khác, add tiếp ở đây

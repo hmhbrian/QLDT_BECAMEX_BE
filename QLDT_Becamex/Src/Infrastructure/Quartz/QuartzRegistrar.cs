@@ -19,7 +19,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz
                 q.AddTrigger(t => t
                     .ForJob(reviewJobKey)
                     .WithIdentity("ReviewReminderJob-Trigger")
-                    .WithCronSchedule("0 47 13 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
+                    .WithCronSchedule("0 0 8 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
                 );
 
                 var startingJobKey = new JobKey("CourseStartingNotifyJob");
@@ -28,7 +28,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz
                 q.AddTrigger(t => t
                     .ForJob(startingJobKey)
                     .WithIdentity("CourseStartingNotifyJob-Trigger")
-                    .WithCronSchedule("0 08 13 * * ?", x => x.InTimeZone(tz))
+                    .WithCronSchedule("0 00 8 * * ?", x => x.InTimeZone(tz))
                 );
 
                 var endingJobKey = new JobKey("CourseEndingNotifyJob");
@@ -37,7 +37,7 @@ namespace QLDT_Becamex.Src.Infrastructure.Quartz
                 q.AddTrigger(t => t
                     .ForJob(endingJobKey)
                     .WithIdentity("CourseEndingNotifyJob-Trigger")
-                    .WithCronSchedule("0 08 13 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
+                    .WithCronSchedule("0 00 8 * * ?", x => x.InTimeZone(tz)) // 8h sáng hằng ngày
                 );
                 // Nếu có job khác, add tiếp ở đây
             });

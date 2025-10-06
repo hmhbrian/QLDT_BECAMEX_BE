@@ -170,6 +170,7 @@ namespace QLDT_Becamex.Src.Application.Features.Courses.Handlers
                 CourseId: course.Id,
                 DepartmentIds: (dto.DepartmentIds ?? Enumerable.Empty<int>()).Select(x => x.ToString()).ToArray(),
                 Levels: (dto.ELevelIds ?? Enumerable.Empty<int>()).Select(x => x.ToString()).ToArray(),
+                MandatoryUserIds: (dto.UserIds ?? Enumerable.Empty<string>()).Select(x => x.ToString()).ToArray(),
                 CreatedBy: currentUserId
             ));
 

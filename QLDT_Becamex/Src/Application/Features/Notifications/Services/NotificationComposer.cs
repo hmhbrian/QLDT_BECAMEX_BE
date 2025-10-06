@@ -13,14 +13,30 @@ namespace QLDT_Becamex.Src.Application.Features.Notifications.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<(string Title, string Body, Dictionary<string, string> Data)> CourseCreatedAsync(string courseId, CancellationToken ct)
+        public async Task<(string Title, string Body, Dictionary<string, string> Data)> CourseCreated_GeneralAsync(string courseId, CancellationToken ct)
         {
             var c = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
                 predicate: c => c.Id == courseId
             );
 
             var title = "Khóa học mới";
-            var body = $"[{c.Code}] {c.Name}";
+            var body = $"Có khóa học mới [{c.Code}] {c.Name}! Hãy đăng ký để có thể học.";
+            var data = new Dictionary<string, string>
+            {
+                ["type"] = "CourseDetail",
+                ["courseId"] = c.Id.ToString()
+            };
+            return (title, body, data);
+        }
+
+        public async Task<(string, string, Dictionary<string, string>)> CourseCreated_MandatoryAsync(string courseId, CancellationToken ct)
+        {
+            var c = await _unitOfWork.CourseRepository.GetFirstOrDefaultAsync(
+                predicate: c => c.Id == courseId
+            );
+
+            var title = "Khóa học bắt buộc";
+            var body = $"Bạn được yêu cầu tham gia: [{c.Code}] {c.Name}";
             var data = new Dictionary<string, string>
             {
                 ["type"] = "CourseDetail",
@@ -68,8 +84,7 @@ namespace QLDT_Becamex.Src.Application.Features.Notifications.Services
             var body = $"[{c.Code}] {c.Name} đã hoàn thành vào ngày {c.EndDate:dd/MM/yyyy}";
             var data = new Dictionary<string, string>
             {
-                ["type"] = "CourseDetail",
-                ["courseId"] = c.Id.ToString()
+                ["type"] = "Certificate",
             };
             return (title, body, data);
         }

@@ -84,12 +84,12 @@ namespace QLDT_Becamex.Src.Controllers
         /// <returns>ActionResult chứa kết quả của thao tác cập nhật.</returns>
         [HttpPut("update")]
         [Authorize]
-        public async Task<IActionResult> UpdateUserByUser([FromForm] UserUserUpdateDto rq, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateUserByUser([FromForm] CreateUserUserUpdate rq, CancellationToken cancellationToken)
         {
 
 
             var result = await _mediator.Send(new UpdateUserByUserCommand(rq), cancellationToken);
-            return Ok(ApiResponse.Ok("Cập nhật thành công")); // Bao kết quả tại đây
+            return Ok(ApiResponse<UserUserUpdateDto>.Ok(result, "Cập nhật thành công")); // Bao kết quả tại đây
         }
 
         /// <summary>

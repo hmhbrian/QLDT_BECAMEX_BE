@@ -99,28 +99,31 @@ builder.Services.AddAuthorization(); // Đăng ký dịch vụ ủy quyền
 builder.Services.AddHttpContextAccessor(); // <-- Đã thêm
 
 // Add Cors dành cho môi trường dev khác domain
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000") // Chỉ cho phép frontend này
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // Nếu có sử dụng cookie, session
-    });
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowSpecificOrigin", policy =>
+//    {
+//        policy
+//            .AllowAnyOrigin()
+//            .AllowAnyMethod()
+//            .AllowAnyHeader();
+//    });
+//});
 
 // Add Cors dành cho môi trường dev khác domain
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // Chỉ cho phép frontend này
+        policy.WithOrigins(
+            "http://localhost:3000"
+        )
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials(); // Nếu có sử dụng cookie, session
     });
 });
+
 
 // 5. Cấu hình AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
